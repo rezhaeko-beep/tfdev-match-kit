@@ -223,13 +223,19 @@ Kembalikan ringkasan singkat (utamakan perilaku detail) lalu JSON schema di atas
       }
     };
 
-    const [sys, full] = await Promise.all([
+    // Prefer Tim Analis v2; fallback to v1 then embedded
+    const [sys2, full2, sys1, full1] = await Promise.all([
+      tryFetch("prompts/system-prompt-analitik-v2.txt"),
+      tryFetch("prompts/prompt-analitik-tfdev-v2.md"),
       tryFetch("prompts/system-prompt-analitik.txt"),
       tryFetch("prompts/prompt-analitik-tfdev.md")
     ]);
 
-    if (sys && sys.trim()) systemPrompt = sys.trim();
-    if (full && full.trim()) promptText = full.trim();
+    const sys = (sys2 && sys2.trim()) || (sys1 && sys1.trim()) || "";
+    const full = (full2 && full2.trim()) || (full1 && full1.trim()) || "";
+
+    if (sys) systemPrompt = sys;
+    if (full) promptText = full;
     else promptText = SYSTEM_PROMPT_FALLBACK + "\n\n---\n\n" + FULL_PROMPT_EMBEDDED;
 
     const mode = document.querySelector('input[name="genPromptMode"]:checked');
@@ -238,7 +244,8 @@ Kembalikan ringkasan singkat (utamakan perilaku detail) lalu JSON schema di atas
 
     const badge = document.getElementById("genPromptSource");
     if (badge) {
-      badge.textContent = full ? "Loaded from prompts/" : "Embedded fallback";
+      const src = full2 ? "prompts/ v2" : full1 ? "prompts/ v1" : "Embedded fallback";
+      badge.textContent = "Loaded from " + src;
       badge.className = "pill" + (full ? " orange" : "");
     }
   }

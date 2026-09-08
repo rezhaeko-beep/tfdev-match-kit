@@ -339,17 +339,32 @@
     const wasPaused = v.paused;
     v.pause();
 
+    // Bias: spread + final-third + late transitions (Tim Analis v2), not only evenly spaced
     const times = [];
-    // always include near start
-    times.push(0.5);
-    for (let t = every; t < v.duration - 0.5 && times.length < maxN; t += every) {
-      times.push(t);
+    const dur = v.duration;
+    const near = (a, b) => Math.abs(a - b) < Math.max(2, every * 0.35);
+    const pushT = (t) => {
+      const x = Math.max(0.4, Math.min(dur - 0.5, t));
+      if (!times.some((y) => near(y, x))) times.push(x);
+    };
+    pushT(0.5);
+    // ~40% slots evenly across full match
+    const evenSlots = Math.max(2, Math.floor(maxN * 0.4));
+    for (let i = 1; i <= evenSlots; i++) {
+      pushT((dur * i) / (evenSlots + 1));
     }
-    // ensure last moment if room
-    if (times.length < maxN && v.duration > 1) {
-      const last = Math.max(0.5, v.duration - 0.8);
-      if (!times.some((x) => Math.abs(x - last) < every * 0.4)) times.push(last);
+    // ~40% slots in final third of video (decisive phase)
+    const lateSlots = Math.max(2, Math.floor(maxN * 0.4));
+    const late0 = dur * (2 / 3);
+    for (let i = 0; i < lateSlots; i++) {
+      pushT(late0 + ((dur - late0 - 0.8) * (i + 0.5)) / lateSlots);
     }
+    // transition-ish anchors: mid → late, and near end
+    pushT(dur * 0.5);
+    pushT(dur * 0.72);
+    pushT(dur * 0.88);
+    pushT(Math.max(0.5, dur - 0.8));
+    times.sort((a, b) => a - b);
     const unique = times.slice(0, maxN);
 
     setStatus("Mengambil " + unique.length + " sample frame…", true);
