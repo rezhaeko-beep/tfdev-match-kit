@@ -805,6 +805,75 @@ Scan sebelum terima bola</textarea></div>
         <div id="finRecentPayments"></div>
         <p class="rumus-hint" style="margin-top:12px">Rumus: remaining = max(0, amount − Σ payments) · status auto lunas/sebagian/overdue · IDR berpemisah ribuan.</p>
       </div>
+
+      <!-- AI Finance Analytics -->
+      <div class="card fai-section" id="faiSection" style="margin-top:16px">
+        <div class="fai-head">
+          <div>
+            <div class="eyebrow" style="margin-bottom:4px">AI · Analytics</div>
+            <h3 style="margin:0">AI Finance Analytics</h3>
+            <p class="fai-sub">Insight lokal dari member / invoice / payment · opsional LLM via kunci Analitik</p>
+          </div>
+          <div class="btn-row" style="margin:0">
+            <button type="button" class="btn btn-ghost btn-sm" id="faiCopyReportBtn">Salin laporan singkat</button>
+            <button type="button" class="btn btn-sm" id="faiGenerateBtn">Generate insight</button>
+          </div>
+        </div>
+
+        <div class="grid grid-3 fai-mini-kpi">
+          <div class="stat-tile fai-tile">
+            <div class="n" id="faiCollectionRate">0%</div>
+            <div class="l">Collection rate MTD</div>
+            <div class="rumus-hint" id="faiCollectionSub">—</div>
+          </div>
+          <div class="stat-tile fai-tile">
+            <div class="n" id="faiMom">0%</div>
+            <div class="l">MoM pembayaran</div>
+            <div class="rumus-hint" id="faiMomSub">—</div>
+          </div>
+          <div class="stat-tile fai-tile">
+            <div class="n" id="faiForecast" style="font-size:18px">Rp 0</div>
+            <div class="l">Forecast akhir bulan</div>
+            <div class="rumus-hint" id="faiForecastSub">—</div>
+          </div>
+        </div>
+
+        <div class="fai-grid">
+          <div class="fai-panel">
+            <h4>Aging piutang overdue</h4>
+            <div id="faiAging"></div>
+          </div>
+          <div class="fai-panel">
+            <h4>Antrian aksi</h4>
+            <div id="faiActions" class="fai-actions"></div>
+          </div>
+        </div>
+
+        <div class="fai-panel" style="margin-top:14px">
+          <h4>Top debtor</h4>
+          <div id="faiDebtors" class="fai-debtors"></div>
+        </div>
+
+        <div class="fai-grid" style="margin-top:14px">
+          <div class="fai-panel">
+            <h4>Mix paket</h4>
+            <div id="faiPkgMix"></div>
+          </div>
+          <div class="fai-panel">
+            <h4>Flag risiko / churn</h4>
+            <div id="faiRisks"></div>
+          </div>
+        </div>
+
+        <div class="fai-panel fai-insight-panel" style="margin-top:14px">
+          <div class="fai-insight-head">
+            <h4 style="margin:0">Insight AI</h4>
+            <span class="rumus-hint" id="faiInsightStatus"></span>
+          </div>
+          <p class="rumus-hint" id="faiKeyHint" style="margin:6px 0 10px"></p>
+          <div id="faiInsightBody" class="fai-insight-body" data-mode="rule"></div>
+        </div>
+      </div>
     </section>
 
     <!-- ========== CLUB · MEMBERS ========== -->
@@ -1081,6 +1150,7 @@ Scan sebelum terima bola</textarea></div>
   <script src="js/player.js"></script>
   <script src="js/club-store.js"></script>
   <script src="js/club.js"></script>
+  <script src="js/finance-ai.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

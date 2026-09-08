@@ -1200,3 +1200,210 @@ code {
 @media (max-width: 720px) {
   .ux-steps { grid-template-columns: 1fr; }
 }
+
+/* ========== Finance AI Analytics ========== */
+.fai-section { border-color: rgba(255, 107, 26, 0.28); }
+.fai-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.fai-sub {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+.fai-mini-kpi { margin: 4px 0 16px; gap: 10px; }
+.fai-tile { min-height: 92px; }
+.fai-tile .n.fai-up { color: #86efac; }
+.fai-tile .n.fai-down { color: #fca5a5; }
+.fai-tile .n.fai-flat { color: var(--orange); }
+
+.fai-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.fai-panel {
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border-soft);
+  background: #0b1017;
+}
+.fai-panel h4 {
+  margin: 0 0 10px;
+  font-size: 13px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: #9fb3c8;
+}
+.fai-empty {
+  color: var(--muted);
+  font-size: 13px;
+  padding: 8px 0;
+}
+
+.fai-aging-row,
+.fai-mix-row {
+  display: grid;
+  grid-template-columns: 88px 1fr auto;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.fai-aging-label,
+.fai-mix-name {
+  font-size: 12px;
+  color: #c9d7e6;
+  font-weight: 700;
+}
+.fai-aging-bar-wrap,
+.fai-mix-bar-wrap {
+  height: 8px;
+  border-radius: 999px;
+  background: #151c27;
+  overflow: hidden;
+}
+.fai-aging-bar {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #FF6B1A, #ff9a4d);
+  min-width: 2px;
+}
+.fai-mix-bar {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(255, 107, 26, 0.85), rgba(59, 130, 246, 0.7));
+  min-width: 2px;
+}
+.fai-aging-meta {
+  text-align: right;
+  font-size: 11px;
+  color: var(--muted);
+  min-width: 96px;
+}
+.fai-aging-meta strong {
+  display: block;
+  color: #fff;
+  font-size: 12px;
+}
+.fai-mix-pct {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--orange);
+  white-space: nowrap;
+}
+.fai-mix-pct span { color: var(--muted); font-weight: 600; }
+
+.fai-actions { display: grid; gap: 8px; }
+.fai-action-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border-soft);
+  background: #0f1520;
+  font-size: 13px;
+  color: #e5eef7;
+  cursor: pointer;
+}
+.fai-action-item input { margin-top: 2px; accent-color: #FF6B1A; }
+.fai-action-item:has(input:checked) {
+  opacity: 0.55;
+  text-decoration: line-through;
+}
+
+.fai-debtors {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+}
+.fai-debtor-card {
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  background: linear-gradient(160deg, rgba(239, 68, 68, 0.08), #0b1017 55%);
+}
+.fai-debtor-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.fai-debtor-top strong { font-size: 14px; color: #fff; }
+.fai-debtor-amt {
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--orange);
+  margin-bottom: 4px;
+}
+.fai-debtor-meta {
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+.fai-debtor-meta .muted { color: var(--muted); }
+
+.fai-risk-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+.fai-risk-row:last-child { border-bottom: 0; }
+.fai-risk-row .meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+.fai-insight-panel {
+  border-color: rgba(255, 107, 26, 0.35);
+  background: linear-gradient(165deg, rgba(255, 107, 26, 0.07), #0b1017 40%);
+}
+.fai-insight-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.fai-insight-body { font-size: 13.5px; color: #d7e3ef; line-height: 1.5; }
+.fai-insight-title {
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 8px;
+}
+.fai-insight-tip {
+  margin-top: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(255, 107, 26, 0.1);
+  border: 1px solid rgba(255, 107, 26, 0.25);
+  color: var(--orange-soft, #ffb07a);
+  font-size: 12.5px;
+}
+.fai-insight-list {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 6px;
+}
+.fai-insight-list li { color: #d7e3ef; }
+
+@media (max-width: 900px) {
+  .fai-grid { grid-template-columns: 1fr; }
+  .fai-mini-kpi.grid-3 { grid-template-columns: 1fr; }
+}
+@media (max-width: 720px) {
+  .fai-aging-row,
+  .fai-mix-row {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+  .fai-aging-meta { text-align: left; }
+  .fai-head .btn-row { width: 100%; }
+}

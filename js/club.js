@@ -33,26 +33,31 @@
     set("finPiutang", idr(d.piutangOutstanding));
 
     const list = document.getElementById("finRecentPayments");
-    if (!list) return;
-    if (!d.recentPayments.length) {
-      list.innerHTML = '<div class="empty-state">Belum ada pembayaran.</div>';
-      return;
+    if (list) {
+      if (!d.recentPayments.length) {
+        list.innerHTML = '<div class="empty-state">Belum ada pembayaran.</div>';
+      } else {
+        list.innerHTML = d.recentPayments.map(function (p) {
+          return (
+            '<div class="club-row">' +
+              '<div class="club-row-main">' +
+                "<strong>" + esc(p.memberName) + "</strong>" +
+                '<div class="meta">' + esc(p.invoiceNote) + " · " + esc(p.method) +
+                  (p.proofNote ? " · " + esc(p.proofNote) : "") + "</div>" +
+              "</div>" +
+              '<div class="club-row-side">' +
+                "<strong>" + idr(p.amount) + "</strong>" +
+                '<div class="meta">' + esc(p.date) + "</div>" +
+              "</div>" +
+            "</div>"
+          );
+        }).join("");
+      }
     }
-    list.innerHTML = d.recentPayments.map(function (p) {
-      return (
-        '<div class="club-row">' +
-          '<div class="club-row-main">' +
-            "<strong>" + esc(p.memberName) + "</strong>" +
-            '<div class="meta">' + esc(p.invoiceNote) + " · " + esc(p.method) +
-              (p.proofNote ? " · " + esc(p.proofNote) : "") + "</div>" +
-          "</div>" +
-          '<div class="club-row-side">' +
-            "<strong>" + idr(p.amount) + "</strong>" +
-            '<div class="meta">' + esc(p.date) + "</div>" +
-          "</div>" +
-        "</div>"
-      );
-    }).join("");
+
+    if (window.FinanceAI && typeof window.FinanceAI.refresh === "function") {
+      window.FinanceAI.refresh();
+    }
   }
 
   /* ---------- Members ---------- */
