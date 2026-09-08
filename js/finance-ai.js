@@ -778,7 +778,7 @@
       var payload = compactForLlm(snap);
       var system =
         "Kamu asisten finance untuk akademi sepak bola TFDEV Soccer (Indonesia). " +
-        "Berikan 5–8 bullet insight singkat Bahasa Indonesia untuk Sacha (admin finance). " +
+        "Berikan 5–8 bullet insight singkat Bahasa Indonesia untuk admin finance club. " +
         "Fokus aksi: penagihan, aging, convert trial, forecast. " +
         "Jangan sebutkan data PII lengkap — hanya first name / agregat. " +
         "Format: bullet points saja, tanpa pembuka panjang.";

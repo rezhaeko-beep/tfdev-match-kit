@@ -86,9 +86,9 @@
     return simpleWaForInvoice(inv, mem);
   }
 
-  function renderSachaToday() {
-    var list = document.getElementById("sachaChecklist");
-    var sub = document.getElementById("sachaTodaySub");
+  function renderFinToday() {
+    var list = document.getElementById("finChecklist");
+    var sub = document.getElementById("finTodaySub");
     if (!list) return;
     var items = [];
     var d = ClubStore.getDashboard();
@@ -200,7 +200,7 @@
     var rep = FinanceAI.buildReport();
     showFinanceReport(rep);
     if (typeof FinanceAI.refresh === "function") FinanceAI.refresh();
-    renderSachaToday();
+    renderFinToday();
     window.TFDEV.toast("Laporan keuangan siap · salin atau unduh");
   }
 
@@ -242,7 +242,7 @@
       window.FinanceAI.refresh();
     }
     renderFinanceOverdue();
-    renderSachaToday();
+    renderFinToday();
   }
 
   /* ---------- Members ---------- */
@@ -789,18 +789,18 @@
     const payDate = document.getElementById("payDate");
     if (payDate && !payDate.value) payDate.value = ClubStore.todayISO();
 
-    // Sacha · Hari ini CTAs
-    const sachaPay = document.getElementById("sachaCatatBayar");
-    if (sachaPay) sachaPay.addEventListener("click", function () { goPaymentsFocus(); });
-    const sachaInv = document.getElementById("sachaBuatTagihan");
-    if (sachaInv) sachaInv.addEventListener("click", goInvoicesCreate);
-    const sachaOd = document.getElementById("sachaFollowOverdue");
-    if (sachaOd) sachaOd.addEventListener("click", function () {
+    // Finance · Hari ini CTAs
+    const finPay = document.getElementById("finCatatBayar");
+    if (finPay) finPay.addEventListener("click", function () { goPaymentsFocus(); });
+    const finInv = document.getElementById("finBuatTagihan");
+    if (finInv) finInv.addEventListener("click", goInvoicesCreate);
+    const finOd = document.getElementById("finFollowOverdue");
+    if (finOd) finOd.addEventListener("click", function () {
       var el = document.getElementById("finOverdueCard");
       if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
     });
-    const sachaRep = document.getElementById("sachaBuatLaporan");
-    if (sachaRep) sachaRep.addEventListener("click", generateFinanceReport);
+    const finRep = document.getElementById("finBuatLaporan");
+    if (finRep) finRep.addEventListener("click", generateFinanceReport);
 
     const repCopy = document.getElementById("finReportCopyBtn");
     if (repCopy) repCopy.addEventListener("click", function () {
