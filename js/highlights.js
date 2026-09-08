@@ -87,6 +87,14 @@
     }));
     store.lastKey = key;
     saveStore(store);
+    notifyCoachAnalytics();
+  }
+  function notifyCoachAnalytics() {
+    try {
+      if (window.TFDEV && window.TFDEV.coachAnalytics && typeof window.TFDEV.coachAnalytics.recompute === "function") {
+        window.TFDEV.coachAnalytics.recompute({ highlights: highlights.slice() });
+      }
+    } catch (_) {}
   }
   function loadForCurrentVideo() {
     const store = loadStore();
@@ -896,8 +904,29 @@
         });
       });
     }
+    if ($("hlApplyMatchCentre")) {
+      $("hlApplyMatchCentre").addEventListener("click", () => {
+        try {
+          if (!window.TFDEV || !window.TFDEV.coachAnalytics) {
+            setStatus("coachAnalytics belum siap.", false);
+            return;
+          }
+          const summary = window.TFDEV.coachAnalytics.applyToMatchCentre({
+            highlights: highlights.slice(),
+            navigate: true
+          });
+          setStatus(
+            "Match Centre diisi dari " + (summary && summary.clipCount != null ? summary.clipCount : highlights.length) + " clips.",
+            true
+          );
+        } catch (e) {
+          setStatus("Gagal isi Match Centre: " + e.message, false);
+        }
+      });
+    }
     // Auto-show match seed on first open (demo key)
     loadForCurrentVideo();
     updateBadge();
+    notifyCoachAnalytics();
   };
 })();

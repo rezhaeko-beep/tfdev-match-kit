@@ -1314,14 +1314,155 @@
   function syncFullAutoBanner() {
     const banner = $("anFullAutoBanner");
     if (!banner) return;
-    const show = hasApiKey();
-    banner.hidden = !show;
-    if (show) {
-      // highlight API path when key present
-      const adv = $("anAdvancedBlock");
-      // keep advanced collapsed by default; banner is enough
-      void adv;
+    banner.hidden = false;
+    const ready = hasApiKey();
+    const title = $("anFullAutoTitle");
+    const hint = $("anFullAutoHint");
+    if (title) {
+      title.textContent = ready
+        ? "API key terdeteksi · Full auto siap"
+        : "Full auto · Gemini Vision";
     }
+    if (hint) {
+      hint.textContent = ready
+        ? "Jalankan Full auto: sample frame → Vision → terapkan modul."
+        : "Paste key Gemini di Lanjutan (AIza… / AQ.…, model gemini-3.6-flash), atau Pakai demo JSON tanpa API.";
+    }
+  }
+
+  /** Built-in demo so Pramu can see end-to-end without an API key (beats rival offline demo). */
+  function getDemoAnalitikPayload() {
+    return {
+      matchCentre: {
+        meta: {
+          title: "TFS VS G8 Babak 1",
+          sourceFile: "demo-json-tanpa-api",
+          dateStamp: "01/02/2024"
+        },
+        teams: { home: { name: "TFS" }, away: { name: "G8" } },
+        score: {
+          home: 0,
+          away: 0,
+          note: "Demo offline · skor dari clip seed (bukan GPS)."
+        },
+        possession: { homePct: 54, awayPct: 46 },
+        stats: {
+          attackingSequences: { home: 4, away: 3, estimated: true },
+          shotsOnTarget: { home: "N/C", away: "N/C" },
+          cards: { home: 0, away: 0 }
+        },
+        internalNotes: [
+          "Demo JSON tanpa API — Match Centre + behaviorInsights + highlights.",
+          "Ganti dengan Full auto Gemini bila punya key AI Studio."
+        ]
+      },
+      behaviorInsights: {
+        teamMood: "Kompak, sabar di build-up; game state 0-0 dijaga sampai akhir babak.",
+        keyBehaviors: [
+          {
+            t: 90,
+            playerNo: "7",
+            tag: "press_support",
+            note: "Intensitas pressing & support di jalur serangan.",
+            valence: "positive"
+          },
+          {
+            t: 150,
+            playerNo: "10",
+            tag: "first_touch",
+            note: "Kontrol + turn di zona tengah — bagus untuk cerita ortu.",
+            valence: "positive"
+          },
+          {
+            t: 510,
+            playerNo: "",
+            tag: "rest_defense",
+            note: "Rest defense saat loss of possession — coaching cue kuat.",
+            valence: "challenge"
+          }
+        ],
+        parentStory:
+          "Di Babak 1 vs G8, anak terlihat terlibat di transisi dan duel tengah. Belum ada gol, tapi keputusan di bawah tekanan dan keberanian 1v1 sudah muncul di clip. Cocok dibahas bareng ortu tanpa menunggu Vision API.",
+        coachCues: [
+          "Jaga jarak antar lini di build-up awal.",
+          "Counter-press 3 detik pertama setelah lose ball.",
+          "Finishing di half-space jadi fokus latihan berikutnya."
+        ]
+      },
+      parentReports: [
+        {
+          player: {
+            name: "Rafi Pratama",
+            number: "7",
+            position: "Winger",
+            ageGroup: "U12",
+            sessionDate: "01/02/2024"
+          },
+          sessionSummary:
+            "Sesi solid: terlibat di peluang & skill, menjaga game state 0-0. Cerita fokus ke perilaku, bukan hanya skor.",
+          strengths: ["Pressing support", "Change of pace 1v1"],
+          focusAreas: [
+            { title: "Finishing", desc: "Keputusan akhir di sepertiga akhir" },
+            { title: "Rest defense", desc: "Jaga jarak antar lini setelah lose ball" }
+          ],
+          coach: { name: "Coach Pramu", note: "Demo tanpa API — ganti dengan Full auto Gemini bila ada key." },
+          overallScore: "7.5",
+          scoreLabel: "BABAK 1"
+        }
+      ],
+      highlights: [
+        {
+          t: 90,
+          type: "CHANCE",
+          team: "TFS",
+          playerNo: "7",
+          title: "Serangan sisi / peluang transisi",
+          note: "Demo highlight dari paket tanpa API.",
+          rating: 4
+        },
+        {
+          t: 396,
+          type: "SKILL",
+          team: "TFS",
+          playerNo: "7",
+          title: "1v1 / change of pace",
+          note: "Clip ortu demo.",
+          rating: 5
+        },
+        {
+          t: 510,
+          type: "COACHING",
+          team: "TFS",
+          playerNo: "",
+          title: "Rest defense saat loss of possession",
+          note: "Poin coaching demo.",
+          rating: 4
+        }
+      ]
+    };
+  }
+
+  function loadDemoJson(opts) {
+    opts = opts || {};
+    const data = getDemoAnalitikPayload();
+    lastResult = data;
+    const pretty = JSON.stringify(data, null, 2);
+    if ($("anJsonOut")) $("anJsonOut").value = pretty;
+    renderBehaviorPanel(data.behaviorInsights || null);
+    setWizardStep(3);
+    setStatus("Demo JSON dimuat (tanpa API). Terapkan ke Match Centre / semua modul.", true);
+    if (opts.apply) {
+      try {
+        applyAll({ navigate: !!opts.navigate });
+        setStatus("Demo diterapkan ke modul · tanpa API key.", true);
+        window.TFDEV.toast && window.TFDEV.toast("Demo JSON diterapkan");
+      } catch (e) {
+        setStatus("Demo dimuat; apply gagal: " + e.message, false);
+      }
+    } else {
+      window.TFDEV.toast && window.TFDEV.toast("Demo JSON siap");
+    }
+    return data;
   }
 
   function setWizardStep(step) {
@@ -1378,6 +1519,16 @@
       });
     };
     if ($("anFullAutoPrimary")) $("anFullAutoPrimary").addEventListener("click", runFull);
+    if ($("anLoadDemoJson")) {
+      $("anLoadDemoJson").addEventListener("click", () => {
+        try {
+          loadDemoJson({ apply: true, navigate: true });
+        } catch (e) {
+          setStatus("Demo JSON gagal: " + e.message, false);
+        }
+      });
+    }
+    syncFullAutoBanner();
 
     if ($("anApiKey")) {
       $("anApiKey").addEventListener("input", syncFullAutoBanner);

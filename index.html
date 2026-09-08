@@ -39,81 +39,86 @@
   </nav>
 
   <main class="main">
-    <!-- HOME -->
+    <!-- HOME · Coach Desk Pramu -->
     <section class="page active" id="page-home">
-      <div class="hero">
-        <div class="hero-copy">
-          <div class="eyebrow">Total Football School · Video Analysis</div>
-          <h1><br/><span>Coach Pramu</span> &amp; Tim Analis</h1>
-          <p>Alur singkat: <strong>upload video</strong> → proses di AI (ChatGPT/Claude/Grok) → <strong>lihat Match Centre</strong>. Tanpa API key.</p>
-          <div class="btn-row">
-            <button class="btn btn-cta" type="button" id="homeStartWizard" data-go="analitik">Upload video → hasil</button>
-            <button class="btn btn-ghost" type="button" data-go="matchcentre">Lihat Match Centre</button>
-          </div>
-          <div class="ux-steps" aria-label="3 langkah">
-            <div class="ux-step"><span class="ux-step-n">1</span><div><strong>Upload</strong><span>Pilih video match</span></div></div>
-            <div class="ux-step"><span class="ux-step-n">2</span><div><strong>Proses</strong><span>Salin prompt → AI</span></div></div>
-            <div class="ux-step"><span class="ux-step-n">3</span><div><strong>Lihat</strong><span>Tempel JSON → Match Centre</span></div></div>
-          </div>
+      <div class="coach-desk">
+        <div class="coach-desk-head">
+          <div class="eyebrow">Desk Coach · Total Football School</div>
+          <h1>Coach <span>Pramu</span></h1>
+          <p>Satu meja kerja: tandai clip <strong>atau</strong> AI Vision (Gemini) — keduanya mengisi Match Centre yang sama. Cerita ortu ikut dari perilaku / tag.</p>
         </div>
-        <div class="hero-stats">
-          <div class="stat-tile"><div class="n">3</div><div class="l">Langkah ke hasil</div></div>
-          <div class="stat-tile"><div class="n">JSON</div><div class="l">Inject Match Centre</div></div>
-          <div class="stat-tile"><div class="n">0–0</div><div class="l">Sample TFS vs G8 Babak 1</div></div>
-          <div class="stat-tile"><div class="n">TFS</div><div class="l">Orange kits · full pitch</div></div>
+
+        <div class="card coach-desk-demo" id="coachDeskDemo" aria-label="Demo TFS vs G8">
+          <div class="coach-desk-demo-label">
+            <span class="pill orange">Demo · TFS vs G8</span>
+            <button class="btn btn-ghost btn-sm" type="button" id="coachDeskApplyClips" title="Isi Match Centre dari clip tags">Isi Match Centre dari clips</button>
+          </div>
+          <div id="coachDeskStrip" class="coach-desk-strip"><!-- filled by coach-desk.js --></div>
+          <div id="coachDeskStory" class="coach-desk-story" aria-live="polite"></div>
+        </div>
+
+        <div class="grid coach-desk-cards" aria-label="3 jalur utama">
+          <article class="card coach-desk-card" data-go="highlights">
+            <div class="icon">⭐</div>
+            <h2>Clips</h2>
+            <p>Tandai momen, analitik ikut</p>
+            <div class="go">HIGHLIGHTS →</div>
+          </article>
+          <article class="card coach-desk-card" data-go="matchcentre">
+            <div class="icon">📊</div>
+            <h2>Laga</h2>
+            <p>Ringkasan laga · Match Centre</p>
+            <div class="go">MATCH CENTRE →</div>
+          </article>
+          <article class="card coach-desk-card" data-go="report">
+            <div class="icon">👨‍👩‍👧</div>
+            <h2>Laporan</h2>
+            <p>Untuk ortu · cerita sesi</p>
+            <div class="go">PARENT REPORT →</div>
+          </article>
+        </div>
+
+        <div class="card coach-desk-gemini">
+          <div class="coach-desk-gemini-copy">
+            <strong>AI Vision (Gemini) — upload video → hasil</strong>
+            <span>Full-auto tanpa OpenAI: paste key AI Studio (AIza… / AQ.…), model <code>gemini-3.6-flash</code>. Atau tandai clips dulu — Match Centre tetap terisi offline.</span>
+          </div>
+          <div class="btn-row" style="margin:0">
+            <button class="btn btn-cta" type="button" id="homeStartWizard" data-go="analitik">AI Vision (Gemini) — upload video → hasil</button>
+            <button class="btn btn-ghost" type="button" data-go="analitik">Buka Analitik</button>
+          </div>
         </div>
       </div>
 
-      <div class="grid grid-2 module-cards">
-        <article class="card module-card" data-go="finance">
-          <div class="icon">💳</div>
-          <h2>Club · Member &amp; Finance</h2>
-          <p>Member, paket, tagihan &amp; pembayaran offline (localStorage). Dashboard finance otomatis hitung piutang &amp; penerimaan.</p>
-          <div class="go">BUKA CLUB →</div>
-        </article>
-        <article class="card module-card" data-go="events">
-          <div class="icon">📝</div>
-          <h2>Event Sheet</h2>
-          <p>Catat GOL / SHOT / SAVE / CORNER / FK / KARTU per menit. Export JSON untuk Tim Analis.</p>
-          <div class="go">ISI EVENT →</div>
-        </article>
-        <article class="card module-card" data-go="matchcentre">
-          <div class="icon">📊</div>
-          <h2>Match Centre</h2>
-          <p>Form → live preview kartu statistik pro. Sample siap pakai: TFS vs G8 0–0.</p>
-          <div class="go">GENERATE →</div>
-        </article>
-        <article class="card module-card" data-go="report">
-          <div class="icon">👨‍👩‍👧</div>
-          <h2>Parent Session Report</h2>
-          <p>Isi field TFDEV → preview laporan orang tua yang polished, siap dicetak/share.</p>
-          <div class="go">BUAT REPORT →</div>
-        </article>
-        <article class="card module-card" data-go="player">
-          <div class="icon">👤</div>
-          <h2>Personal Dashboard</h2>
-          <p>TFdev Score, skill cards, radar &amp; progress charts, session analysis dari video analytics. Sample Rafi + apply JSON.</p>
-          <div class="go">BUKA PLAYER →</div>
-        </article>
-        <article class="card module-card" data-go="generate">
-          <div class="icon">✨</div>
-          <h2>Generate dari AI</h2>
-          <p>Salin prompt analitik, upload video ke ChatGPT/Claude/Grok, tempel JSON → isi Match Centre &amp; Parent Report.</p>
-          <div class="go">BUKA GENERATE →</div>
-        </article>
-        <article class="card module-card" data-go="analitik">
-          <div class="icon">🎬</div>
-          <h2>Analitik AI</h2>
-          <p>Wizard 3 langkah: Upload → Proses → Lihat (Match Centre). Power features tetap ada.</p>
-          <div class="go">MULAI WIZARD →</div>
-        </article>
-        <article class="card module-card" data-go="highlights">
-          <div class="icon">⭐</div>
-          <h2>Highlights</h2>
-          <p>Tandai momen kunci dari video match (gol, chance, skill, save, coaching). Export JSON / daftar teks untuk CapCut &amp; clip ortu.</p>
-          <div class="go">TANDAI MOMEN →</div>
-        </article>
-      </div>
+      <details class="coach-desk-more">
+        <summary>Modul lain (Club · Event · Player · Generate)</summary>
+        <div class="grid grid-2 module-cards" style="margin-top:14px">
+          <article class="card module-card" data-go="finance">
+            <div class="icon">💳</div>
+            <h2>Club · Member &amp; Finance</h2>
+            <p>Member, paket, tagihan &amp; pembayaran offline (localStorage).</p>
+            <div class="go">BUKA CLUB →</div>
+          </article>
+          <article class="card module-card" data-go="events">
+            <div class="icon">📝</div>
+            <h2>Event Sheet</h2>
+            <p>Catat GOL / SHOT / SAVE / CORNER / FK / KARTU per menit.</p>
+            <div class="go">ISI EVENT →</div>
+          </article>
+          <article class="card module-card" data-go="player">
+            <div class="icon">👤</div>
+            <h2>Personal Dashboard</h2>
+            <p>TFdev Score, skill cards, radar &amp; progress dari video analytics.</p>
+            <div class="go">BUKA PLAYER →</div>
+          </article>
+          <article class="card module-card" data-go="generate">
+            <div class="icon">✨</div>
+            <h2>Generate dari AI</h2>
+            <p>Salin prompt, tempel JSON → isi Match Centre &amp; Parent Report.</p>
+            <div class="go">BUKA GENERATE →</div>
+          </article>
+        </div>
+      </details>
     </section>
 
     <!-- EVENT SHEET -->
@@ -443,8 +448,12 @@ Scan sebelum terima bola</textarea></div>
           </div>
           <div class="card">
             <h3>Proses di AI</h3>
+            <div class="an-gemini-callout" role="note">
+              <strong>Gemini free path</strong>
+              <span>Paste key Gemini AI Studio (<code>AIza…</code> atau <code>AQ.…</code>). Model wajib <code>gemini-3.6-flash</code>. Key disimpan di browser ini saja — tanpa OpenAI.</span>
+            </div>
             <p class="ux-hint">
-              <strong style="color:#fff">Tanpa API key (default):</strong> salin prompt → buka ChatGPT / Claude / Grok → upload video (atau frame) + paste prompt → salin JSON jawaban ke langkah Lihat.
+              <strong style="color:#fff">Tanpa API key (default):</strong> salin prompt → buka ChatGPT / Claude / Grok → upload video (atau frame) + paste prompt → salin JSON jawaban ke langkah Lihat. Atau pakai <strong>demo JSON</strong> di bawah untuk lihat end-to-end offline.
             </p>
             <!-- keep mode radios for JS compatibility; API hidden in Lanjutan -->
             <div class="chip-row gen-mode-row" style="margin-bottom:12px" hidden>
@@ -462,12 +471,15 @@ Scan sebelum terima bola</textarea></div>
               </div>
             </div>
 
-            <div class="an-fullauto-banner" id="anFullAutoBanner" hidden>
+            <div class="an-fullauto-banner" id="anFullAutoBanner">
               <div>
-                <strong>API key terdeteksi</strong>
-                <span>Jalankan Full auto: sample frame → Vision → terapkan modul.</span>
+                <strong id="anFullAutoTitle">Full auto · Gemini Vision</strong>
+                <span id="anFullAutoHint">Paste key di Lanjutan, lalu Full auto — atau pakai demo JSON tanpa API.</span>
               </div>
-              <button class="btn btn-cta" type="button" id="anFullAutoPrimary" title="Sample frame → Vision/JSON → semua modul">Full auto</button>
+              <div class="btn-row" style="margin:0;flex-shrink:0">
+                <button class="btn btn-cta" type="button" id="anFullAutoPrimary" title="Sample frame → Vision/JSON → semua modul">Full auto</button>
+                <button class="btn btn-ghost" type="button" id="anLoadDemoJson" title="Load demo matchCentre + behaviorInsights tanpa API">Pakai demo JSON (tanpa API)</button>
+              </div>
             </div>
 
             <details class="an-advanced" id="anAdvancedBlock" style="margin-top:14px">
@@ -670,6 +682,7 @@ Scan sebelum terima bola</textarea></div>
           <span class="pill" id="hlCount">0 highlight</span>
         </div>
         <div class="btn-row" style="margin-bottom:12px">
+          <button class="btn btn-cta" type="button" id="hlApplyMatchCentre" title="Derive stats dari clips → Match Centre">Isi Match Centre dari clips</button>
           <button class="btn" type="button" id="hlExportJson">Export JSON</button>
           <button class="btn btn-ghost" type="button" id="hlImportJson">Import JSON</button>
           <input type="file" id="hlImportFile" accept=".json,application/json" hidden />
@@ -1204,6 +1217,8 @@ Scan sebelum terima bola</textarea></div>
   <script src="js/generate.js"></script>
   <script src="js/analitik.js"></script>
   <script src="js/highlights.js"></script>
+  <script src="js/coach-analytics.js"></script>
+  <script src="js/coach-desk.js"></script>
   <script src="js/player.js"></script>
   <script src="js/club-store.js"></script>
   <script src="js/club.js"></script>
