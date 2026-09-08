@@ -65,8 +65,8 @@
   function getApiConfig() {
     var key = "";
     try { key = localStorage.getItem(API_KEY_LS) || ""; } catch (e) { key = ""; }
-    var base = "https://api.openai.com/v1";
-    var model = "gpt-4o-mini";
+    var base = "https://generativelanguage.googleapis.com/v1beta/openai";
+    var model = "gemini-2.0-flash";
     try {
       base = localStorage.getItem(API_BASE_LS) || base;
       model = localStorage.getItem(API_MODEL_LS) || model;

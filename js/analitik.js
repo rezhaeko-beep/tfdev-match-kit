@@ -527,11 +527,11 @@
     if (!frames.length) {
       throw new Error("Ambil minimal 1 frame dulu (Ambil frame sekarang / sample otomatis).");
     }
-    const base = (($("anApiBase") && $("anApiBase").value.trim()) || "https://api.openai.com/v1").replace(
+    const base = (($("anApiBase") && $("anApiBase").value.trim()) || "https://generativelanguage.googleapis.com/v1beta/openai").replace(
       /\/$/,
       ""
     );
-    const model = ($("anApiModel") && $("anApiModel").value.trim()) || "gpt-4o-mini";
+    const model = ($("anApiModel") && $("anApiModel").value.trim()) || "gemini-2.0-flash";
     const key = ($("anApiKey") && $("anApiKey").value.trim()) || localStorage.getItem(API_KEY_LS) || "";
     if (!key) throw new Error("API key kosong — isi dulu (disimpan di localStorage).");
 
@@ -1199,8 +1199,8 @@
 
   function loadApiSettings() {
     const key = localStorage.getItem(API_KEY_LS) || "";
-    const base = localStorage.getItem(API_BASE_LS) || "https://api.openai.com/v1";
-    const model = localStorage.getItem(API_MODEL_LS) || "gpt-4o-mini";
+    const base = localStorage.getItem(API_BASE_LS) || "https://generativelanguage.googleapis.com/v1beta/openai";
+    const model = localStorage.getItem(API_MODEL_LS) || "gemini-2.0-flash";
     if ($("anApiKey")) $("anApiKey").value = key;
     if ($("anApiBase")) $("anApiBase").value = base;
     if ($("anApiModel")) $("anApiModel").value = model;
