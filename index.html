@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#050505" />
+  <title>TFDEV Analitik · Coach Pramu & Tim Analis</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="app-bg" aria-hidden="true"></div>
+
+  <nav class="nav">
+    <div class="brand">
+      <div class="brand-mark">TF</div>
+      <div class="brand-text">
+        <strong>TFDEV</strong>
+        <span>ANALITIK</span>
+      </div>
+    </div>
+    <button class="nav-toggle" id="navToggle" aria-label="Menu"><span></span></button>
+    <div class="nav-links" id="navLinks">
+      <button class="nav-link active" data-page="home">Home</button>
+      <span class="nav-sep" title="Club">Club</span>
+      <button class="nav-link" data-page="finance">Finance</button>
+      <button class="nav-link" data-page="members">Member</button>
+      <button class="nav-link" data-page="packages">Paket</button>
+      <button class="nav-link" data-page="invoices">Tagihan</button>
+      <button class="nav-link" data-page="payments">Bayar</button>
+      <span class="nav-sep" title="Analitik">Analitik</span>
+      <button class="nav-link" data-page="events">Event Sheet</button>
+      <button class="nav-link" data-page="matchcentre">Match Centre</button>
+      <button class="nav-link" data-page="player">Player</button>
+      <button class="nav-link" data-page="report">Parent Report</button>
+      <button class="nav-link" data-page="generate">Generate</button>
+      <button class="nav-link" data-page="analitik">Analitik AI</button>
+      <button class="nav-link" data-page="highlights">Highlights</button>
+    </div>
+  </nav>
+
+  <main class="main">
+    <!-- HOME -->
+    <section class="page active" id="page-home">
+      <div class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow">Total Football School · Video Analysis</div>
+          <h1><br/><span>Coach Pramu</span> &amp; Tim Analis</h1>
+          <p>Alur singkat: <strong>upload video</strong> → proses di AI (ChatGPT/Claude/Grok) → <strong>lihat Match Centre</strong>. Tanpa API key.</p>
+          <div class="btn-row">
+            <button class="btn btn-cta" data-go="analitik">Upload video → hasil</button>
+            <button class="btn btn-ghost" data-go="matchcentre">Lihat Match Centre</button>
+          </div>
+          <div class="ux-steps" aria-label="3 langkah">
+            <div class="ux-step"><span class="ux-step-n">1</span><div><strong>Upload</strong><span>Pilih video match</span></div></div>
+            <div class="ux-step"><span class="ux-step-n">2</span><div><strong>Proses</strong><span>Salin prompt → AI</span></div></div>
+            <div class="ux-step"><span class="ux-step-n">3</span><div><strong>Hasil</strong><span>Tempel JSON → Match Centre</span></div></div>
+          </div>
+        </div>
+        <div class="hero-stats">
+          <div class="stat-tile"><div class="n">3</div><div class="l">Langkah ke hasil</div></div>
+          <div class="stat-tile"><div class="n">JSON</div><div class="l">Inject Match Centre</div></div>
+          <div class="stat-tile"><div class="n">0–0</div><div class="l">Sample TFS vs G8 Babak 1</div></div>
+          <div class="stat-tile"><div class="n">TFS</div><div class="l">Orange kits · full pitch</div></div>
+        </div>
+      </div>
+
+      <div class="grid grid-2 module-cards">
+        <article class="card module-card" data-go="finance">
+          <div class="icon">💳</div>
+          <h2>Club · Member &amp; Finance</h2>
+          <p>Member, paket, tagihan &amp; pembayaran offline (localStorage). Dashboard finance otomatis hitung piutang &amp; penerimaan.</p>
+          <div class="go">BUKA CLUB →</div>
+        </article>
+        <article class="card module-card" data-go="events">
+          <div class="icon">📝</div>
+          <h2>Event Sheet</h2>
+          <p>Catat GOL / SHOT / SAVE / CORNER / FK / KARTU per menit. Export JSON untuk Tim Analis.</p>
+          <div class="go">ISI EVENT →</div>
+        </article>
+        <article class="card module-card" data-go="matchcentre">
+          <div class="icon">📊</div>
+          <h2>Match Centre</h2>
+          <p>Form → live preview kartu statistik pro. Sample siap pakai: TFS vs G8 0–0.</p>
+          <div class="go">GENERATE →</div>
+        </article>
+        <article class="card module-card" data-go="report">
+          <div class="icon">👨‍👩‍👧</div>
+          <h2>Parent Session Report</h2>
+          <p>Isi field TFDEV → preview laporan orang tua yang polished, siap dicetak/share.</p>
+          <div class="go">BUAT REPORT →</div>
+        </article>
+        <article class="card module-card" data-go="player">
+          <div class="icon">👤</div>
+          <h2>Personal Dashboard</h2>
+          <p>TFdev Score, skill cards, radar &amp; progress charts, session analysis dari video analytics. Sample Rafi + apply JSON.</p>
+          <div class="go">BUKA PLAYER →</div>
+        </article>
+        <article class="card module-card" data-go="generate">
+          <div class="icon">✨</div>
+          <h2>Generate dari AI</h2>
+          <p>Salin prompt analitik, upload video ke ChatGPT/Claude/Grok, tempel JSON → isi Match Centre &amp; Parent Report.</p>
+          <div class="go">BUKA GENERATE →</div>
+        </article>
+        <article class="card module-card" data-go="analitik">
+          <div class="icon">🎬</div>
+          <h2>Analitik AI</h2>
+          <p>Upload video match, ambil frame, salin prompt ke ChatGPT/Claude/Grok (atau Vision API), tempel JSON → Match Centre &amp; Parent Report.</p>
+          <div class="go">VIDEO → AI →</div>
+        </article>
+        <article class="card module-card" data-go="highlights">
+          <div class="icon">⭐</div>
+          <h2>Highlights</h2>
+          <p>Tandai momen kunci dari video match (gol, chance, skill, save, coaching). Export JSON / daftar teks untuk CapCut &amp; clip ortu.</p>
+          <div class="go">TANDAI MOMEN →</div>
+        </article>
+      </div>
+    </section>
+
+    <!-- EVENT SHEET -->
+    <section class="page" id="page-events">
+      <div class="page-head">
+        <div class="eyebrow">Lapangan · Live logging</div>
+        <h1>Event <span>Sheet</span></h1>
+        <p>Catat event per menit. Data tersimpan lokal. Export JSON untuk Tim Analis / Match Centre.</p>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="card event-form">
+          <h3>Tambah event</h3>
+          <div class="field-row">
+            <div class="field">
+              <label>Menit</label>
+              <input type="text" id="evMinute" placeholder="mis. 12 atau 12:30" />
+            </div>
+            <div class="field">
+              <label>Nomor pemain</label>
+              <input type="text" id="evNumber" placeholder="mis. 7" />
+            </div>
+          </div>
+
+          <label style="font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:8px">Tipe</label>
+          <div class="chip-row" id="evTypeChips">
+            <button type="button" class="chip active" data-type="GOL">GOL</button>
+            <button type="button" class="chip" data-type="SHOT">SHOT</button>
+            <button type="button" class="chip" data-type="SAVE">SAVE</button>
+            <button type="button" class="chip" data-type="CORNER">CORNER</button>
+            <button type="button" class="chip" data-type="FK">FK</button>
+            <button type="button" class="chip" data-type="KARTU">KARTU</button>
+          </div>
+
+          <label style="font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--muted);display:block;margin:4px 0 8px">Tim</label>
+          <div class="chip-row" id="evTeamChips">
+            <button type="button" class="chip team-tfs active" data-team="TFS">TFS</button>
+            <button type="button" class="chip team-opp" data-team="LAWÁN">Lawan</button>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label>Skor TFS</label>
+              <input type="number" id="evScoreHome" min="0" value="0" />
+            </div>
+            <div class="field">
+              <label>Skor Lawan</label>
+              <input type="number" id="evScoreAway" min="0" value="0" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Catatan (opsional)</label>
+            <input type="text" id="evNote" placeholder="mis. finishing kaki kiri #7" />
+          </div>
+
+          <div class="btn-row">
+            <button class="btn" id="addEventBtn">+ Tambah event</button>
+            <button class="btn btn-ghost" id="exportEventsBtn">Export JSON</button>
+            <button class="btn btn-danger btn-sm" id="clearEventsBtn">Hapus semua</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <h3 style="margin:0">Daftar event</h3>
+            <span class="pill orange" id="eventCount">0 event</span>
+          </div>
+          <div class="field" style="margin-bottom:12px">
+            <label>Judul match</label>
+            <input type="text" id="evMatchTitle" value="(T8) TFS VS G8 Babak 1" />
+          </div>
+          <div id="eventList" class="event-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MATCH CENTRE -->
+    <section class="page" id="page-matchcentre">
+      <div class="page-head">
+        <div class="eyebrow">Generator · Pro stats card</div>
+        <h1>Match <span>Centre</span></h1>
+        <p>Isi form — preview langsung update. Sample default: TFS vs G8 0–0 (Babak 1).</p>
+      </div>
+
+      <div class="split">
+        <div class="card" id="mcForm">
+          <h3>Data match</h3>
+          <div class="field-row">
+            <div class="field"><label>Tim home</label><input id="mcHome" value="TFS" /></div>
+            <div class="field"><label>Tim away</label><input id="mcAway" value="G8" /></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>Skor home</label><input type="number" id="mcScoreH" value="0" min="0" /></div>
+            <div class="field"><label>Skor away</label><input type="number" id="mcScoreA" value="0" min="0" /></div>
+          </div>
+          <div class="field"><label>Kompetisi / label</label><input id="mcComp" value="TFS VIDEO ANALYSIS · BABAK 1" /></div>
+          <div class="field"><label>Sumber file</label><input id="mcSource" value="(T8) TFS VS G8 Babak 1" /></div>
+          <div class="field"><label>Tanggal stamp</label><input id="mcDate" value="01/02/2024" /></div>
+          <div class="field-row">
+            <div class="field"><label>Possession home %</label><input type="number" id="mcPossH" value="54" min="0" max="100" /></div>
+            <div class="field"><label>Possession away %</label><input type="number" id="mcPossA" value="46" min="0" max="100" /></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>Attack seq home</label><input id="mcAttH" value="~4" /></div>
+            <div class="field"><label>Attack seq away</label><input id="mcAttA" value="~3" /></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>Shots OT home</label><input id="mcShotH" value="N/C" /></div>
+            <div class="field"><label>Shots OT away</label><input id="mcShotA" value="N/C" /></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>Kartu home</label><input id="mcCardH" value="0" /></div>
+            <div class="field"><label>Kartu away</label><input id="mcCardA" value="0" /></div>
+          </div>
+          <div class="field"><label>Catatan / disclaimer</label><textarea id="mcNote">Estimasi dari footage wide sideline. Shot/corner N/C jika tidak terkonfirmasi.</textarea></div>
+          <div class="btn-row">
+            <button class="btn btn-ghost btn-sm" id="mcLoadSample">Load sample TFS vs G8</button>
+            <button class="btn btn-ghost btn-sm" id="mcPrint">Print / PDF preview</button>
+          </div>
+        </div>
+
+        <div class="preview-wrap">
+          <div class="preview-label"><span>Live preview</span><span class="pill">TFS orange kits</span></div>
+          <div class="preview-frame">
+            <div class="mc-card" id="mcPreview"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PARENT REPORT -->
+    <section class="page" id="page-report">
+      <div class="page-head">
+        <div class="eyebrow">TFDEV · Parent communication</div>
+        <h1>Parent Session <span>Report</span></h1>
+        <p>Generator laporan orang tua bergaya TFDEV. Preview update live — siap print atau screenshot.</p>
+      </div>
+
+      <div class="split">
+        <div class="card">
+          <h3>Field report</h3>
+          <div class="field"><label>Nama pemain</label><input id="prName" value="Athalla Jiandra" /></div>
+          <div class="field-row">
+            <div class="field"><label>Nomor / posisi</label><input id="prMeta" value="#7 · Midfielder" /></div>
+            <div class="field"><label>Tanggal sesi</label><input id="prDate" value="08 Sep 2026" /></div>
+          </div>
+          <div class="field"><label>Judul sesi</label><input id="prSession" value="Match Day · TFS vs G8" /></div>
+          <div class="field-row">
+            <div class="field"><label>Skor display</label><input id="prScore" value="0 – 0" /></div>
+            <div class="field"><label>Pill skor</label><input id="prScorePill" value="BABAK 1" /></div>
+          </div>
+          <div class="field"><label>Ringkasan sesi</label><textarea id="prSummary">Athalla aktif di fase build-up dan pressing. Keputusan passing membaik di sepertiga akhir. Fokus minggu depan: finishing setelah receive di half-space.</textarea></div>
+          <div class="field-row">
+            <div class="field"><label>Metric 1 label</label><input id="prM1L" value="Work rate" /></div>
+            <div class="field"><label>Metric 1 value</label><input id="prM1V" value="8.5" /></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>Metric 2 label</label><input id="prM2L" value="Passing" /></div>
+            <div class="field"><label>Metric 2 value</label><input id="prM2V" value="7.5" /></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>Metric 3 label</label><input id="prM3L" value="Decision" /></div>
+            <div class="field"><label>Metric 3 value</label><input id="prM3V" value="8.0" /></div>
+          </div>
+          <div class="field"><label>Kekuatan (satu per baris)</label><textarea id="prStrengths">Tekanan tinggi di midfield
+Komunikasi dengan #6 &amp; #8
+Recovery run setelah lose ball</textarea></div>
+          <div class="field"><label>Fokus berikutnya (satu per baris)</label><textarea id="prFocus">Timing receive di half-space
+Finishing 1-touch setelah cutback
+Scan sebelum terima bola</textarea></div>
+          <div class="btn-row">
+            <button class="btn btn-ghost btn-sm" id="prPrint">Print / PDF preview</button>
+          </div>
+        </div>
+
+        <div class="preview-wrap">
+          <div class="preview-label"><span>Live preview</span><span class="pill orange">TFDEV style</span></div>
+          <div class="preview-frame">
+            <div class="pr-card" id="prPreview"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- GENERATE -->
+    <section class="page" id="page-generate">
+      <div class="page-head">
+        <div class="eyebrow">AI → TFDEV</div>
+        <h1>Generate <span>dari Analitik</span></h1>
+        <p>Salin system prompt, upload video ke ChatGPT / Claude / Grok, tempel JSON hasil analisis, lalu terapkan ke Match Centre atau Parent Report.</p>
+      </div>
+
+      <div class="steps-row">
+        <div class="step-card"><div class="step-n">1</div><div><strong>Upload video</strong><span>ke ChatGPT, Claude, atau Grok</span></div></div>
+        <div class="step-card"><div class="step-n">2</div><div><strong>Paste prompt</strong><span>salin prompt di bawah ke chat AI</span></div></div>
+        <div class="step-card"><div class="step-n">3</div><div><strong>Paste JSON</strong><span>tempel output di sini, lalu Terapkan</span></div></div>
+      </div>
+
+      <div class="grid grid-2" style="margin-top:18px">
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+            <h3 style="margin:0">System / full prompt</h3>
+            <span class="pill" id="genPromptSource">Loading…</span>
+          </div>
+          <div class="chip-row gen-mode-row" style="margin-bottom:12px">
+            <label class="chip-radio"><input type="radio" name="genPromptMode" value="full" checked /> Full prompt</label>
+            <label class="chip-radio"><input type="radio" name="genPromptMode" value="system" /> System singkat</label>
+          </div>
+          <pre class="prompt-box" id="genPromptView" tabindex="0">Memuat prompt…</pre>
+          <div class="btn-row">
+            <button class="btn" id="genCopyPrompt" type="button">Salin prompt</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Tempel JSON hasil AI</h3>
+          <p style="margin-bottom:10px;color:var(--muted);font-size:13px">Schema: <code>matchCentre</code> + <code>parentReports[]</code> + opsional <code>playerDashboard</code>. Boleh tempel blok markdown ber-fence — parser akan ekstrak JSON.</p>
+          <div class="field">
+            <label>AI analysis JSON</label>
+            <textarea id="genJsonInput" class="gen-json" placeholder='{"matchCentre": {...}, "parentReports": [...]}'></textarea>
+          </div>
+          <div class="btn-row">
+            <button class="btn" id="genApplyMc" type="button">Terapkan ke Match Centre</button>
+            <button class="btn btn-ghost" id="genApplyPr" type="button">Terapkan ke Parent Report</button>
+            <button class="btn btn-ghost" id="genApplyPd" type="button">Terapkan ke Player Dashboard</button>
+            <button class="btn btn-ghost btn-sm" id="genLoadSample" type="button">Load sample JSON</button>
+          </div>
+          <div class="gen-status" id="genStatus" aria-live="polite"></div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ANALITIK AI · VIDEO-BASED -->
+    <section class="page" id="page-analitik">
+      <div class="page-head">
+        <div class="eyebrow">Tim Analis · Video → AI → JSON</div>
+        <h1>Analitik <span>AI</span></h1>
+        <p>Upload video match, ambil frame, siapkan paket untuk ChatGPT/Claude/Grok (atau Vision API), tempel JSON hasil → Match Centre &amp; Parent Report.</p>
+      </div>
+
+      <div class="card rules-card" style="margin-bottom:18px">
+        <h3>Aturan analitik (video-first)</h3>
+        <ul class="rules-list">
+          <li><strong>Primary evidence = VIDEO / frames</strong> — jangan mengarang gol, shot, kartu, atau skor yang tidak terbaca dari footage.</li>
+          <li><strong>N/C &amp; null</strong> — angka yang tidak yakin dari wide cam = <code>null</code> + reason, bukan 0 palsu.</li>
+          <li><strong>estimated:true</strong> — possession &amp; attacking sequences boleh estimasi; selalu tandai.</li>
+          <li><strong>Alur</strong> — Video → frame/prompt → AI eksternal atau Vision API → paste JSON → terapkan.</li>
+        </ul>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="card">
+          <h3>1 · Upload video</h3>
+          <div class="an-drop" id="anDropZone" tabindex="0" role="button" aria-label="Zona upload video">
+            <input type="file" id="anVideoFile" accept="video/*" hidden />
+            <div class="an-drop-inner" id="anDropInner">
+              <div class="an-drop-icon">🎬</div>
+              <strong>Tap / drop video match di sini</strong>
+              <span>MP4 / MOV / WebM · works on phone browser</span>
+              <button class="btn btn-sm" type="button" id="anPickVideo">Pilih file video</button>
+            </div>
+          </div>
+          <div class="an-video-wrap" id="anVideoWrap" hidden>
+            <video id="anVideo" controls playsinline preload="metadata"></video>
+            <div class="an-video-meta">
+              <span id="anVideoName">—</span>
+              <span id="anVideoInfo">—</span>
+            </div>
+            <div class="btn-row" style="margin-top:10px">
+              <button class="btn btn-ghost btn-sm" type="button" id="anClearVideo">Ganti / hapus video</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>2 · Match meta</h3>
+          <div class="field-row">
+            <div class="field"><label>Lawan</label><input id="anLawan" value="G8" placeholder="nama lawan" /></div>
+            <div class="field"><label>Kit lawan</label><input id="anKitLawan" value="blue" placeholder="mis. blue / white" /></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>Babak</label><input id="anBabak" value="Babak 1" /></div>
+            <div class="field"><label>Durasi (detik, auto)</label><input type="number" id="anDurasi" value="" min="0" placeholder="dari video" /></div>
+          </div>
+          <div class="field"><label>Source filename</label><input id="anSource" placeholder="otomatis dari nama file" /></div>
+          <h3 style="margin-top:16px">Pemain (opsional · Parent Report)</h3>
+          <div class="field-row">
+            <div class="field"><label>Nama</label><input id="anPlayerName" placeholder="kosongkan = skip parentReports" /></div>
+            <div class="field"><label>No</label><input id="anPlayerNo" placeholder="mis. 7" /></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>Age group</label><input id="anPlayerAge" placeholder="mis. U10" /></div>
+            <div class="field"><label>Posisi</label><input id="anPlayerPos" placeholder="mis. Midfielder" /></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:18px">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+          <h3 style="margin:0">3 · Frame capture untuk AI</h3>
+          <span class="pill" id="anFramesBadge">0 frame</span>
+        </div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:12px">
+          Ambil frame dari waktu video saat ini, atau sample otomatis (setiap N detik, max ~12). Frame dipakai sebagai bukti untuk Vision API / upload ke AI eksternal.
+        </p>
+        <div class="field-row" style="margin-bottom:10px">
+          <div class="field"><label>Interval sample (detik)</label><input type="number" id="anSampleEvery" value="30" min="5" max="300" /></div>
+          <div class="field"><label>Max frames</label><input type="number" id="anSampleMax" value="12" min="1" max="24" /></div>
+        </div>
+        <div class="btn-row">
+          <button class="btn" type="button" id="anCaptureNow">Ambil frame sekarang</button>
+          <button class="btn btn-ghost" type="button" id="anCaptureAuto">Ambil sample otomatis</button>
+          <button class="btn btn-ghost btn-sm" type="button" id="anClearFrames">Hapus semua frame</button>
+          <button class="btn btn-ghost btn-sm" type="button" id="anSendToHighlights">Kirim frame ke Highlights</button>
+        </div>
+        <canvas id="anCanvas" hidden></canvas>
+        <div class="an-frames" id="anFramesStrip" aria-live="polite"></div>
+      </div>
+
+      <div class="grid grid-2" style="margin-top:18px">
+        <div class="card">
+          <h3>4 · AI run mode</h3>
+          <div class="btn-row" style="margin-bottom:12px">
+            <button class="btn" type="button" id="anFullAuto" title="Sample frame → Vision/JSON → Match Centre + Report + Player + Highlights">Full auto: video → semua modul</button>
+          </div>
+          <div class="chip-row gen-mode-row" style="margin-bottom:12px">
+            <label class="chip-radio"><input type="radio" name="anMode" value="external" checked /> Paket eksternal (default)</label>
+            <label class="chip-radio"><input type="radio" name="anMode" value="api" /> API Vision</label>
+          </div>
+          <div id="anExternalFields">
+            <p style="font-size:13px;color:var(--muted);margin-bottom:12px">
+              <strong style="color:#fff">Tanpa API key.</strong> Salin prompt di bawah → upload video (atau frame JPEG) ke ChatGPT / Claude / Grok vision → paste prompt → salin JSON jawaban ke langkah 5.
+            </p>
+            <div class="btn-row" style="margin-bottom:10px">
+              <button class="btn" type="button" id="anCopyPrompt">Salin prompt video-analitik</button>
+              <button class="btn btn-ghost btn-sm" type="button" id="anRebuildPrompt">Rebuild prompt</button>
+            </div>
+            <div class="field">
+              <label>Prompt paket (preview)</label>
+              <textarea id="anPromptOut" class="an-prompt-out" readonly placeholder="Klik Rebuild / Salin prompt…"></textarea>
+            </div>
+          </div>
+          <div id="anApiFields" style="display:none">
+            <p style="font-size:13px;color:var(--muted);margin-bottom:12px">
+              Kirim frame (JPEG data URL) + system prompt ke OpenAI-compatible <code>chat/completions</code> (vision). Key disimpan di <code>localStorage</code>.
+            </p>
+            <div class="field"><label>API base URL</label><input id="anApiBase" value="https://api.openai.com/v1" /></div>
+            <div class="field"><label>Model (vision)</label><input id="anApiModel" value="gpt-4o-mini" /></div>
+            <div class="field"><label>API key</label><input id="anApiKey" type="password" autocomplete="off" placeholder="sk-…" /></div>
+            <div class="btn-row" style="margin-top:10px">
+              <button class="btn" type="button" id="anRunApi">Jalankan Vision API</button>
+            </div>
+            <p style="font-size:12px;color:var(--muted);margin-top:8px">Atau pakai <strong style="color:#FF6B1A">Full auto</strong> di atas: sample frame → Vision → terapkan ke semua modul.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>5 · Paste JSON hasil + terapkan</h3>
+          <div class="field">
+            <label>Tempel JSON dari AI (matchCentre + parentReports + opsional playerDashboard)</label>
+            <textarea id="anJsonOut" class="gen-json an-json-out" placeholder='{"matchCentre":…,"parentReports":…}'></textarea>
+          </div>
+          <div class="btn-row">
+            <button class="btn" type="button" id="anApplyMc">Terapkan ke Match Centre</button>
+            <button class="btn btn-ghost" type="button" id="anApplyPr">Terapkan ke Parent Report</button>
+            <button class="btn btn-ghost" type="button" id="anApplyPd">Terapkan ke Player Dashboard</button>
+            <button class="btn" type="button" id="anApplyAll">Terapkan ke semua</button>
+          </div>
+          <div class="btn-row" style="margin-top:8px">
+            <button class="btn btn-ghost btn-sm" type="button" id="anCopyJson">Salin JSON</button>
+            <button class="btn btn-ghost btn-sm" type="button" id="anOpenMc">Buka Match Centre</button>
+            <button class="btn btn-ghost btn-sm" type="button" id="anOpenPr">Buka Report</button>
+            <button class="btn btn-ghost btn-sm" type="button" id="anOpenPd">Buka Player</button>
+          </div>
+          <div class="gen-status" id="anStatus" aria-live="polite"></div>
+          <ul class="summary-bullets" id="anSummaryList" style="margin-top:12px">
+            <li>Upload video → ambil frame → salin prompt → AI → paste JSON di sini.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+  
+
+    <!-- HIGHLIGHTS -->
+    <section class="page" id="page-highlights">
+      <div class="page-head">
+        <div class="eyebrow">Coach Pramu · Video clips</div>
+        <h1>Match <span>Highlights</span></h1>
+        <p>Tandai momen kunci dari video match untuk coaching &amp; clip orang tua. Video-based only — export JSON atau daftar teks (timestamp) untuk CapCut/editor.</p>
+      </div>
+
+      <div class="card rules-card" style="margin-bottom:18px">
+        <h3>Cara cepat</h3>
+        <ul class="rules-list">
+          <li><strong>Upload video</strong> → putar ke momen penting → <strong>Tandai highlight di waktu ini</strong> (ambil thumbnail otomatis).</li>
+          <li>Isi tipe (<code>GOL|CHANCE|SKILL|SAVE|COACHING|LAINNYA</code>), tim, nomor pemain, judul, catatan, rating.</li>
+          <li>Klik waktu / Jump untuk putar ulang. <strong>Salin daftar teks</strong> untuk CapCut. Data tersimpan di <code>localStorage</code> per nama file video.</li>
+        </ul>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+            <h3 style="margin:0">1 · Video</h3>
+            <span class="pill" id="hlVideoBadge">Tanpa video · jump OFF (demo)</span>
+          </div>
+          <div class="an-drop" id="hlDropZone" tabindex="0" role="button" aria-label="Zona upload video highlights">
+            <input type="file" id="hlVideoFile" accept="video/*" hidden />
+            <div class="an-drop-inner" id="hlDropInner">
+              <div class="an-drop-icon">⭐</div>
+              <strong>Tap / drop video match di sini</strong>
+              <span>MP4 / MOV / WebM · mobile-friendly</span>
+              <button class="btn btn-sm" type="button" id="hlPickVideo">Pilih file video</button>
+            </div>
+          </div>
+          <div class="an-video-wrap" id="hlVideoWrap" hidden>
+            <video id="hlVideo" controls playsinline preload="metadata"></video>
+            <div class="an-video-meta">
+              <span id="hlVideoName">—</span>
+              <span id="hlVideoInfo">—</span>
+            </div>
+            <div class="btn-row" style="margin-top:10px">
+              <button class="btn btn-ghost btn-sm" type="button" id="hlClearVideo">Ganti / hapus video</button>
+            </div>
+          </div>
+          <canvas id="hlCanvas" hidden></canvas>
+        </div>
+
+        <div class="card" id="hlFormCard">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+            <h3 style="margin:0" id="hlFormMode">Highlight baru</h3>
+            <span class="pill orange" id="hlTimeLabel">—</span>
+          </div>
+          <div class="btn-row" style="margin-bottom:12px">
+            <button class="btn" type="button" id="hlMarkNow">Tandai highlight di waktu ini</button>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label>Tipe</label>
+              <select id="hlType">
+                <option value="GOL">GOL</option>
+                <option value="CHANCE">CHANCE</option>
+                <option value="SKILL">SKILL</option>
+                <option value="SAVE">SAVE</option>
+                <option value="COACHING" selected>COACHING</option>
+                <option value="LAINNYA">LAINNYA</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Tim</label>
+              <select id="hlTeam">
+                <option value="TFS" selected>TFS</option>
+                <option value="Lawan">Lawan</option>
+              </select>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>No. pemain (opsional)</label><input id="hlPlayerNo" placeholder="mis. 7" inputmode="numeric" /></div>
+            <div class="field">
+              <label>Rating 1–5 (opsional)</label>
+              <select id="hlRating">
+                <option value="">—</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+              </select>
+            </div>
+          </div>
+          <div class="field"><label>Judul</label><input id="hlTitle" placeholder="mis. Peluang cutback kanan" /></div>
+          <div class="field"><label>Catatan</label><textarea id="hlNote" rows="3" placeholder="Poin coaching / konteks clip ortu"></textarea></div>
+          <div class="btn-row">
+            <button class="btn" type="button" id="hlSaveBtn">Simpan highlight</button>
+            <button class="btn btn-ghost btn-sm" type="button" id="hlCancelEdit" hidden>Batal edit</button>
+          </div>
+          <div class="gen-status" id="hlStatus" aria-live="polite"></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:18px">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+          <h3 style="margin:0">2 · Daftar highlights</h3>
+          <span class="pill" id="hlCount">0 highlight</span>
+        </div>
+        <div class="btn-row" style="margin-bottom:12px">
+          <button class="btn" type="button" id="hlExportJson">Export JSON</button>
+          <button class="btn btn-ghost" type="button" id="hlImportJson">Import JSON</button>
+          <input type="file" id="hlImportFile" accept=".json,application/json" hidden />
+          <button class="btn btn-ghost" type="button" id="hlGenThumbs">Generate thumbs</button>
+          <button class="btn btn-ghost" type="button" id="hlCopyText">Salin daftar teks</button>
+          <button class="btn btn-ghost btn-sm" type="button" id="hlResetSeed">Reset demo seed</button>
+        </div>
+        <div class="hl-list" id="hlList" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <!-- PERSONAL / PLAYER DASHBOARD -->
+    <section class="page" id="page-player">
+      <div class="page-head pd-page-head">
+        <div class="eyebrow">TFdev · AI Youth Football Development</div>
+        <h1>Personal <span>Dashboard</span></h1>
+        <p>Player development output dari <strong>video analytics</strong> saja. Sample Rafi Pratama siap lihat; tempel / terapkan JSON dari Analitik AI.</p>
+      </div>
+
+      <div class="pd-toolbar card">
+        <div class="pd-toolbar-row">
+          <span class="pill" id="pdSourceBadge">Sample · video_analytics</span>
+          <div class="btn-row" style="margin:0">
+            <button class="btn btn-ghost btn-sm" type="button" id="pdLoadSample">Load sample Rafi</button>
+            <button class="btn btn-ghost btn-sm" type="button" id="pdOpenAnalitik">Buka Analitik AI</button>
+          </div>
+        </div>
+        <div class="field" style="margin-top:12px;margin-bottom:0">
+          <label>Paste JSON (playerDashboard atau parentReports) → Apply</label>
+          <textarea id="pdJsonPaste" class="gen-json pd-json-paste" placeholder="{"playerDashboard":{...}} atau {"parentReports":[...]}"></textarea>
+        </div>
+        <div class="btn-row">
+          <button class="btn" type="button" id="pdApplyPaste">Terapkan ke Player Dashboard</button>
+        </div>
+        <div class="gen-status" id="pdPasteStatus" aria-live="polite"></div>
+      </div>
+
+      <div class="pd-dash" id="pdDash">
+        <div class="pd-header card">
+          <div class="pd-identity">
+            <div class="pd-photo" id="pdPhoto" aria-hidden="true">
+              <span class="pd-photo-initials">RP</span>
+            </div>
+            <div class="pd-identity-text">
+              <div class="pd-name-row">
+                <h2 id="pdName">Rafi Pratama</h2>
+                <span class="pd-age-tag" id="pdAge">Age 8</span>
+                <span class="pd-pos" id="pdPosition">Midfielder</span>
+              </div>
+              <div class="pd-quick-stats">
+                <div class="pd-qs"><span class="pd-qs-l">Preferred Foot</span><strong id="pdFoot">Right Foot</strong></div>
+                <div class="pd-qs"><span class="pd-qs-l">Height</span><strong id="pdHeight">128 cm</strong></div>
+                <div class="pd-qs"><span class="pd-qs-l">Weight</span><strong id="pdWeight">26 kg</strong></div>
+              </div>
+            </div>
+          </div>
+          <div class="pd-overall">
+            <div class="pd-overall-label">Overall TFdev Score</div>
+            <div class="pd-overall-score"><strong id="pdOverall">78</strong><span>/ 100</span></div>
+            <div class="pd-delta up" id="pdDelta">↑ 6 pts vs last 7 days</div>
+          </div>
+        </div>
+
+        <div class="pd-skills" id="pdSkillCards"></div>
+
+        <div class="pd-grid">
+          <div class="pd-col">
+            <div class="card pd-chart-card">
+              <h3>Skills Radar</h3>
+              <div class="pd-chart-wrap">
+                <canvas id="pdRadarChart" aria-label="Skills radar chart"></canvas>
+              </div>
+            </div>
+            <div class="card pd-chart-card">
+              <h3>Progress Over Time · Last 4 Weeks</h3>
+              <div class="pd-chart-wrap pd-chart-line">
+                <canvas id="pdProgressChart" aria-label="Progress line chart"></canvas>
+              </div>
+            </div>
+          </div>
+          <div class="pd-col">
+            <div class="card">
+              <div class="pd-card-head">
+                <h3 style="margin:0">Recent Session Analysis</h3>
+                <span class="pill" id="pdSessionDate">Session</span>
+              </div>
+              <div class="pd-table-wrap">
+                <table class="pd-table">
+                  <thead>
+                    <tr><th>Metric</th><th>Value</th><th>Status</th></tr>
+                  </thead>
+                  <tbody id="pdSessionBody"></tbody>
+                </table>
+              </div>
+              <p class="pd-honesty" id="pdHonesty"></p>
+            </div>
+            <div class="card" id="pdDrillsCard">
+              <h3>Recommended Next Drills</h3>
+              <div class="pd-drills" id="pdDrills"></div>
+            </div>
+          </div>
+        </div>
+        <p class="pd-charts-note" id="pdChartsNote" hidden></p>
+      </div>
+    </section>
+
+
+    <!-- ========== CLUB · FINANCE DASHBOARD ========== -->
+    <section class="page" id="page-finance">
+      <div class="page-head">
+        <div class="eyebrow">Club · Keuangan</div>
+        <h1>Dashboard <span>Finance</span></h1>
+        <p>Angka dihitung otomatis dari member, tagihan &amp; pembayaran (localStorage). Offline-ready.</p>
+      </div>
+
+      <div class="grid grid-4 club-kpi">
+        <div class="stat-tile">
+          <div class="n" id="finMemberAktif">0</div>
+          <div class="l">Member aktif</div>
+          <div class="rumus-hint">count status === aktif</div>
+        </div>
+        <div class="stat-tile">
+          <div class="n" id="finOverdue">0</div>
+          <div class="l">Tagihan overdue</div>
+          <div class="rumus-hint">count status overdue</div>
+        </div>
+        <div class="stat-tile">
+          <div class="n" id="finPenerimaan" style="font-size:20px">Rp 0</div>
+          <div class="l">Penerimaan bulan ini</div>
+          <div class="rumus-hint">Σ payments di bulan berjalan</div>
+        </div>
+        <div class="stat-tile">
+          <div class="n" id="finPiutang" style="font-size:20px">Rp 0</div>
+          <div class="l">Outstanding piutang</div>
+          <div class="rumus-hint">Σ remaining non-batal</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+          <h3 style="margin:0">Pembayaran terbaru</h3>
+          <div class="btn-row" style="margin:0">
+            <button type="button" class="btn btn-ghost btn-sm" data-go="payments">+ Catat bayar</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="clubResetSeed">Reset seed</button>
+          </div>
+        </div>
+        <div id="finRecentPayments"></div>
+        <p class="rumus-hint" style="margin-top:12px">Rumus: remaining = max(0, amount − Σ payments) · status auto lunas/sebagian/overdue · IDR berpemisah ribuan.</p>
+      </div>
+    </section>
+
+    <!-- ========== CLUB · MEMBERS ========== -->
+    <section class="page" id="page-members">
+      <div class="page-head">
+        <div class="eyebrow">Club · Keanggotaan</div>
+        <h1>Daftar <span>Member</span></h1>
+        <p>Cari &amp; filter status. Klik baris atau Edit untuk ubah. Tunggakan = punya invoice overdue / sebagian.</p>
+      </div>
+
+      <div class="card">
+        <div class="club-toolbar">
+          <div class="field" style="margin:0;flex:1;min-width:160px">
+            <label>Cari</label>
+            <input type="search" id="memSearch" placeholder="Nama anak / ortu / WA…" />
+          </div>
+          <div class="field" style="margin:0;min-width:140px">
+            <label>Filter</label>
+            <select id="memFilter">
+              <option value="all">Semua</option>
+              <option value="aktif">Aktif</option>
+              <option value="trial">Trial</option>
+              <option value="cuti">Cuti</option>
+              <option value="nonaktif">Nonaktif</option>
+              <option value="tunggakan">Tunggakan</option>
+            </select>
+          </div>
+          <button type="button" class="btn" id="memAddBtn">+ Tambah</button>
+        </div>
+        <div class="pd-table-wrap" style="margin-top:14px">
+          <table class="pd-table club-table">
+            <thead>
+              <tr>
+                <th>Anak</th>
+                <th>Ortu</th>
+                <th>Paket</th>
+                <th>Status</th>
+                <th>Outstanding</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="memTableBody"></tbody>
+          </table>
+        </div>
+        <p class="rumus-hint">Outstanding member = Σ remaining invoice (bukan draft/batal).</p>
+      </div>
+    </section>
+
+    <!-- ========== CLUB · PACKAGES ========== -->
+    <section class="page" id="page-packages">
+      <div class="page-head">
+        <div class="eyebrow">Club · Harga</div>
+        <h1>Paket &amp; <span>Harga</span></h1>
+        <p>CRUD paket trial / monthly / term / season / private. Dipakai saat buat tagihan.</p>
+      </div>
+
+      <div class="btn-row" style="margin-top:0;margin-bottom:14px">
+        <button type="button" class="btn" id="pkgAddBtn">+ Tambah paket</button>
+      </div>
+
+      <div class="card" id="pkgFormCard" hidden>
+        <h3 id="pkgFormTitle">Tambah Paket</h3>
+        <form id="pkgForm">
+          <input type="hidden" id="pkgId" />
+          <div class="field"><label>Nama</label><input id="pkgName" required placeholder="mis. Bulanan U8" /></div>
+          <div class="field-row">
+            <div class="field">
+              <label>Tipe</label>
+              <select id="pkgType">
+                <option value="trial">trial</option>
+                <option value="monthly">monthly</option>
+                <option value="term">term</option>
+                <option value="season">season</option>
+                <option value="private">private</option>
+              </select>
+            </div>
+            <div class="field"><label>Harga (IDR)</label><input type="number" id="pkgPrice" min="0" step="1000" required /></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>Durasi (hari)</label><input type="number" id="pkgDuration" min="1" value="30" /></div>
+            <div class="field"><label>Age group (opsional)</label><input id="pkgAgeGroup" placeholder="U8" /></div>
+          </div>
+          <label class="club-check"><input type="checkbox" id="pkgActive" checked /> Aktif</label>
+          <div class="btn-row">
+            <button type="submit" class="btn">Simpan</button>
+            <button type="button" class="btn btn-ghost" id="pkgCancelBtn">Batal</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <h3>Daftar paket</h3>
+        <div id="pkgList"></div>
+      </div>
+    </section>
+
+    <!-- ========== CLUB · INVOICES ========== -->
+    <section class="page" id="page-invoices">
+      <div class="page-head">
+        <div class="eyebrow">Club · Tagihan</div>
+        <h1>Tagihan / <span>Invoice</span></h1>
+        <p>Status: draft → terbit → sebagian / lunas / overdue · atau batal. Overdue otomatis jika jatuh tempo lewat &amp; masih ada sisa.</p>
+      </div>
+
+      <div class="club-toolbar" style="margin-bottom:14px">
+        <div class="field" style="margin:0;min-width:140px">
+          <label>Filter status</label>
+          <select id="invFilter">
+            <option value="all">Semua</option>
+            <option value="draft">draft</option>
+            <option value="terbit">terbit</option>
+            <option value="sebagian">sebagian</option>
+            <option value="lunas">lunas</option>
+            <option value="overdue">overdue</option>
+            <option value="batal">batal</option>
+          </select>
+        </div>
+        <button type="button" class="btn" id="invAddBtn">+ Buat tagihan</button>
+      </div>
+
+      <div class="card" id="invFormCard" hidden>
+        <h3>Buat invoice</h3>
+        <form id="invForm">
+          <div class="field">
+            <label>Member</label>
+            <select id="invMemberId" required></select>
+          </div>
+          <div class="field">
+            <label>Paket (opsional)</label>
+            <select id="invPackageId"></select>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>Jumlah (IDR)</label><input type="number" id="invAmount" min="0" step="1000" placeholder="dari paket / custom" /></div>
+            <div class="field"><label>Jatuh tempo</label><input type="date" id="invDueDate" /></div>
+          </div>
+          <div class="field"><label>Catatan</label><input id="invNote" placeholder="mis. Iuran September" /></div>
+          <p class="rumus-hint" id="invFormulaHint">Rumus: dari paket → amount = package.price; dueDate = startDate + durationDays.</p>
+          <div class="btn-row">
+            <button type="submit" class="btn">Simpan draft</button>
+            <button type="button" class="btn btn-ghost" id="invCancelBtn">Batal</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <div class="pd-table-wrap">
+          <table class="pd-table club-table">
+            <thead>
+              <tr>
+                <th>Member</th>
+                <th>Paket</th>
+                <th>Amount</th>
+                <th>Sisa</th>
+                <th>Due</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="invTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== CLUB · PAYMENTS ========== -->
+    <section class="page" id="page-payments">
+      <div class="page-head">
+        <div class="eyebrow">Club · Kas masuk</div>
+        <h1>Pembayaran</h1>
+        <p>Catat bayar ke invoice terbit. Status invoice update otomatis (lunas / sebagian / overdue).</p>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="card">
+          <h3>Catat pembayaran</h3>
+          <form id="payForm">
+            <div class="field">
+              <label>Tagihan</label>
+              <select id="payInvoiceId" required></select>
+            </div>
+            <div class="field-row">
+              <div class="field"><label>Jumlah (IDR)</label><input type="number" id="payAmount" min="0" step="1000" required /></div>
+              <div class="field">
+                <label>Metode</label>
+                <select id="payMethod">
+                  <option value="transfer">transfer</option>
+                  <option value="cash">cash</option>
+                  <option value="qris">qris</option>
+                  <option value="ewallet">ewallet</option>
+                </select>
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field"><label>Tanggal</label><input type="date" id="payDate" required /></div>
+              <div class="field"><label>Bukti / catatan</label><input id="payProof" placeholder="mis. BCA · ref 123" /></div>
+            </div>
+            <p class="rumus-hint" id="payFormulaHint">Rumus: remaining = max(0, amount − Σ payments). Status auto.</p>
+            <div class="btn-row">
+              <button type="submit" class="btn">Simpan pembayaran</button>
+            </div>
+          </form>
+          <div id="payReceipt" class="club-receipt-wrap" hidden></div>
+        </div>
+        <div class="card">
+          <h3>Riwayat pembayaran</h3>
+          <div id="payList"></div>
+        </div>
+      </div>
+    </section>
+
+
+  </main>
+
+
+  <div class="club-drawer-backdrop" id="clubDrawerBackdrop"></div>
+  <aside class="club-drawer" id="memDrawer" aria-label="Form member">
+    <div class="club-drawer-head">
+      <h2 id="memDrawerTitle">Tambah Member</h2>
+      <button type="button" class="btn btn-ghost btn-sm" data-close-drawer aria-label="Tutup">✕</button>
+    </div>
+    <form id="memForm" class="club-drawer-body">
+      <input type="hidden" id="memId" />
+      <div class="field"><label>Nama anak</label><input id="memNamaAnak" required placeholder="Nama lengkap" /></div>
+      <div class="field-row">
+        <div class="field"><label>Tanggal lahir</label><input type="date" id="memDob" /></div>
+        <div class="field"><label>Age group</label><input id="memAgeGroup" placeholder="U8" /></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Posisi</label><input id="memPosisi" placeholder="Midfielder" /></div>
+        <div class="field">
+          <label>Kaki</label>
+          <select id="memKaki">
+            <option value="">—</option>
+            <option value="Kanan">Kanan</option>
+            <option value="Kiri">Kiri</option>
+            <option value="Keduanya">Keduanya</option>
+          </select>
+        </div>
+      </div>
+      <div class="field"><label>Nama ortu / wali</label><input id="memNamaOrtu" /></div>
+      <div class="field-row">
+        <div class="field"><label>WA ortu</label><input id="memWaOrtu" placeholder="08…" inputmode="tel" /></div>
+        <div class="field"><label>Email</label><input type="email" id="memEmail" /></div>
+      </div>
+      <div class="field"><label>Paket</label><select id="memPaketId"></select></div>
+      <div class="field-row">
+        <div class="field"><label>Tanggal mulai</label><input type="date" id="memStartDate" /></div>
+        <div class="field">
+          <label>Status</label>
+          <select id="memStatus">
+            <option value="aktif">aktif</option>
+            <option value="trial">trial</option>
+            <option value="cuti">cuti</option>
+            <option value="nonaktif">nonaktif</option>
+          </select>
+        </div>
+      </div>
+      <div class="field"><label>Catatan</label><textarea id="memNotes" rows="3" placeholder="Medis / alergi / lain"></textarea></div>
+      <p class="rumus-hint" id="memOutstandingHint"></p>
+      <div class="btn-row">
+        <button type="submit" class="btn">Simpan</button>
+        <button type="button" class="btn btn-ghost" data-close-drawer>Tutup</button>
+      </div>
+    </form>
+  </aside>
+
+  <div class="toast" id="toast"></div>
+  <script src="js/events.js"></script>
+  <script src="js/matchcentre.js"></script>
+  <script src="js/report.js"></script>
+  <script src="js/generate.js"></script>
+  <script src="js/analitik.js"></script>
+  <script src="js/highlights.js"></script>
+  <script src="js/player.js"></script>
+  <script src="js/club-store.js"></script>
+  <script src="js/club.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
