@@ -1407,3 +1407,95 @@ code {
   .fai-aging-meta { text-align: left; }
   .fai-head .btn-row { width: 100%; }
 }
+
+
+/* ---------- Sacha Finance daily UX ---------- */
+.sacha-today {
+  border-color: rgba(255, 107, 26, 0.35);
+  background: linear-gradient(180deg, rgba(255,107,26,.08), rgba(11,16,23,.4));
+}
+.sacha-today-head {
+  display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  align-items: flex-start; margin-bottom: 14px;
+}
+.sacha-today-sub { margin: 0; font-size: 13px; color: var(--muted); max-width: 420px; }
+.sacha-cta-row {
+  display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;
+}
+.sacha-cta { min-width: 140px; font-weight: 800; }
+.sacha-cta-report {
+  background: #fff;
+  color: #0b1017;
+  border-color: #fff;
+}
+.sacha-cta-report:hover { filter: brightness(0.95); }
+.sacha-checklist {
+  margin: 0; padding: 0 0 0 18px;
+  display: grid; gap: 6px;
+  color: #d7e3ef; font-size: 13.5px;
+}
+.sacha-checklist li { line-height: 1.4; }
+
+.fin-overdue-row .orange { color: var(--orange); }
+.fin-recent-secondary { opacity: 0.92; }
+
+.fin-report-card {
+  border-color: rgba(59, 130, 246, 0.35);
+  background: rgba(59, 130, 246, 0.06);
+}
+.fin-report-head {
+  display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  align-items: flex-start; margin-bottom: 12px;
+}
+.fin-report-preview {
+  margin: 0;
+  max-height: 360px;
+  overflow: auto;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border-soft);
+  background: #0b1017;
+  color: #d7e3ef;
+  font-size: 12.5px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+#faiSection.an-advanced {
+  padding: 0 14px 14px;
+}
+#faiSection.an-advanced > summary {
+  font-size: 14px;
+  color: var(--muted);
+}
+#faiSection.an-advanced[open] > summary { color: #fff; margin-bottom: 4px; }
+
+.pay-hero-card { border-color: rgba(255, 107, 26, 0.3); }
+.pay-hero-title {
+  margin: 0 0 14px;
+  font-size: 22px;
+  font-weight: 900;
+  color: #fff;
+}
+.pay-remaining {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 10px; margin: 0 0 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 107, 26, 0.35);
+  background: rgba(255, 107, 26, 0.1);
+}
+.pay-remaining-label {
+  font-size: 12px; font-weight: 800; letter-spacing: .4px;
+  text-transform: uppercase; color: var(--muted);
+}
+.pay-remaining strong {
+  font-size: 20px; color: var(--orange); font-weight: 900;
+}
+
+@media (max-width: 720px) {
+  .sacha-cta { flex: 1 1 100%; }
+  .fin-report-preview { max-height: 280px; }
+}

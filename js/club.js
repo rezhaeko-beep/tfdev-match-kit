@@ -21,6 +21,189 @@
   }
 
   /* ---------- Finance Dashboard ---------- */
+  function copyPlain(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text);
+    }
+    return new Promise(function (resolve, reject) {
+      try {
+        var ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.position = "fixed";
+        ta.style.left = "-9999px";
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+        resolve();
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+
+  function goPaymentsFocus(invoiceId) {
+    window.TFDEV.showPage("payments");
+    setTimeout(function () {
+      fillPayInvoiceSelect(invoiceId || undefined);
+      onPayInvoiceChange();
+      var sel = document.getElementById("payInvoiceId");
+      var amt = document.getElementById("payAmount");
+      if (invoiceId && amt) amt.focus();
+      else if (sel) sel.focus();
+    }, 50);
+  }
+
+  function goInvoicesCreate() {
+    window.TFDEV.showPage("invoices");
+    setTimeout(function () {
+      if (typeof openInvForm === "function") openInvForm();
+    }, 50);
+  }
+
+  function simpleWaForInvoice(inv, mem) {
+    var anak = (mem && mem.namaAnak) || inv.memberName || "anak";
+    var ortu = (mem && mem.namaOrtu) || ("Ortu " + anak);
+    var first = String(anak).trim().split(/\s+/)[0] || anak;
+    return (
+      "Halo " + ortu + ", salam dari TFDEV Soccer 👋\n\n" +
+      "Mengingatkan sisa iuran " + first + " sebesar *" + idr(inv.remaining) + "* " +
+      "(jatuh tempo " + (inv.dueDate || "-") + "). Mohon konfirmasi jika sudah transfer ya.\n\n" +
+      "Terima kasih 🙏"
+    );
+  }
+
+  function waTextForInvoice(inv) {
+    var mem = ClubStore.getMember(inv.memberId);
+    if (window.FinanceAI && typeof FinanceAI.getSnapshot === "function" &&
+        typeof FinanceAI.waFollowUpText === "function") {
+      try {
+        var snap = FinanceAI.getSnapshot();
+        var d = (snap.topDebtors || []).find(function (x) { return x.memberId === inv.memberId; });
+        if (d) return FinanceAI.waFollowUpText(d);
+      } catch (e) { /* fallback */ }
+    }
+    return simpleWaForInvoice(inv, mem);
+  }
+
+  function renderSachaToday() {
+    var list = document.getElementById("sachaChecklist");
+    var sub = document.getElementById("sachaTodaySub");
+    if (!list) return;
+    var items = [];
+    var d = ClubStore.getDashboard();
+    if (window.FinanceAI && typeof FinanceAI.getSnapshot === "function") {
+      try {
+        var snap = FinanceAI.getSnapshot();
+        items = (snap.actions || []).slice(0, 3).map(function (a) { return a.text; });
+        if (sub) {
+          sub.textContent = d.overdueCount
+            ? (d.overdueCount + " overdue · " + idr(d.piutangOutstanding) + " piutang")
+            : ("Piutang " + idr(d.piutangOutstanding) + " · penerimaan MTD " + idr(d.penerimaanBulanIni));
+        }
+      } catch (e) { items = []; }
+    }
+    if (!items.length) {
+      items = [
+        (d.overdueCount || 0) + " tagihan overdue perlu follow-up",
+        "Catat pembayaran masuk hari ini",
+        "Buat / terbitkan tagihan yang masih draft"
+      ];
+      if (sub) {
+        sub.textContent = "Siap kerja — catat bayar, buat tagihan, follow-up overdue.";
+      }
+    }
+    list.innerHTML = items.map(function (t) {
+      return "<li>" + esc(t) + "</li>";
+    }).join("");
+  }
+
+  function renderFinanceOverdue() {
+    var wrap = document.getElementById("finOverdueList");
+    var badge = document.getElementById("finOverdueBadge");
+    if (!wrap) return;
+    var rows = ClubStore.getInvoices({ status: "overdue" })
+      .slice()
+      .sort(function (a, b) {
+        return String(a.dueDate).localeCompare(String(b.dueDate)) ||
+          (b.remaining - a.remaining);
+      })
+      .slice(0, 8);
+    if (badge) badge.textContent = String(rows.length);
+    if (!rows.length) {
+      wrap.innerHTML = '<div class="empty-state">Tidak ada tagihan overdue 🎉</div>';
+      return;
+    }
+    wrap.innerHTML = rows.map(function (inv) {
+      return (
+        '<div class="club-row fin-overdue-row" data-id="' + esc(inv.id) + '">' +
+          '<div class="club-row-main">' +
+            "<strong>" + esc(inv.memberName) + "</strong>" +
+            '<div class="meta">' + esc(inv.note || inv.packageName || inv.id) +
+              " · jatuh tempo " + esc(inv.dueDate) + "</div>" +
+          "</div>" +
+          '<div class="club-row-side">' +
+            "<strong class=\"orange\">" + idr(inv.remaining) + "</strong>" +
+            '<div class="btn-row" style="margin:8px 0 0;justify-content:flex-end">' +
+              '<button type="button" class="btn btn-sm fin-od-pay" data-id="' + esc(inv.id) + '">Bayar</button>' +
+              '<button type="button" class="btn btn-ghost btn-sm fin-od-wa" data-id="' + esc(inv.id) + '">Salin WA</button>' +
+            "</div>" +
+          "</div>" +
+        "</div>"
+      );
+    }).join("");
+
+    wrap.querySelectorAll(".fin-od-pay").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        goPaymentsFocus(btn.dataset.id);
+      });
+    });
+    wrap.querySelectorAll(".fin-od-wa").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var inv = ClubStore.getInvoice(btn.dataset.id);
+        if (!inv) return;
+        var text = waTextForInvoice(inv);
+        copyPlain(text).then(function () {
+          btn.textContent = "Tersalin ✓";
+          setTimeout(function () { btn.textContent = "Salin WA"; }, 1600);
+          window.TFDEV.toast("Teks WA follow-up disalin");
+        }).catch(function () {
+          window.TFDEV.toast("Gagal salin — coba manual");
+        });
+      });
+    });
+  }
+
+  var lastFinanceReport = null;
+
+  function showFinanceReport(rep) {
+    lastFinanceReport = rep;
+    var card = document.getElementById("finReportCard");
+    var preview = document.getElementById("finReportPreview");
+    var meta = document.getElementById("finReportMeta");
+    if (!card || !preview) return;
+    card.hidden = false;
+    preview.textContent = rep.text;
+    if (meta) {
+      meta.textContent = "Periode " + rep.meta.periodLabel +
+        " · dibuat " + rep.meta.generatedAt + " " + rep.meta.timeLabel +
+        " · " + rep.meta.payCount + " pembayaran MTD";
+    }
+    card.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  function generateFinanceReport() {
+    if (!window.FinanceAI || typeof FinanceAI.buildReport !== "function") {
+      window.TFDEV.toast("FinanceAI belum siap");
+      return;
+    }
+    var rep = FinanceAI.buildReport();
+    showFinanceReport(rep);
+    if (typeof FinanceAI.refresh === "function") FinanceAI.refresh();
+    renderSachaToday();
+    window.TFDEV.toast("Laporan keuangan siap · salin atau unduh");
+  }
+
   function renderFinance() {
     const d = ClubStore.getDashboard();
     const set = function (id, text) {
@@ -58,6 +241,8 @@
     if (window.FinanceAI && typeof window.FinanceAI.refresh === "function") {
       window.FinanceAI.refresh();
     }
+    renderFinanceOverdue();
+    renderSachaToday();
   }
 
   /* ---------- Members ---------- */
@@ -274,8 +459,15 @@
 
   /* ---------- Invoices ---------- */
   function renderInvoices() {
-    const st = (document.getElementById("invFilter") || {}).value || "all";
-    const rows = ClubStore.getInvoices({ status: st });
+    const st = (document.getElementById("invFilter") || {}).value || "belum_lunas";
+    var rows;
+    if (st === "belum_lunas") {
+      rows = ClubStore.getInvoices({ status: "all" }).filter(function (i) {
+        return i.status !== "lunas" && i.status !== "batal";
+      });
+    } else {
+      rows = ClubStore.getInvoices({ status: st });
+    }
     const body = document.getElementById("invTableBody");
     if (!body) return;
     if (!rows.length) {
@@ -430,16 +622,23 @@
     const id = document.getElementById("payInvoiceId").value;
     const hint = document.getElementById("payFormulaHint");
     const amountEl = document.getElementById("payAmount");
+    const box = document.getElementById("payRemainingBox");
+    const amtLabel = document.getElementById("payRemainingAmt");
     if (!id) {
-      hint.textContent = "Rumus: remaining = max(0, amount − Σ payments). Status auto lunas/sebagian/overdue.";
+      if (hint) hint.textContent = "Pilih tagihan — sisa otomatis muncul.";
+      if (box) box.hidden = true;
       return;
     }
     const inv = ClubStore.getInvoice(id);
     if (!inv) return;
     amountEl.value = inv.remaining;
-    hint.textContent =
-      "Sisa tagihan " + idr(inv.remaining) + " dari " + idr(inv.amount) +
-      " (sudah bayar " + idr(inv.paidTotal) + "). remaining = max(0, amount − Σ payments).";
+    if (box) box.hidden = false;
+    if (amtLabel) amtLabel.textContent = idr(inv.remaining);
+    if (hint) {
+      hint.textContent =
+        "Total " + idr(inv.amount) + " · sudah bayar " + idr(inv.paidTotal) +
+        " · sisa " + idr(inv.remaining);
+    }
   }
 
   function renderPayments() {
@@ -485,14 +684,20 @@
         proofNote: document.getElementById("payProof").value.trim()
       });
       showReceipt(result.receipt);
-      document.getElementById("payForm").reset();
+      var methodKeep = document.getElementById("payMethod").value;
+      document.getElementById("payAmount").value = "";
+      document.getElementById("payProof").value = "";
       document.getElementById("payDate").value = ClubStore.todayISO();
+      document.getElementById("payMethod").value = methodKeep || "transfer";
       fillPayInvoiceSelect();
+      onPayInvoiceChange();
       renderPayments();
       renderInvoices();
       renderFinance();
       renderMembers();
-      window.TFDEV.toast("Pembayaran tercatat · " + result.receipt.amountLabel);
+      window.TFDEV.toast("Tersimpan · lanjut isi yang berikutnya");
+      var nextSel = document.getElementById("payInvoiceId");
+      if (nextSel) nextSel.focus();
     } catch (err) {
       window.TFDEV.toast(err.message || "Gagal simpan");
     }
@@ -583,6 +788,47 @@
     if (payInv) payInv.addEventListener("change", onPayInvoiceChange);
     const payDate = document.getElementById("payDate");
     if (payDate && !payDate.value) payDate.value = ClubStore.todayISO();
+
+    // Sacha · Hari ini CTAs
+    const sachaPay = document.getElementById("sachaCatatBayar");
+    if (sachaPay) sachaPay.addEventListener("click", function () { goPaymentsFocus(); });
+    const sachaInv = document.getElementById("sachaBuatTagihan");
+    if (sachaInv) sachaInv.addEventListener("click", goInvoicesCreate);
+    const sachaOd = document.getElementById("sachaFollowOverdue");
+    if (sachaOd) sachaOd.addEventListener("click", function () {
+      var el = document.getElementById("finOverdueCard");
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    const sachaRep = document.getElementById("sachaBuatLaporan");
+    if (sachaRep) sachaRep.addEventListener("click", generateFinanceReport);
+
+    const repCopy = document.getElementById("finReportCopyBtn");
+    if (repCopy) repCopy.addEventListener("click", function () {
+      var text = (lastFinanceReport && lastFinanceReport.text) ||
+        (window.FinanceAI && FinanceAI.buildReport && FinanceAI.buildReport().text) || "";
+      if (!text) { window.TFDEV.toast("Buat laporan dulu"); return; }
+      copyPlain(text).then(function () {
+        window.TFDEV.toast("Laporan disalin");
+        repCopy.textContent = "Tersalin ✓";
+        setTimeout(function () { repCopy.textContent = "Salin laporan"; }, 1600);
+      }).catch(function () { window.TFDEV.toast("Gagal salin"); });
+    });
+    const repTxt = document.getElementById("finReportDlTxtBtn");
+    if (repTxt) repTxt.addEventListener("click", function () {
+      if (window.FinanceAI && FinanceAI.downloadReport) {
+        var rep = FinanceAI.downloadReport(undefined, "txt");
+        showFinanceReport(rep);
+        window.TFDEV.toast("Unduhan .txt dimulai");
+      }
+    });
+    const repCsv = document.getElementById("finReportDlCsvBtn");
+    if (repCsv) repCsv.addEventListener("click", function () {
+      if (window.FinanceAI && FinanceAI.downloadReport) {
+        var rep = FinanceAI.downloadReport(undefined, "csv");
+        showFinanceReport(rep);
+        window.TFDEV.toast("Unduhan .csv dimulai");
+      }
+    });
 
     const resetBtn = document.getElementById("clubResetSeed");
     if (resetBtn) resetBtn.addEventListener("click", function () {

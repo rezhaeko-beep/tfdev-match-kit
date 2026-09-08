@@ -351,9 +351,9 @@ Scan sebelum terima bola</textarea></div>
     <!-- ANALITIK AI · VIDEO-BASED -->
     <section class="page" id="page-analitik">
       <div class="page-head">
-        <div class="eyebrow">Tim Analis · Wizard 3 langkah</div>
+        <div class="eyebrow">Tim Analis · Wizard 3 langkah · Human Behavior</div>
         <h1>Analitik <span>AI</span></h1>
-        <p>Untuk Coach Pramu: <strong>Upload</strong> → <strong>Proses</strong> (salin prompt / Full auto) → <strong>Lihat</strong> hasil di Match Centre. Default tanpa API key.</p>
+        <p>Untuk Coach Pramu: <strong>Upload</strong> → <strong>Proses</strong> (salin prompt / Full auto) → <strong>Lihat</strong> perilaku + Match Centre. Vision membaca <strong>perilaku manusia</strong> di lapangan — bukan scoreboard kering saja.</p>
       </div>
 
       <nav class="an-wizard" id="anWizard" aria-label="Wizard Analitik">
@@ -367,7 +367,7 @@ Scan sebelum terima bola</textarea></div>
         </button>
         <button type="button" class="an-wizard-step" data-an-step="3" id="anWizardStep3">
           <span class="an-wizard-n">3</span>
-          <span class="an-wizard-label"><strong>Lihat</strong><small>JSON → Match Centre</small></span>
+          <span class="an-wizard-label"><strong>Lihat</strong><small>Perilaku + Match Centre</small></span>
         </button>
       </nav>
 
@@ -434,6 +434,13 @@ Scan sebelum terima bola</textarea></div>
 
         <!-- STEP 2 · Proses -->
         <div class="an-wizard-panel" id="anPanel2" data-an-panel="2" hidden>
+          <div class="an-bhv-banner" role="note">
+            <div class="an-bhv-banner-icon" aria-hidden="true">◎</div>
+            <div>
+              <strong>AI Vision · Human Behavior</strong>
+              <span>AI mengamati decision under pressure, scanning, courage 1v1, reset setelah lose, help peers &amp; body language — lalu menyusun cerita untuk ortu. Angka Match Centre tetap ada; perilaku adalah bintangnya.</span>
+            </div>
+          </div>
           <div class="card">
             <h3>Proses di AI</h3>
             <p class="ux-hint">
@@ -514,13 +521,21 @@ Scan sebelum terima bola</textarea></div>
 
         <!-- STEP 3 · Lihat -->
         <div class="an-wizard-panel" id="anPanel3" data-an-panel="3" hidden>
+          <div class="an-bhv-banner" role="note">
+            <div class="an-bhv-banner-icon" aria-hidden="true">◎</div>
+            <div>
+              <strong>AI Vision · Human Behavior</strong>
+              <span>Setelah JSON diterapkan / Full auto, kartu perilaku &amp; cerita ortu muncul di bawah. Jump-to-time membuka momen di video / Highlights.</span>
+            </div>
+          </div>
           <div class="card">
             <h3>Lihat hasil · tempel JSON + terapkan</h3>
-            <p class="ux-hint">Tempel JSON dari AI, lalu terapkan ke Match Centre. Modul lain tetap tersedia sebagai opsi sekunder.</p>
+            <p class="ux-hint">Tempel JSON dari AI, lalu terapkan ke Match Centre. Modul lain tetap tersedia sebagai opsi sekunder. Utamakan field <code>behaviorInsights</code>.</p>
             <div class="field">
-              <label>Tempel JSON dari AI (matchCentre + parentReports + opsional playerDashboard)</label>
-              <textarea id="anJsonOut" class="gen-json an-json-out" placeholder='{"matchCentre":…,"parentReports":…}'></textarea>
+              <label>Tempel JSON dari AI (matchCentre + behaviorInsights + parentReports + opsional highlights)</label>
+              <textarea id="anJsonOut" class="gen-json an-json-out" placeholder='{"matchCentre":…,"behaviorInsights":{…},"parentReports":…}'></textarea>
             </div>
+            <div id="anBehaviorPanel" class="an-behavior-panel" hidden aria-live="polite"></div>
             <div class="btn-row">
               <button class="btn btn-cta" type="button" id="anApplyMc">Terapkan ke Match Centre</button>
               <button class="btn btn-ghost" type="button" id="anApplyAll">Terapkan ke semua</button>
@@ -767,48 +782,82 @@ Scan sebelum terima bola</textarea></div>
     <section class="page" id="page-finance">
       <div class="page-head">
         <div class="eyebrow">Club · Keuangan</div>
-        <h1>Dashboard <span>Finance</span></h1>
-        <p>Angka dihitung otomatis dari member, tagihan &amp; pembayaran (localStorage). Offline-ready.</p>
+        <h1>Kerja harian <span>Sacha</span></h1>
+        <p>Kerja harian Sacha · catat bayar &amp; tagih overdue</p>
       </div>
 
       <div class="grid grid-4 club-kpi">
-        <div class="stat-tile">
+        <div class="stat-tile" title="count status === aktif">
           <div class="n" id="finMemberAktif">0</div>
           <div class="l">Member aktif</div>
-          <div class="rumus-hint">count status === aktif</div>
         </div>
-        <div class="stat-tile">
+        <div class="stat-tile" title="count status overdue">
           <div class="n" id="finOverdue">0</div>
           <div class="l">Tagihan overdue</div>
-          <div class="rumus-hint">count status overdue</div>
         </div>
-        <div class="stat-tile">
+        <div class="stat-tile" title="Σ payments di bulan berjalan">
           <div class="n" id="finPenerimaan" style="font-size:20px">Rp 0</div>
           <div class="l">Penerimaan bulan ini</div>
-          <div class="rumus-hint">Σ payments di bulan berjalan</div>
         </div>
-        <div class="stat-tile">
+        <div class="stat-tile" title="Σ remaining non-batal">
           <div class="n" id="finPiutang" style="font-size:20px">Rp 0</div>
           <div class="l">Outstanding piutang</div>
-          <div class="rumus-hint">Σ remaining non-batal</div>
         </div>
       </div>
 
-      <div class="card" style="margin-top:16px">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px">
-          <h3 style="margin:0">Pembayaran terbaru</h3>
+      <div class="card sacha-today" id="sachaTodayCard" style="margin-top:16px">
+        <div class="sacha-today-head">
+          <div>
+            <div class="eyebrow" style="margin-bottom:4px">Prioritas</div>
+            <h3 style="margin:0">Sacha · Hari ini</h3>
+          </div>
+          <p class="sacha-today-sub" id="sachaTodaySub">Siap kerja — catat bayar, buat tagihan, follow-up overdue.</p>
+        </div>
+        <div class="sacha-cta-row">
+          <button type="button" class="btn sacha-cta" id="sachaCatatBayar">Catat bayar</button>
+          <button type="button" class="btn btn-ghost sacha-cta" id="sachaBuatTagihan">Buat tagihan</button>
+          <button type="button" class="btn btn-ghost sacha-cta" id="sachaFollowOverdue">Follow-up overdue</button>
+          <button type="button" class="btn sacha-cta sacha-cta-report" id="sachaBuatLaporan">Buat laporan keuangan</button>
+        </div>
+        <ul class="sacha-checklist" id="sachaChecklist"></ul>
+      </div>
+
+      <div class="card fin-report-card" id="finReportCard" hidden style="margin-top:16px">
+        <div class="fin-report-head">
+          <div>
+            <div class="eyebrow" style="margin-bottom:4px">Auto · Laporan</div>
+            <h3 style="margin:0">Laporan keuangan</h3>
+            <p class="rumus-hint" id="finReportMeta" style="margin:6px 0 0">Siap salin / unduh</p>
+          </div>
           <div class="btn-row" style="margin:0">
-            <button type="button" class="btn btn-ghost btn-sm" data-go="payments">+ Catat bayar</button>
-            <button type="button" class="btn btn-ghost btn-sm" id="clubResetSeed">Reset seed</button>
+            <button type="button" class="btn btn-sm" id="finReportCopyBtn">Salin laporan</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="finReportDlTxtBtn">Unduh .txt</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="finReportDlCsvBtn">Unduh .csv</button>
           </div>
         </div>
-        <div id="finRecentPayments"></div>
-        <p class="rumus-hint" style="margin-top:12px">Rumus: remaining = max(0, amount − Σ payments) · status auto lunas/sebagian/overdue · IDR berpemisah ribuan.</p>
+        <pre class="fin-report-preview" id="finReportPreview" aria-label="Preview laporan keuangan"></pre>
       </div>
 
-      <!-- AI Finance Analytics -->
-      <div class="card fai-section" id="faiSection" style="margin-top:16px">
-        <div class="fai-head">
+      <div class="card" id="finOverdueCard" style="margin-top:16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+          <h3 style="margin:0">Perlu ditagih <span class="club-pill bad" id="finOverdueBadge">0</span></h3>
+          <span class="rumus-hint" style="margin:0">Top 8 overdue · Bayar atau Salin WA</span>
+        </div>
+        <div id="finOverdueList"></div>
+      </div>
+
+      <div class="card fin-recent-secondary" style="margin-top:16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+          <h3 style="margin:0;font-size:15px;color:var(--muted)">Pembayaran terbaru</h3>
+          <button type="button" class="btn btn-ghost btn-sm" data-go="payments">Lihat semua</button>
+        </div>
+        <div id="finRecentPayments"></div>
+      </div>
+
+      <!-- AI Finance Analytics — collapsed by default -->
+      <details class="card fai-section an-advanced" id="faiSection" style="margin-top:16px">
+        <summary>Lanjutan · AI analytics (opsional)</summary>
+        <div class="fai-head" style="margin-top:8px">
           <div>
             <div class="eyebrow" style="margin-bottom:4px">AI · Analytics</div>
             <h3 style="margin:0">AI Finance Analytics</h3>
@@ -873,7 +922,10 @@ Scan sebelum terima bola</textarea></div>
           <p class="rumus-hint" id="faiKeyHint" style="margin:6px 0 10px"></p>
           <div id="faiInsightBody" class="fai-insight-body" data-mode="rule"></div>
         </div>
-      </div>
+        <div class="btn-row" style="margin-top:16px">
+          <button type="button" class="btn btn-ghost btn-sm" id="clubResetSeed">Reset seed</button>
+        </div>
+      </details>
     </section>
 
     <!-- ========== CLUB · MEMBERS ========== -->
@@ -979,9 +1031,11 @@ Scan sebelum terima bola</textarea></div>
       </div>
 
       <div class="club-toolbar" style="margin-bottom:14px">
-        <div class="field" style="margin:0;min-width:140px">
+        <button type="button" class="btn" id="invAddBtn">+ Buat tagihan</button>
+        <div class="field" style="margin:0;min-width:160px">
           <label>Filter status</label>
           <select id="invFilter">
+            <option value="belum_lunas" selected>Belum lunas</option>
             <option value="all">Semua</option>
             <option value="draft">draft</option>
             <option value="terbit">terbit</option>
@@ -991,7 +1045,6 @@ Scan sebelum terima bola</textarea></div>
             <option value="batal">batal</option>
           </select>
         </div>
-        <button type="button" class="btn" id="invAddBtn">+ Buat tagihan</button>
       </div>
 
       <div class="card" id="invFormCard" hidden>
@@ -1042,17 +1095,21 @@ Scan sebelum terima bola</textarea></div>
     <section class="page" id="page-payments">
       <div class="page-head">
         <div class="eyebrow">Club · Kas masuk</div>
-        <h1>Pembayaran</h1>
-        <p>Catat bayar ke invoice terbit. Status invoice update otomatis (lunas / sebagian / overdue).</p>
+        <h1>Catat <span>pembayaran</span></h1>
+        <p>Mode batch: simpan → isi yang berikutnya. Tanggal default hari ini.</p>
       </div>
 
       <div class="grid grid-2">
-        <div class="card">
-          <h3>Catat pembayaran</h3>
+        <div class="card pay-hero-card">
+          <h2 class="pay-hero-title">Catat pembayaran</h2>
           <form id="payForm">
             <div class="field">
               <label>Tagihan</label>
               <select id="payInvoiceId" required></select>
+            </div>
+            <div class="pay-remaining" id="payRemainingBox" hidden>
+              <span class="pay-remaining-label">Sisa tagihan</span>
+              <strong id="payRemainingAmt">Rp 0</strong>
             </div>
             <div class="field-row">
               <div class="field"><label>Jumlah (IDR)</label><input type="number" id="payAmount" min="0" step="1000" required /></div>
@@ -1070,7 +1127,7 @@ Scan sebelum terima bola</textarea></div>
               <div class="field"><label>Tanggal</label><input type="date" id="payDate" required /></div>
               <div class="field"><label>Bukti / catatan</label><input id="payProof" placeholder="mis. BCA · ref 123" /></div>
             </div>
-            <p class="rumus-hint" id="payFormulaHint">Rumus: remaining = max(0, amount − Σ payments). Status auto.</p>
+            <p class="rumus-hint" id="payFormulaHint">Pilih tagihan — sisa otomatis muncul.</p>
             <div class="btn-row">
               <button type="submit" class="btn">Simpan pembayaran</button>
             </div>
