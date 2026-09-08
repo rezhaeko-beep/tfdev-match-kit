@@ -47,13 +47,13 @@
           <h1><br/><span>Coach Pramu</span> &amp; Tim Analis</h1>
           <p>Alur singkat: <strong>upload video</strong> → proses di AI (ChatGPT/Claude/Grok) → <strong>lihat Match Centre</strong>. Tanpa API key.</p>
           <div class="btn-row">
-            <button class="btn btn-cta" data-go="analitik">Upload video → hasil</button>
-            <button class="btn btn-ghost" data-go="matchcentre">Lihat Match Centre</button>
+            <button class="btn btn-cta" type="button" id="homeStartWizard" data-go="analitik">Upload video → hasil</button>
+            <button class="btn btn-ghost" type="button" data-go="matchcentre">Lihat Match Centre</button>
           </div>
           <div class="ux-steps" aria-label="3 langkah">
             <div class="ux-step"><span class="ux-step-n">1</span><div><strong>Upload</strong><span>Pilih video match</span></div></div>
             <div class="ux-step"><span class="ux-step-n">2</span><div><strong>Proses</strong><span>Salin prompt → AI</span></div></div>
-            <div class="ux-step"><span class="ux-step-n">3</span><div><strong>Hasil</strong><span>Tempel JSON → Match Centre</span></div></div>
+            <div class="ux-step"><span class="ux-step-n">3</span><div><strong>Lihat</strong><span>Tempel JSON → Match Centre</span></div></div>
           </div>
         </div>
         <div class="hero-stats">
@@ -104,8 +104,8 @@
         <article class="card module-card" data-go="analitik">
           <div class="icon">🎬</div>
           <h2>Analitik AI</h2>
-          <p>Upload video match, ambil frame, salin prompt ke ChatGPT/Claude/Grok (atau Vision API), tempel JSON → Match Centre &amp; Parent Report.</p>
-          <div class="go">VIDEO → AI →</div>
+          <p>Wizard 3 langkah: Upload → Proses → Lihat (Match Centre). Power features tetap ada.</p>
+          <div class="go">MULAI WIZARD →</div>
         </article>
         <article class="card module-card" data-go="highlights">
           <div class="icon">⭐</div>
@@ -351,154 +351,206 @@ Scan sebelum terima bola</textarea></div>
     <!-- ANALITIK AI · VIDEO-BASED -->
     <section class="page" id="page-analitik">
       <div class="page-head">
-        <div class="eyebrow">Tim Analis · Video → AI → JSON</div>
+        <div class="eyebrow">Tim Analis · Wizard 3 langkah</div>
         <h1>Analitik <span>AI</span></h1>
-        <p>Upload video match, ambil frame, siapkan paket untuk ChatGPT/Claude/Grok (atau Vision API), tempel JSON hasil → Match Centre &amp; Parent Report.</p>
+        <p>Untuk Coach Pramu: <strong>Upload</strong> → <strong>Proses</strong> (salin prompt / Full auto) → <strong>Lihat</strong> hasil di Match Centre. Default tanpa API key.</p>
       </div>
 
-      <div class="card rules-card" style="margin-bottom:18px">
-        <h3>Aturan analitik (video-first)</h3>
-        <ul class="rules-list">
-          <li><strong>Primary evidence = VIDEO / frames</strong> — jangan mengarang gol, shot, kartu, atau skor yang tidak terbaca dari footage.</li>
-          <li><strong>N/C &amp; null</strong> — angka yang tidak yakin dari wide cam = <code>null</code> + reason, bukan 0 palsu.</li>
-          <li><strong>estimated:true</strong> — possession &amp; attacking sequences boleh estimasi; selalu tandai.</li>
-          <li><strong>Alur</strong> — Video → frame/prompt → AI eksternal atau Vision API → paste JSON → terapkan.</li>
-        </ul>
-      </div>
+      <nav class="an-wizard" id="anWizard" aria-label="Wizard Analitik">
+        <button type="button" class="an-wizard-step is-active" data-an-step="1" id="anWizardStep1">
+          <span class="an-wizard-n">1</span>
+          <span class="an-wizard-label"><strong>Upload</strong><small>Video + meta</small></span>
+        </button>
+        <button type="button" class="an-wizard-step" data-an-step="2" id="anWizardStep2">
+          <span class="an-wizard-n">2</span>
+          <span class="an-wizard-label"><strong>Proses</strong><small>Prompt / Full auto</small></span>
+        </button>
+        <button type="button" class="an-wizard-step" data-an-step="3" id="anWizardStep3">
+          <span class="an-wizard-n">3</span>
+          <span class="an-wizard-label"><strong>Lihat</strong><small>JSON → Match Centre</small></span>
+        </button>
+      </nav>
 
-      <div class="grid grid-2">
-        <div class="card">
-          <h3>1 · Upload video</h3>
-          <div class="an-drop" id="anDropZone" tabindex="0" role="button" aria-label="Zona upload video">
-            <input type="file" id="anVideoFile" accept="video/*" hidden />
-            <div class="an-drop-inner" id="anDropInner">
-              <div class="an-drop-icon">🎬</div>
-              <strong>Tap / drop video match di sini</strong>
-              <span>MP4 / MOV / WebM · works on phone browser</span>
-              <button class="btn btn-sm" type="button" id="anPickVideo">Pilih file video</button>
+      <div class="an-wizard-panels">
+        <!-- STEP 1 · Upload -->
+        <div class="an-wizard-panel is-active" id="anPanel1" data-an-panel="1">
+          <div class="grid grid-2">
+            <div class="card">
+              <h3>Upload video</h3>
+              <div class="an-drop" id="anDropZone" tabindex="0" role="button" aria-label="Zona upload video">
+                <input type="file" id="anVideoFile" accept="video/*" hidden />
+                <div class="an-drop-inner" id="anDropInner">
+                  <div class="an-drop-icon">🎬</div>
+                  <strong>Tap / drop video match di sini</strong>
+                  <span>MP4 / MOV / WebM · works on phone browser</span>
+                  <button class="btn btn-sm" type="button" id="anPickVideo">Pilih file video</button>
+                </div>
+              </div>
+              <div class="an-video-wrap" id="anVideoWrap" hidden>
+                <video id="anVideo" controls playsinline preload="metadata"></video>
+                <div class="an-video-meta">
+                  <span id="anVideoName">—</span>
+                  <span id="anVideoInfo">—</span>
+                </div>
+                <div class="btn-row" style="margin-top:10px">
+                  <button class="btn btn-ghost btn-sm" type="button" id="anClearVideo">Ganti / hapus video</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3>Meta singkat</h3>
+              <p class="ux-hint">Isi lawan, kit &amp; babak supaya prompt AI akurat.</p>
+              <div class="field-row">
+                <div class="field"><label>Lawan</label><input id="anLawan" value="G8" placeholder="nama lawan" /></div>
+                <div class="field"><label>Babak</label><input id="anBabak" value="Babak 1" /></div>
+              </div>
+              <div class="field-row">
+                <div class="field"><label>Kit lawan</label><input id="anKitLawan" value="blue" placeholder="mis. blue / white" /></div>
+                <div class="field"><label>Durasi (detik, auto)</label><input type="number" id="anDurasi" value="" min="0" placeholder="dari video" /></div>
+              </div>
+              <div class="field"><label>Source filename</label><input id="anSource" placeholder="otomatis dari nama file" /></div>
+              <details class="an-advanced">
+                <summary>Opsional: Parent Report</summary>
+                <div class="field-row" style="margin-top:12px">
+                  <div class="field"><label>Nama</label><input id="anPlayerName" placeholder="kosongkan = skip parentReports" /></div>
+                  <div class="field"><label>No</label><input id="anPlayerNo" placeholder="mis. 7" /></div>
+                </div>
+                <div class="field-row">
+                  <div class="field"><label>Age group</label><input id="anPlayerAge" placeholder="mis. U10" /></div>
+                  <div class="field"><label>Posisi</label><input id="anPlayerPos" placeholder="mis. Midfielder" /></div>
+                </div>
+              </details>
             </div>
           </div>
-          <div class="an-video-wrap" id="anVideoWrap" hidden>
-            <video id="anVideo" controls playsinline preload="metadata"></video>
-            <div class="an-video-meta">
-              <span id="anVideoName">—</span>
-              <span id="anVideoInfo">—</span>
-            </div>
-            <div class="btn-row" style="margin-top:10px">
-              <button class="btn btn-ghost btn-sm" type="button" id="anClearVideo">Ganti / hapus video</button>
+          <div class="an-wizard-nav">
+            <span class="an-wizard-hint">Setelah video siap, lanjut ke Proses.</span>
+            <div class="btn-row">
+              <button class="btn btn-ghost" type="button" id="anWizardBack1" disabled>← Kembali</button>
+              <button class="btn btn-cta" type="button" id="anWizardNext1">Lanjut · Proses →</button>
             </div>
           </div>
         </div>
 
-        <div class="card">
-          <h3>2 · Match meta</h3>
-          <div class="field-row">
-            <div class="field"><label>Lawan</label><input id="anLawan" value="G8" placeholder="nama lawan" /></div>
-            <div class="field"><label>Kit lawan</label><input id="anKitLawan" value="blue" placeholder="mis. blue / white" /></div>
-          </div>
-          <div class="field-row">
-            <div class="field"><label>Babak</label><input id="anBabak" value="Babak 1" /></div>
-            <div class="field"><label>Durasi (detik, auto)</label><input type="number" id="anDurasi" value="" min="0" placeholder="dari video" /></div>
-          </div>
-          <div class="field"><label>Source filename</label><input id="anSource" placeholder="otomatis dari nama file" /></div>
-          <h3 style="margin-top:16px">Pemain (opsional · Parent Report)</h3>
-          <div class="field-row">
-            <div class="field"><label>Nama</label><input id="anPlayerName" placeholder="kosongkan = skip parentReports" /></div>
-            <div class="field"><label>No</label><input id="anPlayerNo" placeholder="mis. 7" /></div>
-          </div>
-          <div class="field-row">
-            <div class="field"><label>Age group</label><input id="anPlayerAge" placeholder="mis. U10" /></div>
-            <div class="field"><label>Posisi</label><input id="anPlayerPos" placeholder="mis. Midfielder" /></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card" style="margin-top:18px">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">
-          <h3 style="margin:0">3 · Frame capture untuk AI</h3>
-          <span class="pill" id="anFramesBadge">0 frame</span>
-        </div>
-        <p style="font-size:13px;color:var(--muted);margin-bottom:12px">
-          Ambil frame dari waktu video saat ini, atau sample otomatis (setiap N detik, max ~12). Frame dipakai sebagai bukti untuk Vision API / upload ke AI eksternal.
-        </p>
-        <div class="field-row" style="margin-bottom:10px">
-          <div class="field"><label>Interval sample (detik)</label><input type="number" id="anSampleEvery" value="30" min="5" max="300" /></div>
-          <div class="field"><label>Max frames</label><input type="number" id="anSampleMax" value="12" min="1" max="24" /></div>
-        </div>
-        <div class="btn-row">
-          <button class="btn" type="button" id="anCaptureNow">Ambil frame sekarang</button>
-          <button class="btn btn-ghost" type="button" id="anCaptureAuto">Ambil sample otomatis</button>
-          <button class="btn btn-ghost btn-sm" type="button" id="anClearFrames">Hapus semua frame</button>
-          <button class="btn btn-ghost btn-sm" type="button" id="anSendToHighlights">Kirim frame ke Highlights</button>
-        </div>
-        <canvas id="anCanvas" hidden></canvas>
-        <div class="an-frames" id="anFramesStrip" aria-live="polite"></div>
-      </div>
-
-      <div class="grid grid-2" style="margin-top:18px">
-        <div class="card">
-          <h3>4 · AI run mode</h3>
-          <div class="btn-row" style="margin-bottom:12px">
-            <button class="btn" type="button" id="anFullAuto" title="Sample frame → Vision/JSON → Match Centre + Report + Player + Highlights">Full auto: video → semua modul</button>
-          </div>
-          <div class="chip-row gen-mode-row" style="margin-bottom:12px">
-            <label class="chip-radio"><input type="radio" name="anMode" value="external" checked /> Paket eksternal (default)</label>
-            <label class="chip-radio"><input type="radio" name="anMode" value="api" /> API Vision</label>
-          </div>
-          <div id="anExternalFields">
-            <p style="font-size:13px;color:var(--muted);margin-bottom:12px">
-              <strong style="color:#fff">Tanpa API key.</strong> Salin prompt di bawah → upload video (atau frame JPEG) ke ChatGPT / Claude / Grok vision → paste prompt → salin JSON jawaban ke langkah 5.
+        <!-- STEP 2 · Proses -->
+        <div class="an-wizard-panel" id="anPanel2" data-an-panel="2" hidden>
+          <div class="card">
+            <h3>Proses di AI</h3>
+            <p class="ux-hint">
+              <strong style="color:#fff">Tanpa API key (default):</strong> salin prompt → buka ChatGPT / Claude / Grok → upload video (atau frame) + paste prompt → salin JSON jawaban ke langkah Lihat.
             </p>
-            <div class="btn-row" style="margin-bottom:10px">
-              <button class="btn" type="button" id="anCopyPrompt">Salin prompt video-analitik</button>
-              <button class="btn btn-ghost btn-sm" type="button" id="anRebuildPrompt">Rebuild prompt</button>
+            <!-- keep mode radios for JS compatibility; API hidden in Lanjutan -->
+            <div class="chip-row gen-mode-row" style="margin-bottom:12px" hidden>
+              <label class="chip-radio"><input type="radio" name="anMode" value="external" checked /> Paket eksternal (default)</label>
+              <label class="chip-radio"><input type="radio" name="anMode" value="api" /> API Vision</label>
             </div>
+            <div id="anExternalFields">
+              <div class="btn-row" style="margin-bottom:10px">
+                <button class="btn btn-cta btn-lg" type="button" id="anCopyPrompt">Salin prompt</button>
+                <button class="btn btn-ghost btn-sm" type="button" id="anRebuildPrompt">Rebuild prompt</button>
+              </div>
+              <div class="field">
+                <label>Prompt paket (preview)</label>
+                <textarea id="anPromptOut" class="an-prompt-out" readonly placeholder="Klik Rebuild / Salin prompt…"></textarea>
+              </div>
+            </div>
+
+            <div class="an-fullauto-banner" id="anFullAutoBanner" hidden>
+              <div>
+                <strong>API key terdeteksi</strong>
+                <span>Jalankan Full auto: sample frame → Vision → terapkan modul.</span>
+              </div>
+              <button class="btn btn-cta" type="button" id="anFullAutoPrimary" title="Sample frame → Vision/JSON → semua modul">Full auto</button>
+            </div>
+
+            <details class="an-advanced" id="anAdvancedBlock" style="margin-top:14px">
+              <summary>Lanjutan · frame sample &amp; API Vision</summary>
+              <div style="margin-top:14px">
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+                  <h3 style="margin:0;font-size:15px">Frame capture (opsional)</h3>
+                  <span class="pill" id="anFramesBadge">0 frame</span>
+                </div>
+                <p class="ux-hint">Ambil frame dari video sebagai bukti untuk AI. Opsional — AI vision bisa langsung dari file video.</p>
+                <div class="field-row" style="margin-bottom:10px">
+                  <div class="field"><label>Interval sample (detik)</label><input type="number" id="anSampleEvery" value="30" min="5" max="300" /></div>
+                  <div class="field"><label>Max frames</label><input type="number" id="anSampleMax" value="12" min="1" max="24" /></div>
+                </div>
+                <div class="btn-row">
+                  <button class="btn btn-ghost" type="button" id="anCaptureNow">Ambil frame sekarang</button>
+                  <button class="btn btn-ghost" type="button" id="anCaptureAuto">Ambil sample otomatis</button>
+                  <button class="btn btn-ghost btn-sm" type="button" id="anClearFrames">Hapus semua frame</button>
+                  <button class="btn btn-ghost btn-sm" type="button" id="anSendToHighlights">Kirim frame ke Highlights</button>
+                </div>
+                <canvas id="anCanvas" hidden></canvas>
+                <div class="an-frames" id="anFramesStrip" aria-live="polite"></div>
+
+                <hr class="ux-hr" />
+                <h3 style="font-size:15px;margin-bottom:8px">API Vision (butuh key)</h3>
+                <p class="ux-hint">Hanya jika punya OpenAI-compatible key. Default Pramu: tetap pakai paket eksternal di atas.</p>
+                <div class="btn-row" style="margin-bottom:12px">
+                  <button class="btn btn-ghost btn-sm" type="button" id="anEnableApiMode">Aktifkan mode API Vision</button>
+                  <button class="btn btn-ghost btn-sm" type="button" id="anEnableExternalMode">Kembali ke paket eksternal</button>
+                </div>
+                <div id="anApiFields" style="display:none">
+                  <div class="field"><label>API base URL</label><input id="anApiBase" value="https://api.openai.com/v1" /></div>
+                  <div class="field"><label>Model (vision)</label><input id="anApiModel" value="gpt-4o-mini" /></div>
+                  <div class="field"><label>API key</label><input id="anApiKey" type="password" autocomplete="off" placeholder="sk-…" /></div>
+                  <div class="btn-row" style="margin-top:10px">
+                    <button class="btn" type="button" id="anRunApi">Jalankan Vision API</button>
+                    <button class="btn btn-ghost" type="button" id="anFullAuto" title="Sample frame → Vision/JSON → semua modul">Full auto</button>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+          <div class="an-wizard-nav">
+            <span class="an-wizard-hint">Sudah punya JSON dari AI? Lanjut ke Lihat.</span>
+            <div class="btn-row">
+              <button class="btn btn-ghost" type="button" id="anWizardBack2">← Upload</button>
+              <button class="btn btn-cta" type="button" id="anWizardNext2">Lanjut · Lihat →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 3 · Lihat -->
+        <div class="an-wizard-panel" id="anPanel3" data-an-panel="3" hidden>
+          <div class="card">
+            <h3>Lihat hasil · tempel JSON + terapkan</h3>
+            <p class="ux-hint">Tempel JSON dari AI, lalu terapkan ke Match Centre. Modul lain tetap tersedia sebagai opsi sekunder.</p>
             <div class="field">
-              <label>Prompt paket (preview)</label>
-              <textarea id="anPromptOut" class="an-prompt-out" readonly placeholder="Klik Rebuild / Salin prompt…"></textarea>
+              <label>Tempel JSON dari AI (matchCentre + parentReports + opsional playerDashboard)</label>
+              <textarea id="anJsonOut" class="gen-json an-json-out" placeholder='{"matchCentre":…,"parentReports":…}'></textarea>
+            </div>
+            <div class="btn-row">
+              <button class="btn btn-cta" type="button" id="anApplyMc">Terapkan ke Match Centre</button>
+              <button class="btn btn-ghost" type="button" id="anApplyAll">Terapkan ke semua</button>
+              <button class="btn btn-ghost btn-sm" type="button" id="anApplyPr">Parent Report</button>
+              <button class="btn btn-ghost btn-sm" type="button" id="anApplyPd">Player Dashboard</button>
+            </div>
+            <div class="btn-row" style="margin-top:8px">
+              <button class="btn btn-ghost btn-sm" type="button" id="anCopyJson">Salin JSON</button>
+              <button class="btn btn-ghost btn-sm" type="button" id="anOpenMc">Buka Match Centre</button>
+              <button class="btn btn-ghost btn-sm" type="button" id="anOpenPr">Buka Report</button>
+              <button class="btn btn-ghost btn-sm" type="button" id="anOpenPd">Buka Player</button>
+            </div>
+            <div class="an-post-apply" id="anPostApply" hidden>
+              <p><strong>Berhasil diterapkan ke Match Centre.</strong> Lanjut lihat kartu statistik.</p>
+              <button class="btn btn-cta" type="button" id="anGoMc">Buka Match Centre</button>
+            </div>
+            <div class="gen-status" id="anStatus" aria-live="polite"></div>
+            <ul class="summary-bullets" id="anSummaryList" style="margin-top:12px">
+              <li>1 Upload → 2 Proses (salin prompt) → 3 Lihat · tempel JSON → Terapkan Match Centre.</li>
+            </ul>
+          </div>
+          <div class="an-wizard-nav">
+            <span class="an-wizard-hint">Power features (Parent / Player / Full auto) tetap di langkah sebelumnya.</span>
+            <div class="btn-row">
+              <button class="btn btn-ghost" type="button" id="anWizardBack3">← Proses</button>
             </div>
           </div>
-          <div id="anApiFields" style="display:none">
-            <p style="font-size:13px;color:var(--muted);margin-bottom:12px">
-              Kirim frame (JPEG data URL) + system prompt ke OpenAI-compatible <code>chat/completions</code> (vision). Key disimpan di <code>localStorage</code>.
-            </p>
-            <div class="field"><label>API base URL</label><input id="anApiBase" value="https://api.openai.com/v1" /></div>
-            <div class="field"><label>Model (vision)</label><input id="anApiModel" value="gpt-4o-mini" /></div>
-            <div class="field"><label>API key</label><input id="anApiKey" type="password" autocomplete="off" placeholder="sk-…" /></div>
-            <div class="btn-row" style="margin-top:10px">
-              <button class="btn" type="button" id="anRunApi">Jalankan Vision API</button>
-            </div>
-            <p style="font-size:12px;color:var(--muted);margin-top:8px">Atau pakai <strong style="color:#FF6B1A">Full auto</strong> di atas: sample frame → Vision → terapkan ke semua modul.</p>
-          </div>
-        </div>
-
-        <div class="card">
-          <h3>5 · Paste JSON hasil + terapkan</h3>
-          <div class="field">
-            <label>Tempel JSON dari AI (matchCentre + parentReports + opsional playerDashboard)</label>
-            <textarea id="anJsonOut" class="gen-json an-json-out" placeholder='{"matchCentre":…,"parentReports":…}'></textarea>
-          </div>
-          <div class="btn-row">
-            <button class="btn" type="button" id="anApplyMc">Terapkan ke Match Centre</button>
-            <button class="btn btn-ghost" type="button" id="anApplyPr">Terapkan ke Parent Report</button>
-            <button class="btn btn-ghost" type="button" id="anApplyPd">Terapkan ke Player Dashboard</button>
-            <button class="btn" type="button" id="anApplyAll">Terapkan ke semua</button>
-          </div>
-          <div class="btn-row" style="margin-top:8px">
-            <button class="btn btn-ghost btn-sm" type="button" id="anCopyJson">Salin JSON</button>
-            <button class="btn btn-ghost btn-sm" type="button" id="anOpenMc">Buka Match Centre</button>
-            <button class="btn btn-ghost btn-sm" type="button" id="anOpenPr">Buka Report</button>
-            <button class="btn btn-ghost btn-sm" type="button" id="anOpenPd">Buka Player</button>
-          </div>
-          <div class="gen-status" id="anStatus" aria-live="polite"></div>
-          <ul class="summary-bullets" id="anSummaryList" style="margin-top:12px">
-            <li>Upload video → ambil frame → salin prompt → AI → paste JSON di sini.</li>
-          </ul>
         </div>
       </div>
     </section>
-
-  
 
     <!-- HIGHLIGHTS -->
     <section class="page" id="page-highlights">
@@ -610,6 +662,7 @@ Scan sebelum terima bola</textarea></div>
           <button class="btn btn-ghost" type="button" id="hlCopyText">Salin daftar teks</button>
           <button class="btn btn-ghost btn-sm" type="button" id="hlResetSeed">Reset demo seed</button>
         </div>
+        <p class="hl-seed-tip" id="hlSeedTip" hidden>Demo seed TFS vs G8 Babak 1 · klik waktu untuk lompat; Salin daftar teks untuk CapCut.</p>
         <div class="hl-list" id="hlList" aria-live="polite"></div>
       </div>
     </section>
