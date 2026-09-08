@@ -501,6 +501,11 @@
     const list = $("hlList");
     const count = $("hlCount");
     if (count) count.textContent = highlights.length + " highlight";
+    const tip = $("hlSeedTip");
+    if (tip) {
+      const hasSeed = highlights.some((h) => h && h.seed);
+      tip.hidden = !hasSeed;
+    }
     if (!list) return;
     const sorted = highlights.slice().sort((a, b) => a.t - b.t);
     if (!sorted.length) {
