@@ -80,11 +80,11 @@
 
         <div class="card coach-desk-gemini">
           <div class="coach-desk-gemini-copy">
-            <strong>AI Vision (Gemini) — upload video → hasil</strong>
-            <span>Full-auto tanpa OpenAI: paste key AI Studio (AIza… / AQ.…), model <code>gemini-3.6-flash</code>. Atau tandai clips dulu — Match Centre tetap terisi offline.</span>
+            <strong>Full auto Vision · Gemini</strong>
+            <span>Upload video → paste key AI Studio → Full auto. Model <code>gemini-3.6-flash</code> (fallback otomatis). Tanpa OpenAI · tanpa demo JSON.</span>
           </div>
           <div class="btn-row" style="margin:0">
-            <button class="btn btn-cta" type="button" id="homeStartWizard" data-go="analitik">AI Vision (Gemini) — upload video → hasil</button>
+            <button class="btn btn-cta" type="button" id="homeStartWizard" data-go="analitik">Full auto Vision · Gemini</button>
             <button class="btn btn-ghost" type="button" data-go="analitik">Buka Analitik</button>
           </div>
         </div>
@@ -358,7 +358,7 @@ Scan sebelum terima bola</textarea></div>
       <div class="page-head">
         <div class="eyebrow">Tim Analis · Wizard 3 langkah · Human Behavior</div>
         <h1>Analitik <span>AI</span></h1>
-        <p>Untuk Coach Pramu: <strong>Upload</strong> → <strong>Proses</strong> (salin prompt / Full auto) → <strong>Lihat</strong> perilaku + Match Centre. Vision membaca <strong>perilaku manusia</strong> di lapangan — bukan scoreboard kering saja.</p>
+        <p>Untuk Coach Pramu: <strong>Upload</strong> → <strong>Proses</strong> (paste key Gemini → Full auto) → <strong>Lihat</strong> perilaku + Match Centre. Vision membaca <strong>perilaku manusia</strong> di lapangan — bukan scoreboard kering saja.</p>
       </div>
 
       <nav class="an-wizard" id="anWizard" aria-label="Wizard Analitik">
@@ -368,7 +368,7 @@ Scan sebelum terima bola</textarea></div>
         </button>
         <button type="button" class="an-wizard-step" data-an-step="2" id="anWizardStep2">
           <span class="an-wizard-n">2</span>
-          <span class="an-wizard-label"><strong>Proses</strong><small>Prompt / Full auto</small></span>
+          <span class="an-wizard-label"><strong>Proses</strong><small>Full auto · Gemini</small></span>
         </button>
         <button type="button" class="an-wizard-step" data-an-step="3" id="anWizardStep3">
           <span class="an-wizard-n">3</span>
@@ -447,49 +447,71 @@ Scan sebelum terima bola</textarea></div>
             </div>
           </div>
           <div class="card">
-            <h3>Proses di AI</h3>
+            <h3>Proses · Gemini Full auto</h3>
             <div class="an-gemini-callout" role="note">
-              <strong>Gemini free path</strong>
-              <span>Paste key Gemini AI Studio (<code>AIza…</code> atau <code>AQ.…</code>). Model wajib <code>gemini-3.6-flash</code>. Key disimpan di browser ini saja — tanpa OpenAI.</span>
+              <strong>Gemini Full auto (default)</strong>
+              <span>Paste key Gemini AI Studio di bawah, pastikan video sudah di-upload, lalu tekan <strong>Full auto · Gemini</strong>. Key hanya di browser ini — tanpa OpenAI, tanpa demo JSON.</span>
             </div>
-            <p class="ux-hint">
-              <strong style="color:#fff">Tanpa API key (default):</strong> salin prompt → buka ChatGPT / Claude / Grok → upload video (atau frame) + paste prompt → salin JSON jawaban ke langkah Lihat. Atau pakai <strong>demo JSON</strong> di bawah untuk lihat end-to-end offline.
+            <p class="ux-hint" id="anFullAutoLead">
+              <strong style="color:#fff">Menang dengan Vision nyata:</strong> paste key → Full auto. AI sample frame dari video, kirim ke Gemini Vision, terapkan ke Match Centre &amp; perilaku.
             </p>
-            <!-- keep mode radios for JS compatibility; API hidden in Lanjutan -->
+            <!-- keep mode radios for JS; default API Vision -->
             <div class="chip-row gen-mode-row" style="margin-bottom:12px" hidden>
-              <label class="chip-radio"><input type="radio" name="anMode" value="external" checked /> Paket eksternal (default)</label>
-              <label class="chip-radio"><input type="radio" name="anMode" value="api" /> API Vision</label>
+              <label class="chip-radio"><input type="radio" name="anMode" value="external" /> Paket eksternal</label>
+              <label class="chip-radio"><input type="radio" name="anMode" value="api" checked /> API Vision</label>
             </div>
-            <div id="anExternalFields">
-              <div class="btn-row" style="margin-bottom:10px">
-                <button class="btn btn-cta btn-lg" type="button" id="anCopyPrompt">Salin prompt</button>
-                <button class="btn btn-ghost btn-sm" type="button" id="anRebuildPrompt">Rebuild prompt</button>
-              </div>
+
+            <div class="an-gemini-hero" id="anApiFields">
               <div class="field">
-                <label>Prompt paket (preview)</label>
-                <textarea id="anPromptOut" class="an-prompt-out" readonly placeholder="Klik Rebuild / Salin prompt…"></textarea>
+                <label>API key Gemini</label>
+                <input id="anApiKey" type="password" autocomplete="off" placeholder="AQ.… atau AIza…" />
+              </div>
+              <div class="field-row" style="margin-bottom:10px">
+                <div class="field">
+                  <label>API base (Gemini OpenAI-compat)</label>
+                  <input id="anApiBase" value="https://generativelanguage.googleapis.com/v1beta/openai" readonly />
+                </div>
+                <div class="field">
+                  <label>Model</label>
+                  <input id="anApiModel" value="gemini-3.6-flash" />
+                </div>
               </div>
             </div>
 
             <div class="an-fullauto-banner" id="anFullAutoBanner">
               <div>
                 <strong id="anFullAutoTitle">Full auto · Gemini Vision</strong>
-                <span id="anFullAutoHint">Paste key di Lanjutan, lalu Full auto — atau pakai demo JSON tanpa API.</span>
+                <span id="anFullAutoHint">Paste key Gemini di atas, lalu Full auto — upload video di langkah Upload.</span>
               </div>
               <div class="btn-row" style="margin:0;flex-shrink:0">
-                <button class="btn btn-cta" type="button" id="anFullAutoPrimary" title="Sample frame → Vision/JSON → semua modul">Full auto</button>
-                <button class="btn btn-ghost" type="button" id="anLoadDemoJson" title="Load demo matchCentre + behaviorInsights tanpa API">Pakai demo JSON (tanpa API)</button>
+                <button class="btn btn-cta btn-lg" type="button" id="anFullAutoPrimary" title="Sample frame → Gemini Vision → semua modul">Full auto · Gemini</button>
               </div>
             </div>
 
+            <details class="an-legacy" id="anLegacyManual" style="margin-top:14px">
+              <summary>Cara lama (prompt/JSON manual)</summary>
+              <div style="margin-top:14px" id="anExternalFields">
+                <p class="ux-hint">Cadangan offline: salin prompt ke ChatGPT/Claude/Grok, atau load demo JSON. Bukan jalur menang vs rival.</p>
+                <div class="btn-row" style="margin-bottom:10px">
+                  <button class="btn btn-ghost" type="button" id="anCopyPrompt">Salin prompt</button>
+                  <button class="btn btn-ghost btn-sm" type="button" id="anRebuildPrompt">Rebuild prompt</button>
+                  <button class="btn btn-ghost" type="button" id="anLoadDemoJson" title="Load demo matchCentre + behaviorInsights tanpa API">Pakai demo JSON</button>
+                </div>
+                <div class="field">
+                  <label>Prompt paket (preview)</label>
+                  <textarea id="anPromptOut" class="an-prompt-out" readonly placeholder="Klik Rebuild / Salin prompt…"></textarea>
+                </div>
+              </div>
+            </details>
+
             <details class="an-advanced" id="anAdvancedBlock" style="margin-top:14px">
-              <summary>Lanjutan · frame sample &amp; API Vision</summary>
+              <summary>Lanjutan · frame sample</summary>
               <div style="margin-top:14px">
                 <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">
                   <h3 style="margin:0;font-size:15px">Frame capture (opsional)</h3>
                   <span class="pill" id="anFramesBadge">0 frame</span>
                 </div>
-                <p class="ux-hint">Ambil frame dari video sebagai bukti untuk AI. Opsional — AI vision bisa langsung dari file video.</p>
+                <p class="ux-hint">Full auto mengambil sample sendiri. Manual frame hanya jika perlu bukti ekstra.</p>
                 <div class="field-row" style="margin-bottom:10px">
                   <div class="field"><label>Interval sample (detik)</label><input type="number" id="anSampleEvery" value="30" min="5" max="300" /></div>
                   <div class="field"><label>Max frames</label><input type="number" id="anSampleMax" value="12" min="1" max="24" /></div>
@@ -504,26 +526,21 @@ Scan sebelum terima bola</textarea></div>
                 <div class="an-frames" id="anFramesStrip" aria-live="polite"></div>
 
                 <hr class="ux-hr" />
-                <h3 style="font-size:15px;margin-bottom:8px">API Vision (butuh key)</h3>
-                <p class="ux-hint">Hanya jika punya OpenAI-compatible key. Default Pramu: tetap pakai paket eksternal di atas.</p>
+                <h3 style="font-size:15px;margin-bottom:8px">API Vision (manual)</h3>
+                <p class="ux-hint">Key &amp; model sudah di panel utama. Tombol di bawah menjalankan Vision tanpa pipeline Full auto.</p>
                 <div class="btn-row" style="margin-bottom:12px">
-                  <button class="btn btn-ghost btn-sm" type="button" id="anEnableApiMode">Aktifkan mode API Vision</button>
-                  <button class="btn btn-ghost btn-sm" type="button" id="anEnableExternalMode">Kembali ke paket eksternal</button>
+                  <button class="btn btn-ghost btn-sm" type="button" id="anEnableApiMode">Mode API Vision</button>
+                  <button class="btn btn-ghost btn-sm" type="button" id="anEnableExternalMode">Mode paket eksternal</button>
                 </div>
-                <div id="anApiFields" style="display:none">
-                  <div class="field"><label>API base URL</label><input id="anApiBase" value="https://generativelanguage.googleapis.com/v1beta/openai" /></div>
-                  <div class="field"><label>Model (vision)</label><input id="anApiModel" value="gemini-3.6-flash" /></div>
-                  <div class="field"><label>API key</label><input id="anApiKey" type="password" autocomplete="off" placeholder="AIza… (Gemini AI Studio)" /></div>
-                  <div class="btn-row" style="margin-top:10px">
-                    <button class="btn" type="button" id="anRunApi">Jalankan Vision API</button>
-                    <button class="btn btn-ghost" type="button" id="anFullAuto" title="Sample frame → Vision/JSON → semua modul">Full auto</button>
-                  </div>
+                <div class="btn-row" style="margin-top:10px">
+                  <button class="btn" type="button" id="anRunApi">Jalankan Vision API</button>
+                  <button class="btn btn-ghost" type="button" id="anFullAuto" title="Sample frame → Vision/JSON → semua modul">Full auto</button>
                 </div>
               </div>
             </details>
           </div>
           <div class="an-wizard-nav">
-            <span class="an-wizard-hint">Sudah punya JSON dari AI? Lanjut ke Lihat.</span>
+            <span class="an-wizard-hint">Setelah Full auto / JSON siap, lanjut ke Lihat.</span>
             <div class="btn-row">
               <button class="btn btn-ghost" type="button" id="anWizardBack2">← Upload</button>
               <button class="btn btn-cta" type="button" id="anWizardNext2">Lanjut · Lihat →</button>

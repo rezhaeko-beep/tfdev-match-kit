@@ -3,7 +3,14 @@
   const API_BASE_LS = "tfdev-analitik-api-base";
   const API_MODEL_LS = "tfdev-analitik-api-model";
   const MAX_VISION_FRAMES = 6;
-  const JPEG_QUALITY = 0.72;
+  const MAX_VISION_FRAMES_FULL_AUTO = 4;
+  const JPEG_QUALITY = 0.68;
+  const CAPTURE_MAX_WIDTH = 960;
+  const GEMINI_MODEL_FALLBACKS = [
+    "gemini-3.6-flash",
+    "gemini-3.5-flash",
+    "gemini-flash-latest"
+  ];
 
   let videoObjectUrl = null;
   let frames = []; // { id, t, dataUrl, w, h }
@@ -48,13 +55,12 @@
 
   function getMode() {
     const checked = document.querySelector('input[name="anMode"]:checked');
-    return checked ? checked.value : "external";
+    return checked ? checked.value : "api";
   }
 
   function syncModeUi() {
-    const api = getMode() === "api";
-    if ($("anApiFields")) $("anApiFields").style.display = api ? "" : "none";
-    // Paket eksternal tetap terlihat (default Pramu); API hanya di Lanjutan.
+    // Gemini hero (key/base/model) always visible; legacy prompt/JSON stays in <details>.
+    if ($("anApiFields")) $("anApiFields").style.display = "";
     if ($("anExternalFields")) $("anExternalFields").style.display = "";
   }
 
@@ -235,7 +241,7 @@
       return null;
     }
     const canvas = $("anCanvas");
-    const maxW = 1280;
+    const maxW = CAPTURE_MAX_WIDTH;
     let w = v.videoWidth;
     let h = v.videoHeight;
     if (w > maxW) {
@@ -476,7 +482,8 @@
     return data;
   }
 
-  function buildUserContentForVision(meta) {
+  function buildUserContentForVision(meta, maxFrames) {
+    const limit = Math.max(1, Number(maxFrames) || MAX_VISION_FRAMES);
     const parts = [];
     const textBlock =
       "Analisis VIDEO/frames youth academy berikut untuk TFDEV Analitik.\n" +
@@ -501,7 +508,7 @@
       "Frame timestamps:\n" +
       (frames.length
         ? frames
-            .slice(0, MAX_VISION_FRAMES)
+            .slice(0, limit)
             .map((f, i) => (i + 1) + ". t=" + fmtTime(f.t))
             .join("\n")
         : "(tidak ada frame — analisis terbatas)") +
@@ -513,7 +520,7 @@
 
     parts.push({ type: "text", text: textBlock });
 
-    frames.slice(0, MAX_VISION_FRAMES).forEach((f) => {
+    frames.slice(0, limit).forEach((f) => {
       parts.push({
         type: "image_url",
         image_url: { url: f.dataUrl, detail: "low" }
@@ -522,7 +529,26 @@
     return parts;
   }
 
-  async function runApiVision() {
+  function buildModelFallbackChain(preferred) {
+    const chain = [];
+    const push = (m) => {
+      const v = String(m || "").trim();
+      if (v && chain.indexOf(v) === -1) chain.push(v);
+    };
+    push(preferred);
+    GEMINI_MODEL_FALLBACKS.forEach(push);
+    return chain.slice(0, 3);
+  }
+
+  function persistSucceededModel(model) {
+    if ($("anApiModel")) $("anApiModel").value = model;
+    try {
+      localStorage.setItem(API_MODEL_LS, model);
+    } catch (_) {}
+  }
+
+  async function runApiVision(opts) {
+    opts = opts || {};
     const meta = readMeta();
     if (!frames.length) {
       throw new Error("Ambil minimal 1 frame dulu (Ambil frame sekarang / sample otomatis).");
@@ -531,74 +557,116 @@
       /\/$/,
       ""
     );
-    const model = ($("anApiModel") && $("anApiModel").value.trim()) || "gemini-3.6-flash";
+    const preferred = ($("anApiModel") && $("anApiModel").value.trim()) || "gemini-3.6-flash";
     const key = ($("anApiKey") && $("anApiKey").value.trim()) || localStorage.getItem(API_KEY_LS) || "";
-    if (!key) throw new Error("API key kosong — isi dulu (disimpan di localStorage).");
+    if (!key) throw new Error("API key kosong — paste key Gemini di atas (disimpan di localStorage).");
 
     localStorage.setItem(API_KEY_LS, key);
     localStorage.setItem(API_BASE_LS, base);
-    localStorage.setItem(API_MODEL_LS, model);
+    localStorage.setItem(API_MODEL_LS, preferred);
 
+    const frameLimit = opts.fullAuto ? MAX_VISION_FRAMES_FULL_AUTO : MAX_VISION_FRAMES;
     const system = getSystemPrompt();
-    const userContent = buildUserContentForVision(meta);
+    const userContent = buildUserContentForVision(meta, frameLimit);
+    const models = buildModelFallbackChain(preferred);
+    let lastErr = null;
+    let content = "";
+    let usedModel = preferred;
 
-    setStatus("Mengirim " + Math.min(frames.length, MAX_VISION_FRAMES) + " frame ke Vision API…", true);
-
-    let res;
-    try {
-      res = await fetch(base + "/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + key
-        },
-        body: JSON.stringify({
-          model: model,
-          temperature: 0.2,
-          messages: [
-            { role: "system", content: system },
-            { role: "user", content: userContent }
-          ]
-        })
-      });
-    } catch (netErr) {
-      throw new Error(
-        "Jaringan/CORS gagal ke Vision API (" +
-          ((netErr && netErr.message) || "Failed to fetch") +
-          "). Cek base URL + koneksi, atau coba model gemini-3.6-flash."
+    for (let i = 0; i < models.length; i++) {
+      const model = models[i];
+      usedModel = model;
+      setStatus(
+        "Mencoba model " +
+          model +
+          "… (" +
+          Math.min(frames.length, frameLimit) +
+          " frame)" +
+          (i ? " · fallback " + (i + 1) + "/" + models.length : ""),
+        true
       );
+
+      let res;
+      try {
+        res = await fetch(base + "/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + key
+          },
+          body: JSON.stringify({
+            model: model,
+            temperature: 0.2,
+            messages: [
+              { role: "system", content: system },
+              { role: "user", content: userContent }
+            ]
+          })
+        });
+      } catch (netErr) {
+        throw new Error(
+          "Jaringan/CORS gagal ke Vision API (" +
+            ((netErr && netErr.message) || "Failed to fetch") +
+            "). Cek koneksi atau base Gemini OpenAI-compat."
+        );
+      }
+
+      if (!res.ok) {
+        const errText = await res.text().catch(() => "");
+        const retryable = res.status === 404 || res.status === 503 || res.status === 429;
+        lastErr = new Error(
+          "API " + res.status + ": " + (errText.slice(0, 180) || res.statusText)
+        );
+        if (retryable && i < models.length - 1) {
+          setStatus(
+            "Model " + model + " gagal (" + res.status + ") — mencoba " + models[i + 1] + "…",
+            true
+          );
+          continue;
+        }
+        let hint = "";
+        if (res.status === 401 || res.status === 403) {
+          hint = " → API key salah/expired, paste ulang di atas.";
+        } else if (res.status === 429 || res.status === 503) {
+          hint = " → Gemini sibuk, coba lagi 10–20 detik.";
+        } else if (res.status === 404) {
+          hint = " → semua model fallback gagal; cek model di panel.";
+        }
+        throw new Error(lastErr.message + hint);
+      }
+
+      const body = await res.json();
+      content =
+        (body.choices && body.choices[0] && body.choices[0].message && body.choices[0].message.content) ||
+        body.content ||
+        "";
+      if (Array.isArray(content)) {
+        content = content
+          .map(function (p) {
+            if (typeof p === "string") return p;
+            if (p && typeof p.text === "string") return p.text;
+            if (p && p.type === "text" && typeof p.text === "string") return p.text;
+            return "";
+          })
+          .join("\n");
+      }
+      if (!String(content || "").trim()) {
+        lastErr = new Error("Respons Vision kosong dari " + model);
+        if (i < models.length - 1) {
+          setStatus("Respons kosong dari " + model + " — mencoba model lain…", true);
+          continue;
+        }
+        throw new Error("Respons Vision kosong — coba model lain atau kurangi frame.");
+      }
+
+      persistSucceededModel(model);
+      break;
     }
 
-    if (!res.ok) {
-      const errText = await res.text().catch(() => "");
-      let hint = "";
-      if (res.status === 404 && /no longer available|NOT_FOUND/i.test(errText)) {
-        hint = " → ganti Model ke gemini-3.6-flash di Lanjutan.";
-      } else if (res.status === 401 || res.status === 403) {
-        hint = " → API key salah/expired, paste ulang di Lanjutan.";
-      } else if (res.status === 429 || res.status === 503) {
-        hint = " → Gemini sibuk, coba lagi 10–20 detik.";
-      }
-      throw new Error("API " + res.status + ": " + (errText.slice(0, 180) || res.statusText) + hint);
-    }
-    const body = await res.json();
-    let content =
-      (body.choices && body.choices[0] && body.choices[0].message && body.choices[0].message.content) ||
-      body.content ||
-      "";
-    if (Array.isArray(content)) {
-      content = content
-        .map(function (p) {
-          if (typeof p === "string") return p;
-          if (p && typeof p.text === "string") return p.text;
-          if (p && p.type === "text" && typeof p.text === "string") return p.text;
-          return "";
-        })
-        .join("\n");
-    }
     if (!String(content || "").trim()) {
-      throw new Error("Respons Vision kosong — coba model gemini-3.6-flash atau kurangi frame.");
+      throw lastErr || new Error("Vision gagal pada semua model fallback.");
     }
+
     const data = parseAiJson(content);
     lastResult = data;
     const pretty = {
@@ -622,8 +690,8 @@
         data.behaviorInsights.keyBehaviors.length) ||
       0;
     const summary = [
-      "Mode: API Vision (" + model + ") · Human Behavior",
-      "Frames dikirim: " + Math.min(frames.length, MAX_VISION_FRAMES),
+      "Mode: API Vision (" + usedModel + ") · Human Behavior",
+      "Frames dikirim: " + Math.min(frames.length, frameLimit),
       "Match: " + ((data.matchCentre && data.matchCentre.meta && data.matchCentre.meta.title) || meta.lawan),
       "behaviorInsights: " + (data.behaviorInsights ? behN + " key behaviors" : "—"),
       "parentReports: " + ((data.parentReports && data.parentReports.length) || 0),
@@ -633,7 +701,7 @@
       $("anSummaryList").innerHTML = summary.map((s) => "<li>" + escapeHtml(s) + "</li>").join("");
     }
     renderBehaviorPanel(data.behaviorInsights || null);
-    setStatus("Vision API selesai · JSON siap diterapkan.", true);
+    setStatus("Vision API selesai · " + usedModel + " · JSON siap diterapkan.", true);
     window.TFDEV.toast("Analitik Vision selesai");
     setWizardStep(3);
     return data;
@@ -1173,7 +1241,20 @@
 
     if (!frames.length) {
       setStatus("Full auto: mengambil sample frame otomatis…", true);
-      await captureAutoSample();
+      const maxEl = $("anSampleMax");
+      const prevMax = maxEl ? maxEl.value : null;
+      if (maxEl) {
+        const want = Math.min(
+          MAX_VISION_FRAMES_FULL_AUTO,
+          Math.max(1, Number(maxEl.value) || MAX_VISION_FRAMES_FULL_AUTO)
+        );
+        maxEl.value = String(want);
+      }
+      try {
+        await captureAutoSample();
+      } finally {
+        if (maxEl && prevMax != null) maxEl.value = prevMax;
+      }
       if (!frames.length) {
         await waitForFrames(5000);
       }
@@ -1194,8 +1275,8 @@
           syncModeUi();
         }
       }
-      setStatus("Full auto: menjalankan Vision API…", true);
-      data = await runApiVision();
+      setStatus("Full auto: menjalankan Gemini Vision…", true);
+      data = await runApiVision({ fullAuto: true });
     } else {
       const raw = ($("anJsonOut") && $("anJsonOut").value.trim()) || "";
       if (raw) {
@@ -1207,7 +1288,7 @@
         setStatus("Full auto: memakai hasil JSON terakhir.", true);
       } else {
         throw new Error(
-          "Belum ada API key / JSON. Paste key Gemini di Analitik → Lanjutan (disimpan di browser ini), lalu Full auto lagi."
+          "Belum ada API key Gemini. Paste key di panel Proses (disimpan di browser ini), lalu Full auto lagi."
         );
       }
     }
@@ -1320,13 +1401,13 @@
     const hint = $("anFullAutoHint");
     if (title) {
       title.textContent = ready
-        ? "API key terdeteksi · Full auto siap"
+        ? "Siap Full auto · Gemini"
         : "Full auto · Gemini Vision";
     }
     if (hint) {
       hint.textContent = ready
-        ? "Jalankan Full auto: sample frame → Vision → terapkan modul."
-        : "Paste key Gemini di Lanjutan (AIza… / AQ.…, model gemini-3.6-flash), atau Pakai demo JSON tanpa API.";
+        ? "Siap Full auto · Gemini — tekan tombol: sample frame → Vision → modul."
+        : "Paste key Gemini di atas, lalu Full auto";
     }
   }
 
@@ -1531,8 +1612,12 @@
     syncFullAutoBanner();
 
     if ($("anApiKey")) {
-      $("anApiKey").addEventListener("input", syncFullAutoBanner);
-      $("anApiKey").addEventListener("change", syncFullAutoBanner);
+      const onKey = () => {
+        if (hasApiKey()) setMode("api");
+        syncFullAutoBanner();
+      };
+      $("anApiKey").addEventListener("input", onKey);
+      $("anApiKey").addEventListener("change", onKey);
     }
     syncFullAutoBanner();
 
@@ -1575,6 +1660,7 @@
   window.TFDEV.initAnalitik = function () {
     if (!$("page-analitik")) return;
     loadApiSettings();
+    setMode("api");
     if ($("anBehaviorPanel")) {
       $("anBehaviorPanel").addEventListener("click", (e) => {
         const btn = e.target.closest("[data-bhv-t]");
