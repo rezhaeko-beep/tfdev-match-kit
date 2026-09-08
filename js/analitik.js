@@ -544,31 +544,61 @@
 
     setStatus("Mengirim " + Math.min(frames.length, MAX_VISION_FRAMES) + " frame ke Vision API…", true);
 
-    const res = await fetch(base + "/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + key
-      },
-      body: JSON.stringify({
-        model: model,
-        temperature: 0.2,
-        messages: [
-          { role: "system", content: system },
-          { role: "user", content: userContent }
-        ]
-      })
-    });
+    let res;
+    try {
+      res = await fetch(base + "/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + key
+        },
+        body: JSON.stringify({
+          model: model,
+          temperature: 0.2,
+          messages: [
+            { role: "system", content: system },
+            { role: "user", content: userContent }
+          ]
+        })
+      });
+    } catch (netErr) {
+      throw new Error(
+        "Jaringan/CORS gagal ke Vision API (" +
+          ((netErr && netErr.message) || "Failed to fetch") +
+          "). Cek base URL + koneksi, atau coba model gemini-3.6-flash."
+      );
+    }
 
     if (!res.ok) {
       const errText = await res.text().catch(() => "");
-      throw new Error("API " + res.status + ": " + (errText.slice(0, 220) || res.statusText));
+      let hint = "";
+      if (res.status === 404 && /no longer available|NOT_FOUND/i.test(errText)) {
+        hint = " → ganti Model ke gemini-3.6-flash di Lanjutan.";
+      } else if (res.status === 401 || res.status === 403) {
+        hint = " → API key salah/expired, paste ulang di Lanjutan.";
+      } else if (res.status === 429 || res.status === 503) {
+        hint = " → Gemini sibuk, coba lagi 10–20 detik.";
+      }
+      throw new Error("API " + res.status + ": " + (errText.slice(0, 180) || res.statusText) + hint);
     }
     const body = await res.json();
-    const content =
+    let content =
       (body.choices && body.choices[0] && body.choices[0].message && body.choices[0].message.content) ||
       body.content ||
       "";
+    if (Array.isArray(content)) {
+      content = content
+        .map(function (p) {
+          if (typeof p === "string") return p;
+          if (p && typeof p.text === "string") return p.text;
+          if (p && p.type === "text" && typeof p.text === "string") return p.text;
+          return "";
+        })
+        .join("\n");
+    }
+    if (!String(content || "").trim()) {
+      throw new Error("Respons Vision kosong — coba model gemini-3.6-flash atau kurangi frame.");
+    }
     const data = parseAiJson(content);
     lastResult = data;
     const pretty = {
@@ -1177,7 +1207,7 @@
         setStatus("Full auto: memakai hasil JSON terakhir.", true);
       } else {
         throw new Error(
-          "Belum ada JSON. Paste JSON hasil AI, atau aktifkan mode API Vision + isi API key."
+          "Belum ada API key / JSON. Paste key Gemini di Analitik → Lanjutan (disimpan di browser ini), lalu Full auto lagi."
         );
       }
     }
@@ -1199,8 +1229,27 @@
 
   function loadApiSettings() {
     const key = localStorage.getItem(API_KEY_LS) || "";
-    const base = localStorage.getItem(API_BASE_LS) || "https://generativelanguage.googleapis.com/v1beta/openai";
-    const model = localStorage.getItem(API_MODEL_LS) || "gemini-3.6-flash";
+    let base = localStorage.getItem(API_BASE_LS) || "https://generativelanguage.googleapis.com/v1beta/openai";
+    let model = localStorage.getItem(API_MODEL_LS) || "gemini-3.6-flash";
+    // Migrate stale OpenAI / retired Gemini defaults so Full auto does not 404.
+    const staleBase =
+      !base ||
+      /api\.openai\.com/i.test(base) ||
+      /api\.groq\.com/i.test(base);
+    const staleModel =
+      !model ||
+      /^gpt-/i.test(model) ||
+      /llama/i.test(model) ||
+      /^gemini-2\.0/i.test(model) ||
+      /^gemini-2\.5-flash$/i.test(model);
+    if (staleBase) {
+      base = "https://generativelanguage.googleapis.com/v1beta/openai";
+      localStorage.setItem(API_BASE_LS, base);
+    }
+    if (staleModel) {
+      model = "gemini-3.6-flash";
+      localStorage.setItem(API_MODEL_LS, model);
+    }
     if ($("anApiKey")) $("anApiKey").value = key;
     if ($("anApiBase")) $("anApiBase").value = base;
     if ($("anApiModel")) $("anApiModel").value = model;
