@@ -177,7 +177,7 @@
 
     const parentStory =
       list.length === 0
-        ? "Belum ada clip. Tandai momen di Highlights — cerita ortu ikut terisi dari tag."
+        ? "Belum ada clip. Tandai momen di Highlights — cerita ortu + CapCut ikut dari tag (tanpa Vision key)."
         : "Hari ini anak terlibat di " +
           list.length +
           " momen bertanda" +
@@ -187,7 +187,7 @@
           scoreH +
           "–" +
           scoreA +
-          ".";
+          ". Siap isi laporan ortu dari clips + Salin CapCut.";
 
     return {
       version: 1,
@@ -217,7 +217,204 @@
     };
   }
 
-  function persist(summary) {
+
+  /** Build parentReports[0]-compatible object from clip tags (no Vision key). */
+  function buildParentReport(opts) {
+    opts = opts || {};
+    const list = (opts.highlights ? opts.highlights : loadHighlights()).map((h) => ({
+      t: Number(h.t) || 0,
+      type: String(h.type || "LAINNYA").toUpperCase(),
+      team: teamBucket(h.team),
+      playerNo: String(h.playerNo || "").replace(/^#/, ""),
+      title: h.title || "",
+      note: h.note || "",
+      rating: h.rating == null || h.rating === "" ? null : Number(h.rating)
+    }));
+    const summary = opts.summary || derive(list);
+    const skillOrChance = list.filter(
+      (h) =>
+        h.type === "SKILL" ||
+        (h.type === "CHANCE" && h.team === "TFS") ||
+        h.type === "GOL"
+    );
+    const coaching = list.filter((h) => h.type === "COACHING");
+    const named =
+      list.find((h) => h.type === "SKILL" && h.playerNo) ||
+      list.find((h) => h.playerNo) ||
+      null;
+    const playerNo = named ? named.playerNo : "";
+    const playerName = playerNo ? "Pemain #" + playerNo : "Pemain TFS";
+
+    const strengths = [];
+    skillOrChance
+      .slice()
+      .sort((a, b) => (Number(b.rating) || 0) - (Number(a.rating) || 0) || a.t - b.t)
+      .forEach((h) => {
+        const line =
+          (h.title || h.note || h.type) +
+          (h.playerNo ? " (#" + h.playerNo + ")" : "") +
+          " @" +
+          fmtTime(h.t);
+        if (line && strengths.indexOf(line) < 0) strengths.push(line);
+      });
+    while (strengths.length < 2 && coaching.length) {
+      const c = coaching[strengths.length];
+      if (!c) break;
+      strengths.push((c.title || "Keterlibatan positif") + " @" + fmtTime(c.t));
+    }
+    if (!strengths.length) {
+      strengths.push("Aktif mengikuti sesi (dari clip tags)");
+      strengths.push("Siap dikembangkan lewat highlight CapCut");
+    }
+
+    const focusAreas = coaching.slice(0, 3).map((h) => ({
+      title: h.title || "Poin coaching",
+      desc: (h.note || "Fokus latihan berikutnya.") + " @" + fmtTime(h.t)
+    }));
+    if (!focusAreas.length) {
+      focusAreas.push({
+        title: "Keputusan di sepertiga akhir",
+        desc: "Latihan receive + scan sebelum pass / finish."
+      });
+    }
+
+    const skillN = summary.counts.SKILL || 0;
+    const chanceN = summary.counts.CHANCE || 0;
+    const clipN = list.length;
+    const scoreH = summary.score.home;
+    const scoreA = summary.score.away;
+    const warm =
+      clipN === 0
+        ? "Belum ada clip bertanda. Tandai SKILL / CHANCE / COACHING di Highlights — laporan ortu ikut terisi tanpa Vision key."
+        : "Hari ini " +
+          playerName +
+          " terlihat di " +
+          clipN +
+          " momen yang kami tandai" +
+          (skillN ? ", termasuk " + skillN + " momen skill" : "") +
+          (chanceN ? " dan " + chanceN + " peluang" : "") +
+          ". Skor babak dari tag GOL: " +
+          scoreH +
+          "–" +
+          scoreA +
+          ". Kami bangga dengan usaha dan keberanian bermain — fokus minggu depan ada di poin coaching di bawah. Highlight CapCut siap dari daftar timestamp.";
+
+    const overall = Math.max(
+      62,
+      Math.min(
+        92,
+        70 +
+          Math.round((skillN + chanceN) * 1.5) +
+          Math.min(8, Math.round((Number(named && named.rating) || 3) * 1.2))
+      )
+    );
+
+    const metrics = [
+      { label: "Work rate", value: Math.min(9.5, (7 + skillN * 0.3)).toFixed(1), key: "work" },
+      { label: "Involvement", value: Math.min(9.5, (6.5 + clipN * 0.15)).toFixed(1), key: "involve" },
+      {
+        label: "Decision",
+        value: Math.min(9.5, (7 + (coaching.length ? 0.5 : 0) + skillN * 0.2)).toFixed(1),
+        key: "decision"
+      }
+    ];
+
+    const keyBehaviors = list
+      .filter((h) => h.type === "SKILL" || h.type === "CHANCE" || h.type === "COACHING")
+      .slice(0, 8)
+      .map((h) => ({
+        t: h.t,
+        playerNo: h.playerNo || "",
+        tag: h.type === "COACHING" ? "FOCUS" : h.type === "SKILL" ? "COURAGE" : "EFFORT",
+        note: h.title || h.note || h.type,
+        valence: h.type === "COACHING" ? "coach" : "positive"
+      }));
+
+    return {
+      player: {
+        name: playerName,
+        number: playerNo || null,
+        no: playerNo || null,
+        position: "Academy",
+        sessionDate: new Date().toLocaleDateString("id-ID", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric"
+        }),
+        location: "Match Day · dari Highlights clips"
+      },
+      overallScore: overall,
+      scoreLabel: "CLIPS",
+      scoreDelta: null,
+      sessionSummary: warm,
+      strengths: strengths.slice(0, 4),
+      focusAreas: focusAreas.slice(0, 3),
+      metrics: metrics,
+      coach: {
+        name: "Coach Pramu",
+        note: (summary.briefing || []).slice(0, 2).join(" ")
+      },
+      behaviorInsights: {
+        teamMood: "Dari clip tags (tanpa Vision)",
+        keyBehaviors: keyBehaviors,
+        parentStory: warm,
+        coachCues: (summary.briefing || []).slice(0, 4)
+      },
+      homeSupport: {
+        drills: focusAreas.slice(0, 3).map((f) => ({
+          title: f.title,
+          desc: f.desc
+        }))
+      },
+      source: "coach-analytics-clips"
+    };
+  }
+
+  function applyToParentReport(opts) {
+    opts = opts || {};
+    const summary = opts.recompute === false ? get() || recompute() : recompute(opts);
+    const report = buildParentReport({
+      highlights: opts.highlights,
+      summary: summary
+    });
+    if (!window.ParentReport || typeof window.ParentReport.applyJson !== "function") {
+      throw new Error("ParentReport.applyJson belum siap");
+    }
+    window.ParentReport.applyJson(report, summary.matchCentre || null);
+    try {
+      if (window.PlayerDashboard && typeof window.PlayerDashboard.applyFromAnalytics === "function") {
+        window.PlayerDashboard.applyFromAnalytics({
+          parentReports: [report],
+          matchCentre: summary.matchCentre
+        });
+      }
+    } catch (_) {}
+    try {
+      const ta = document.getElementById("anJsonOut");
+      if (ta) {
+        let existing = {};
+        try {
+          existing = JSON.parse(ta.value || "{}") || {};
+        } catch (_) {
+          existing = {};
+        }
+        existing.parentReports = [report];
+        existing.matchCentre = existing.matchCentre || summary.matchCentre;
+        existing.behaviorInsights = report.behaviorInsights;
+        existing.source = "coach-analytics-clips";
+        ta.value = JSON.stringify(existing, null, 2);
+      }
+    } catch (_) {}
+    if (opts.navigate !== false && window.TFDEV && window.TFDEV.showPage) {
+      window.TFDEV.showPage("report");
+    }
+    if (window.TFDEV && window.TFDEV.toast) {
+      window.TFDEV.toast("Laporan ortu diisi dari clips");
+    }
+    return report;
+  }
+
+    function persist(summary) {
     try {
       localStorage.setItem(LS_KEY, JSON.stringify(summary));
     } catch (e) {
@@ -300,6 +497,8 @@
     get: get,
     recompute: recompute,
     applyToMatchCentre: applyToMatchCentre,
+    buildParentReport: buildParentReport,
+    applyToParentReport: applyToParentReport,
     LS_KEY: LS_KEY
   };
 })();

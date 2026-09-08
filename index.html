@@ -45,13 +45,14 @@
         <div class="coach-desk-head">
           <div class="eyebrow">Desk Coach · Total Football School</div>
           <h1>Coach <span>Pramu</span></h1>
-          <p>Satu meja kerja: tandai clip <strong>atau</strong> AI Vision (Gemini) — keduanya mengisi Match Centre yang sama. Cerita ortu ikut dari perilaku / tag.</p>
+          <p>Satu meja kerja: tandai clip <strong>atau</strong> AI Vision (Gemini) — keduanya mengisi Match Centre yang sama. Dari clips juga bisa <strong>isi laporan ortu</strong> (tanpa Vision key) + Salin CapCut.</p>
         </div>
 
         <div class="card coach-desk-demo" id="coachDeskDemo" aria-label="Demo TFS vs G8">
           <div class="coach-desk-demo-label">
             <span class="pill orange">Demo · TFS vs G8</span>
             <button class="btn btn-ghost btn-sm" type="button" id="coachDeskApplyClips" title="Isi Match Centre dari clip tags">Isi Match Centre dari clips</button>
+            <button class="btn btn-ghost btn-sm" type="button" id="coachDeskApplyReport" title="Laporan ortu dari clip tags — tanpa Vision">Isi laporan ortu dari clips</button>
           </div>
           <div id="coachDeskStrip" class="coach-desk-strip"><!-- filled by coach-desk.js --></div>
           <div id="coachDeskStory" class="coach-desk-story" aria-live="polite"></div>
@@ -242,9 +243,17 @@
         </div>
 
         <div class="preview-wrap">
-          <div class="preview-label"><span>Live preview</span><span class="pill">TFS orange kits</span></div>
-          <div class="preview-frame">
-            <div class="mc-card" id="mcPreview"></div>
+          <div class="preview-label"><span>Broadcast card</span><span class="pill orange">LIVE · TFS</span></div>
+          <div class="preview-frame mc-preview-frame">
+            <div class="mc-card mc-broadcast" id="mcPreview"></div>
+          </div>
+          <div class="card mc-moments-card" id="mcMomentsCard" style="margin-top:12px">
+            <div class="pd-card-head" style="margin-bottom:8px">
+              <h3 style="margin:0;font-size:14px">Key moments · jump ke video</h3>
+              <span class="pill" id="mcMomentsPill">dari clips</span>
+            </div>
+            <div class="mc-moments" id="mcMoments" aria-live="polite"></div>
+            <p class="ux-hint" style="margin-top:8px;margin-bottom:0">Klik waktu untuk lompat di Highlights (butuh video ter-upload).</p>
           </div>
         </div>
       </div>
@@ -291,14 +300,16 @@ Recovery run setelah lose ball</textarea></div>
 Finishing 1-touch setelah cutback
 Scan sebelum terima bola</textarea></div>
           <div class="btn-row">
-            <button class="btn btn-ghost btn-sm" id="prPrint">Print / PDF preview</button>
+            <button class="btn btn-cta" type="button" id="prWhatsApp" title="Kirim ringkasan singkat ke WhatsApp ortu">WhatsApp ortu</button>
+            <button class="btn btn-ghost btn-sm" type="button" id="prPrint">Print / PDF · kertas cream</button>
           </div>
+          <p class="ux-hint" style="margin-top:8px">Preview cream TFDEV siap screenshot. Print menyembunyikan nav — pilih Save as PDF di dialog print.</p>
         </div>
 
         <div class="preview-wrap">
-          <div class="preview-label"><span>Live preview</span><span class="pill orange">TFDEV style</span></div>
-          <div class="preview-frame">
-            <div class="pr-card" id="prPreview"></div>
+          <div class="preview-label"><span>Live preview · kertas cream</span><span class="pill orange">TFDEV paper</span></div>
+          <div class="preview-frame pr-preview-frame">
+            <div class="pr-card pr-paper" id="prPreview"></div>
           </div>
         </div>
       </div>
@@ -609,7 +620,7 @@ Scan sebelum terima bola</textarea></div>
         <ul class="rules-list">
           <li><strong>Upload video</strong> → putar ke momen penting → <strong>Tandai highlight di waktu ini</strong> (ambil thumbnail otomatis).</li>
           <li>Isi tipe (<code>GOL|CHANCE|SKILL|SAVE|COACHING|LAINNYA</code>), tim, nomor pemain, judul, catatan, rating.</li>
-          <li>Klik waktu / Jump untuk putar ulang. <strong>Salin daftar teks</strong> untuk CapCut. Data tersimpan di <code>localStorage</code> per nama file video.</li>
+          <li>Klik waktu / Jump untuk putar ulang. Tombol <strong>Salin CapCut</strong> di daftar — siap paste ke editor. Data tersimpan di <code>localStorage</code> per nama file video.</li>
         </ul>
       </div>
 
@@ -698,16 +709,17 @@ Scan sebelum terima bola</textarea></div>
           <h3 style="margin:0">2 · Daftar highlights</h3>
           <span class="pill" id="hlCount">0 highlight</span>
         </div>
-        <div class="btn-row" style="margin-bottom:12px">
+        <div class="btn-row hl-action-row" style="margin-bottom:12px">
+          <button class="btn btn-cta" type="button" id="hlCopyText" title="Salin timestamp + judul untuk CapCut / editor">Salin CapCut</button>
           <button class="btn btn-cta" type="button" id="hlApplyMatchCentre" title="Derive stats dari clips → Match Centre">Isi Match Centre dari clips</button>
-          <button class="btn" type="button" id="hlExportJson">Export JSON</button>
+          <button class="btn" type="button" id="hlApplyParentReport" title="Bangun laporan ortu dari tag clips (tanpa Vision key)">Isi laporan ortu dari clips</button>
+          <button class="btn btn-ghost" type="button" id="hlExportJson">Export JSON</button>
           <button class="btn btn-ghost" type="button" id="hlImportJson">Import JSON</button>
           <input type="file" id="hlImportFile" accept=".json,application/json" hidden />
           <button class="btn btn-ghost" type="button" id="hlGenThumbs">Generate thumbs</button>
-          <button class="btn btn-ghost" type="button" id="hlCopyText">Salin daftar teks</button>
           <button class="btn btn-ghost btn-sm" type="button" id="hlResetSeed">Reset demo seed</button>
         </div>
-        <p class="hl-seed-tip" id="hlSeedTip" hidden>Demo seed TFS vs G8 Babak 1 · klik waktu untuk lompat; Salin daftar teks untuk CapCut.</p>
+        <p class="hl-seed-tip" id="hlSeedTip" hidden>Demo seed TFS vs G8 Babak 1 · klik waktu untuk lompat; <strong>Salin CapCut</strong> untuk editor; isi laporan ortu tanpa Vision key.</p>
         <div class="hl-list" id="hlList" aria-live="polite"></div>
       </div>
     </section>
@@ -758,9 +770,9 @@ Scan sebelum terima bola</textarea></div>
             </div>
           </div>
           <div class="pd-overall">
-            <div class="pd-overall-label">Overall TFdev Score</div>
+            <div class="pd-overall-label">TFdev Score</div>
             <div class="pd-overall-score"><strong id="pdOverall">78</strong><span>/ 100</span></div>
-            <div class="pd-delta up" id="pdDelta">↑ 6 pts vs last 7 days</div>
+            <div class="pd-delta up" id="pdDelta" title="Delta vs ~3 minggu dari progress series">↑ +6 pts vs 3 minggu</div>
           </div>
         </div>
 
@@ -797,8 +809,15 @@ Scan sebelum terima bola</textarea></div>
               </div>
               <p class="pd-honesty" id="pdHonesty"></p>
             </div>
+            <div class="card pd-session-summary" id="pdSessionSummaryCard">
+              <div class="pd-card-head">
+                <h3 style="margin:0">Ringkasan sesi terakhir</h3>
+                <span class="pill orange" id="pdSummaryPill">video</span>
+              </div>
+              <p class="pd-session-blurb" id="pdSessionBlurb">Sesi demo Rafi — first touch &amp; agility naik; fokus finishing di half-space.</p>
+            </div>
             <div class="card" id="pdDrillsCard">
-              <h3>Recommended Next Drills</h3>
+              <h3>Drill berikutnya</h3>
               <div class="pd-drills" id="pdDrills"></div>
             </div>
           </div>

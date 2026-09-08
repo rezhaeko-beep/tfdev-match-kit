@@ -33,41 +33,108 @@
     return [Math.round((na / t) * 100), Math.round((nb / t) * 100)];
   }
 
+  function renderMoments() {
+    const host = document.getElementById("mcMoments");
+    const pill = document.getElementById("mcMomentsPill");
+    if (!host) return;
+    let list = [];
+    try {
+      if (window.Highlights && typeof window.Highlights.list === "function") {
+        list = window.Highlights.list() || [];
+      }
+    } catch (_) {}
+    if (!list.length) {
+      try {
+        const s = window.TFDEV && window.TFDEV.coachAnalytics && window.TFDEV.coachAnalytics.get();
+        if (s && Array.isArray(s.briefing)) {
+          /* fallback empty */
+        }
+      } catch (_) {}
+    }
+    const top = list
+      .slice()
+      .sort((a, b) => (Number(b.rating) || 0) - (Number(a.rating) || 0) || a.t - b.t)
+      .filter((h) => h.type === "SKILL" || h.type === "CHANCE" || h.type === "GOL" || h.type === "COACHING" || h.type === "SAVE")
+      .slice(0, 6);
+    if (pill) pill.textContent = top.length ? top.length + " momen" : "dari clips";
+    if (!top.length) {
+      host.innerHTML = '<p class="ux-hint" style="margin:0">Belum ada clip — tandai di Highlights atau Full auto Gemini.</p>';
+      return;
+    }
+    host.innerHTML = top
+      .map((h) => {
+        const t = Number(h.t) || 0;
+        const label =
+          (window.Highlights && window.Highlights.fmtTime
+            ? window.Highlights.fmtTime(t)
+            : String(t));
+        return (
+          '<button type="button" class="mc-moment" data-jump="' +
+          t +
+          '" title="Jump ke Highlights @' +
+          label +
+          '">' +
+          '<span class="mc-moment-t">' +
+          label +
+          "</span>" +
+          '<span class="mc-moment-type">' +
+          esc(h.type || "") +
+          "</span>" +
+          '<span class="mc-moment-title">' +
+          esc((h.title || h.note || "").slice(0, 42)) +
+          (h.playerNo ? " #" + esc(h.playerNo) : "") +
+          "</span>" +
+          "</button>"
+        );
+      })
+      .join("");
+  }
+
   function render() {
     const possH = Math.min(100, Math.max(0, num("mcPossH")));
     const possA = Math.min(100, Math.max(0, num("mcPossA")));
     const [attL, attR] = barPair(val("mcAttH"), val("mcAttA"));
     const [shL, shR] = barPair(val("mcShotH"), val("mcShotA"));
     const [cL, cR] = barPair(val("mcCardH"), val("mcCardA"));
+    const homeName = val("mcHome") || "TFS";
+    const awayName = val("mcAway") || "AWAY";
 
     document.getElementById("mcPreview").innerHTML = `
       <div class="mc-topbar">
         <span class="comp">${esc(val("mcComp"))}</span>
-        <span class="pill">LIVE CARD</span>
+        <span class="mc-live"><i></i> BROADCAST</span>
       </div>
       <div class="mc-scoreboard">
         <div class="mc-team home">
           <div class="mc-team-row">
-            <div class="mc-kit orange">${esc(val("mcHome").slice(0, 3).toUpperCase())}</div>
+            <div class="mc-kit orange">${esc(homeName.slice(0, 3).toUpperCase())}</div>
             <div>
-              <div class="mc-team-name">${esc(val("mcHome"))}</div>
+              <div class="mc-team-name">${esc(homeName)}</div>
               <div class="mc-team-sub">Orange kit</div>
             </div>
           </div>
         </div>
         <div class="mc-score-mid">
-          <div class="score">${num("mcScoreH")} – ${num("mcScoreA")}</div>
+          <div class="score">${num("mcScoreH")}<span class="mc-score-sep">–</span>${num("mcScoreA")}</div>
           <div class="ht">Best-supported score</div>
         </div>
         <div class="mc-team away">
           <div class="mc-team-row">
-            <div class="mc-kit away">${esc(val("mcAway").slice(0, 3).toUpperCase())}</div>
+            <div class="mc-kit away">${esc(awayName.slice(0, 3).toUpperCase())}</div>
             <div>
-              <div class="mc-team-name">${esc(val("mcAway"))}</div>
+              <div class="mc-team-name">${esc(awayName)}</div>
               <div class="mc-team-sub">Away kit</div>
             </div>
           </div>
         </div>
+      </div>
+      <div class="mc-chips" aria-label="Key stats">
+        <span class="mc-chip"><b>${possH}%</b> Poss</span>
+        <span class="mc-chip"><b>${esc(val("mcAttH"))}</b> Att</span>
+        <span class="mc-chip"><b>${esc(val("mcShotH"))}</b> SoT</span>
+        <span class="mc-chip muted"><b>${esc(val("mcAttA"))}</b> Att away</span>
+        <span class="mc-chip muted"><b>${esc(val("mcShotA"))}</b> SoT away</span>
+        <span class="mc-chip muted"><b>${possA}%</b> Poss away</span>
       </div>
       <div class="mc-meta">
         <span>Date <b>${esc(val("mcDate"))}</b></span>
@@ -90,10 +157,11 @@
         <div class="mc-est">${esc(val("mcNote"))}</div>
       </div>
       <div class="mc-footer">
-        <div>TFS VIDEO ANALYSIS · MATCH STATS</div>
-        <div>TFDEV ANALITIK</div>
+        <div>TFS VIDEO ANALYSIS · BROADCAST CARD</div>
+        <div>TFDEV MATCH CENTRE</div>
       </div>
     `;
+    renderMoments();
   }
 
   function statRow(l, r, label, wl, wr) {
@@ -208,7 +276,38 @@
     document.getElementById("mcLoadSample").addEventListener("click", applySample);
     document.getElementById("mcPrint").addEventListener("click", () => {
       window.TFDEV.showPage("matchcentre");
-      setTimeout(() => window.print(), 100);
+      document.body.classList.add("print-matchcentre");
+      document.body.classList.remove("print-report");
+      setTimeout(() => window.print(), 120);
+    });
+    const moments = document.getElementById("mcMoments");
+    if (moments) {
+      moments.addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-jump]");
+        if (!btn) return;
+        const t = Number(btn.getAttribute("data-jump"));
+        if (window.TFDEV && window.TFDEV.showPage) window.TFDEV.showPage("highlights");
+        setTimeout(() => {
+          if (window.Highlights && typeof window.Highlights.jumpTo === "function") {
+            window.Highlights.jumpTo(t);
+          }
+        }, 80);
+      });
+    }
+    document.addEventListener("tfdev:coach-analytics", () => {
+      try { renderMoments(); } catch (_) {}
+    });
+    const prev = window.TFDEV.onPage;
+    window.TFDEV.onPage = function (id) {
+      if (typeof prev === "function") prev(id);
+      if (id === "matchcentre") {
+        setTimeout(() => {
+          render();
+        }, 40);
+      }
+    };
+    window.addEventListener("afterprint", () => {
+      document.body.classList.remove("print-report", "print-matchcentre");
     });
     render();
   };

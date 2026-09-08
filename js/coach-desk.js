@@ -28,7 +28,7 @@
         "Clip SKILL & COACHING siap untuk ortu / CapCut."
       ],
       parentStory:
-        "Cerita ortu siap dari clip: skill #7/#10, peluang transisi, dan poin coaching shape & rest defense — tanpa perlu Vision key."
+        "Cerita ortu siap dari clip: skill #7/#10, peluang, coaching — tombol Isi laporan ortu dari clips (tanpa Vision). Salin CapCut di Highlights."
     };
   }
 
@@ -122,6 +122,20 @@
           window.TFDEV.coachAnalytics.applyToMatchCentre({ navigate: true });
         } catch (e) {
           window.TFDEV.toast && window.TFDEV.toast(e.message || "Gagal apply");
+        }
+      });
+    }
+    const reportBtn = $("coachDeskApplyReport");
+    if (reportBtn) {
+      reportBtn.addEventListener("click", () => {
+        try {
+          if (!window.TFDEV.coachAnalytics || !window.TFDEV.coachAnalytics.applyToParentReport) {
+            window.TFDEV.toast && window.TFDEV.toast("coachAnalytics belum siap");
+            return;
+          }
+          window.TFDEV.coachAnalytics.applyToParentReport({ navigate: true });
+        } catch (e) {
+          window.TFDEV.toast && window.TFDEV.toast(e.message || "Gagal laporan ortu");
         }
       });
     }

@@ -11,6 +11,8 @@
     return v(id).split(/\n+/).map((x) => x.trim()).filter(Boolean);
   }
 
+  const PAGES_URL = "https://rezhaeko-beep.github.io/tfdev-match-kit/";
+
   function render() {
     const strengths = lines("prStrengths").map((t) => `<li>${esc(t)}</li>`).join("") || "<li>—</li>";
     const focus = lines("prFocus").map((t) => `<li>${esc(t)}</li>`).join("") || "<li>—</li>";
@@ -59,10 +61,37 @@
         <div class="pr-panel"><h4>Focus next</h4><ul>${focus}</ul></div>
       </div>
       <div class="pr-foot">
-        <span>TFDEV · Parent Session Report</span>
+        <span>TFDEV · Parent Session Report · cream paper</span>
         <span>TFS Orange Kits · Video Analysis</span>
       </div>
     `;
+  }
+
+  function buildWhatsAppText() {
+    const name = v("prName") || "Pemain";
+    const score = v("prScore") || "—";
+    const pill = v("prScorePill") || "";
+    const strengths = lines("prStrengths").slice(0, 2);
+    const focus = lines("prFocus").slice(0, 1);
+    const bits = [
+      "TFDEV · Laporan Sesi",
+      name + (pill ? " · " + pill : ""),
+      "Skor: " + score
+    ];
+    if (strengths.length) {
+      bits.push("Kekuatan:");
+      strengths.forEach((s) => bits.push("• " + s));
+    }
+    if (focus.length) bits.push("Fokus: " + focus[0]);
+    bits.push(PAGES_URL + "#report");
+    return bits.join("\n");
+  }
+
+  function shareWhatsApp() {
+    const text = buildWhatsAppText();
+    const url = "https://wa.me/?text=" + encodeURIComponent(text);
+    window.open(url, "_blank", "noopener,noreferrer");
+    if (window.TFDEV && window.TFDEV.toast) window.TFDEV.toast("WhatsApp ortu dibuka");
   }
 
   /** Apply parentReports[0] schema (optional matchCentre for session title / score). */
@@ -150,16 +179,28 @@
   window.TFDEV = window.TFDEV || {};
   window.ParentReport = {
     render: render,
-    applyJson: applyJson
+    applyJson: applyJson,
+    shareWhatsApp: shareWhatsApp,
+    buildWhatsAppText: buildWhatsAppText
   };
 
   window.TFDEV.initReport = function () {
     document.querySelectorAll("#page-report input, #page-report textarea").forEach((el) => {
       el.addEventListener("input", render);
     });
-    document.getElementById("prPrint").addEventListener("click", () => {
-      window.TFDEV.showPage("report");
-      setTimeout(() => window.print(), 100);
+    const printBtn = document.getElementById("prPrint");
+    if (printBtn) {
+      printBtn.addEventListener("click", () => {
+        window.TFDEV.showPage("report");
+        document.body.classList.add("print-report");
+        document.body.classList.remove("print-matchcentre");
+        setTimeout(() => window.print(), 120);
+      });
+    }
+    const wa = document.getElementById("prWhatsApp");
+    if (wa) wa.addEventListener("click", shareWhatsApp);
+    window.addEventListener("afterprint", () => {
+      document.body.classList.remove("print-report", "print-matchcentre");
     });
     render();
   };

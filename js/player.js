@@ -13,7 +13,7 @@
       photoDataUrl: null,
       example: true
     },
-    score: { overall: 78, delta: 6 },
+    score: { overall: 78, delta: 7 },
     skills: [
       { key: "firstTouch", label: "First Touch", value: 82, delta: 2 },
       { key: "dribbling", label: "Dribbling Control", value: 75, delta: 1 },
@@ -97,11 +97,25 @@
     return "neutral";
   }
 
+  function deltaVs3Weeks(progress, overall) {
+    if (!Array.isArray(progress) || progress.length < 2) return null;
+    const now =
+      clampScore(overall != null ? overall : progress[progress.length - 1].score);
+    // Weekly series: ~3 minggu ≈ 4th from end; else first point
+    const idx = progress.length >= 4 ? progress.length - 4 : 0;
+    const then = clampScore(progress[idx].score);
+    if (now == null || then == null) return null;
+    return now - then;
+  }
+
   function formatDelta(d) {
-    if (d == null || d === "" || !isFinite(Number(d))) return null;
+    if (d == null || d === "" || !isFinite(Number(d))) {
+      return { text: "— vs 3 minggu", cls: "flat" };
+    }
     const n = Number(d);
-    if (n === 0) return "→ 0 pts vs last period";
-    return (n > 0 ? "↑ " : "↓ ") + Math.abs(n) + " pts vs last 7 days";
+    if (n === 0) return { text: "— 0 pts vs 3 minggu", cls: "flat" };
+    if (n > 0) return { text: "↑ +" + Math.abs(n) + " pts vs 3 minggu", cls: "up" };
+    return { text: "↓ " + Math.abs(n) + " pts vs 3 minggu", cls: "down" };
   }
 
   function initials(name) {
@@ -233,7 +247,10 @@
       },
       score: {
         overall: overall,
-        delta: report.scoreDelta != null ? Number(report.scoreDelta) : null
+        delta:
+          report.scoreDelta != null && isFinite(Number(report.scoreDelta))
+            ? Number(report.scoreDelta)
+            : deltaVs3Weeks(progress, overall)
       },
       skills: skills,
       radar: radar,
@@ -309,6 +326,10 @@
       d.progress = Array.isArray(data.progress) && data.progress.length
         ? data.progress
         : buildProgressSeries(d.score.overall, d.sessionDate || d.player.sessionDate);
+      if (d.score.delta == null || !isFinite(Number(d.score.delta))) {
+        const computed = deltaVs3Weeks(d.progress, d.score.overall);
+        if (computed != null) d.score.delta = computed;
+      }
       d.drills = Array.isArray(data.drills) ? data.drills : [];
       d.source = data.source || "video_analytics";
       return d;
@@ -702,16 +723,37 @@
     if ($("pdOverall")) $("pdOverall").textContent = String(score.overall != null ? score.overall : "—");
     const deltaEl = $("pdDelta");
     if (deltaEl) {
-      const txt = formatDelta(score.delta);
-      if (txt) {
-        deltaEl.textContent = txt;
-        deltaEl.className = "pd-delta " + (Number(score.delta) >= 0 ? "up" : "down");
-        deltaEl.hidden = false;
-      } else {
-        deltaEl.textContent = "Delta vs last period: N/C (video)";
-        deltaEl.className = "pd-delta muted";
-        deltaEl.hidden = false;
+      let deltaVal = score.delta;
+      if (deltaVal == null || !isFinite(Number(deltaVal))) {
+        deltaVal = deltaVs3Weeks(dash.progress, score.overall);
       }
+      const fmt = formatDelta(deltaVal);
+      deltaEl.textContent = fmt.text;
+      deltaEl.className = "pd-delta " + fmt.cls;
+      deltaEl.hidden = false;
+    }
+
+    const blurb = $("pdSessionBlurb");
+    const pill = $("pdSummaryPill");
+    if (blurb) {
+      const skills = dash.skills || [];
+      const top = skills.slice().sort((a, b) => (b.value || 0) - (a.value || 0))[0];
+      const focusSkill = skills.slice().sort((a, b) => (a.value || 0) - (b.value || 0))[0];
+      const drills = dash.drills || [];
+      const parts = [];
+      if (dash.sessionDate) parts.push("Sesi " + dash.sessionDate);
+      if (top) parts.push((top.label || "skill") + " " + top.value + "/100");
+      if (focusSkill && (!top || focusSkill.key !== top.key)) {
+        parts.push("fokus " + (focusSkill.label || "area lemah"));
+      }
+      if (drills[0]) parts.push("drill: " + (drills[0].title || "berikutnya"));
+      blurb.textContent =
+        parts.length
+          ? parts.join(" · ") + "."
+          : "Belum ada ringkasan sesi — apply JSON atau isi dari clips.";
+    }
+    if (pill) {
+      pill.textContent = p.example ? "sample" : (dash.source || "video").replace(/_/g, " ");
     }
 
     const skillsHost = $("pdSkillCards");

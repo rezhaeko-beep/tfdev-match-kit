@@ -592,8 +592,8 @@
       ? "TFDEV Highlights" + (videoName ? " · " + videoName : " · TFS vs G8 Babak 1") + "\n" + lines.join("\n")
       : "(kosong)";
     const done = () => {
-      setStatus("Daftar teks disalin (" + lines.length + ") — siap paste ke CapCut.", true);
-      window.TFDEV && window.TFDEV.toast && window.TFDEV.toast("Teks disalin");
+      setStatus("Salin CapCut OK (" + lines.length + " baris) — paste ke CapCut/editor.", true);
+      window.TFDEV && window.TFDEV.toast && window.TFDEV.toast("CapCut list disalin");
     };
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
@@ -921,6 +921,32 @@
           );
         } catch (e) {
           setStatus("Gagal isi Match Centre: " + e.message, false);
+        }
+      });
+    }
+    if ($("hlApplyParentReport")) {
+      $("hlApplyParentReport").addEventListener("click", () => {
+        try {
+          if (!window.TFDEV || !window.TFDEV.coachAnalytics) {
+            setStatus("coachAnalytics belum siap.", false);
+            return;
+          }
+          if (typeof window.TFDEV.coachAnalytics.applyToParentReport !== "function") {
+            setStatus("applyToParentReport belum siap.", false);
+            return;
+          }
+          const report = window.TFDEV.coachAnalytics.applyToParentReport({
+            highlights: highlights.slice(),
+            navigate: true
+          });
+          setStatus(
+            "Laporan ortu diisi dari clips" +
+              (report && report.player && report.player.name ? " · " + report.player.name : "") +
+              " (tanpa Vision key).",
+            true
+          );
+        } catch (e) {
+          setStatus("Gagal isi laporan ortu: " + e.message, false);
         }
       });
     }
