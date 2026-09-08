@@ -1,5 +1,13 @@
 {
-  "clientId": "",
+  "clientId": "507805559000-g4ju5f9esb86c78v7rp59poku6otheq1.apps.googleusercontent.com",
   "apiKeyNote": "Gemini key in Analitik is reused for Gemini Files/generateContent only; Drive needs GIS OAuth",
-  "scopes": ["https://www.googleapis.com/auth/drive.readonly"]
+  "scopes": [
+    "https://www.googleapis.com/auth/drive.readonly"
+  ],
+  "project": "TFDEV Match Kit",
+  "origins": [
+    "https://rezhaeko-beep.github.io",
+    "http://127.0.0.1:8766",
+    "http://localhost:8766"
+  ]
 }
