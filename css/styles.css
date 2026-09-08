@@ -1950,3 +1950,40 @@ code {
 @media (max-width: 720px) {
   .an-drive-pramu-paste { flex-direction: column; align-items: stretch; }
 }
+
+
+/* Drive → Gemini full-video analyze */
+.an-drive-gemini {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(66, 133, 244, 0.28);
+}
+.an-drive-gemini-title {
+  margin: 0 0 6px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text, #e8eef7);
+}
+.an-drive-gemini-actions {
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+.an-drive-gemini-status {
+  margin: 10px 0 0;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--muted, #9aa8bc);
+  white-space: pre-wrap;
+  min-height: 1.2em;
+}
+.an-drive-gemini-status.ok { color: var(--orange-soft, #ffb38a); }
+.an-drive-gemini-status.err { color: #ff8f8f; }
+.an-oauth-help {
+  margin: 0 0 8px;
+  font-size: 12px;
+  line-height: 1.45;
+}
+.an-oauth-help code {
+  font-size: 11px;
+  word-break: break-all;
+}

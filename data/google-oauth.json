@@ -1,0 +1,5 @@
+{
+  "clientId": "",
+  "apiKeyNote": "Gemini key in Analitik is reused for Gemini Files/generateContent only; Drive needs GIS OAuth",
+  "scopes": ["https://www.googleapis.com/auth/drive.readonly"]
+}

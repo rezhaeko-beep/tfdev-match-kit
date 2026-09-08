@@ -170,6 +170,32 @@
     window.TFDEV.toast("Video siap");
   }
 
+  /** Load a Blob/File from Drive (or elsewhere) into #anVideo — same path as file picker. */
+  function loadVideoBlob(blob, filename) {
+    if (!blob) throw new Error("Blob video kosong");
+    const name = filename || "drive-video.mp4";
+    const type =
+      (blob.type && String(blob.type)) ||
+      ( /\.mov$/i.test(name) ? "video/quicktime" :
+        /\.webm$/i.test(name) ? "video/webm" :
+        /\.m4v$/i.test(name) ? "video/x-m4v" :
+        "video/mp4" );
+    let file = null;
+    try {
+      file = new File([blob], name, { type: type, lastModified: Date.now() });
+    } catch (_) {
+      file = blob;
+      try {
+        if (!file.name) Object.defineProperty(file, "name", { value: name, configurable: true });
+      } catch (__) {}
+      try {
+        if (!file.type) Object.defineProperty(file, "type", { value: type, configurable: true });
+      } catch (__) {}
+    }
+    loadVideoFile(file);
+    return file;
+  }
+
   function onVideoMeta() {
     const v = $("anVideo");
     if (!v) return;
@@ -1114,6 +1140,44 @@
   }
 
   /**
+   * Apply a Vision/Gemini JSON result: fill anJsonOut, behavior panel, then applyAll.
+   * Used by Drive→Gemini full-video path and other external callers.
+   */
+  function applyVisionResult(data, opts) {
+    opts = opts || {};
+    if (!data || typeof data !== "object") {
+      throw new Error("Hasil Vision kosong / bukan objek");
+    }
+    lastResult = data;
+    const pretty = {
+      matchCentre: data.matchCentre,
+      behaviorInsights: data.behaviorInsights || undefined,
+      parentReports: data.parentReports || [],
+      highlights: data.highlights || data.keyMoments || undefined,
+      playerDashboard: data.playerDashboard || undefined
+    };
+    if (!pretty.behaviorInsights) delete pretty.behaviorInsights;
+    if (!pretty.highlights) delete pretty.highlights;
+    if (!pretty.playerDashboard) delete pretty.playerDashboard;
+    if ($("anJsonOut")) $("anJsonOut").value = JSON.stringify(pretty, null, 2);
+    renderBehaviorPanel(getBehaviorInsights(data));
+    setWizardStep(3);
+    showPostApply(true);
+    if (opts.apply === false) {
+      setStatus("JSON Vision siap — belum diterapkan ke modul.", true);
+      return { data: data, results: [] };
+    }
+    const results = applyAll({ navigate: opts.navigate !== false });
+    setStatus(
+      "Vision diterapkan · " +
+        results.filter(function (r) { return r.ok; }).length +
+        " modul OK.",
+      true
+    );
+    return { data: data, results: results };
+  }
+
+  /**
    * Apply current JSON to all modules without page-jump spam.
    * opts.navigate: if true, go to matchcentre once at end.
    */
@@ -1673,10 +1737,44 @@
     },
     runFullAuto: runFullAuto,
     applyAll: applyAll,
+    applyVisionResult: applyVisionResult,
+    loadVideoFile: loadVideoFile,
+    loadVideoBlob: loadVideoBlob,
+    parseAiJson: parseAiJson,
+    getSystemPrompt: getSystemPrompt,
+    readMeta: readMeta,
+    hasApiKey: hasApiKey,
+    setStatus: setStatus,
+    setWizardStep: setWizardStep,
     getLast: function () {
       return lastResult;
     },
     captureCurrentFrame: captureCurrentFrame
+  };
+
+  /** Minimal hooks for Drive→Gemini (and other callers) without breaking Gemini-first flow. */
+  window.TFDEV.analitik = {
+    loadVideoFile: loadVideoFile,
+    loadVideoBlob: loadVideoBlob,
+    applyVisionResult: applyVisionResult,
+    parseAiJson: parseAiJson,
+    runFullAuto: runFullAuto,
+    applyAll: applyAll,
+    getSystemPrompt: getSystemPrompt,
+    readMeta: readMeta,
+    hasApiKey: hasApiKey,
+    setStatus: setStatus,
+    setWizardStep: setWizardStep,
+    getApiKey: function () {
+      return (($("anApiKey") && $("anApiKey").value.trim()) || localStorage.getItem(API_KEY_LS) || "");
+    },
+    getPreferredModel: function () {
+      return (($("anApiModel") && $("anApiModel").value.trim()) || localStorage.getItem(API_MODEL_LS) || "gemini-3.6-flash");
+    },
+    buildModelFallbackChain: buildModelFallbackChain,
+    getLast: function () {
+      return lastResult;
+    }
   };
 
   window.TFDEV.initAnalitik = function () {

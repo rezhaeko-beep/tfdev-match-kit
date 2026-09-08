@@ -63,6 +63,14 @@ Tip tunnel (opsional): jika akses dari HP/LAN, forward port **8766** (mis. `ssh 
 
 Aturan prompt: primary evidence = VIDEO/frames; jangan mengarang; N/C / `null` + reason jika unreadable dari footage.
 
+### Drive Pramu → Gemini (tanpa unduh manual)
+
+1. Di langkah **Upload**, pilih video katalog **Drive Pramu · Bali 7** (atau paste Drive id).
+2. Paste **API key Gemini** di panel Proses (localStorage).
+3. Isi **Google OAuth Client ID** (Web client, origins: `https://rezhaeko-beep.github.io`, `http://127.0.0.1:8766`, `http://localhost:8766`) — disimpan di `localStorage` `tfdev-google-oauth-client-id`. Config kosong di `data/google-oauth.json` (jangan commit secret).
+4. **Analisa total · Gemini dari Drive** — GIS OAuth `drive.readonly` → unduh file → resumable upload Gemini Files → `generateContent` video utuh → apply Match Centre / parent / highlights.
+5. Atau **Cepat · Drive + sample frame** — unduh lalu `runFullAuto` (sample frame, lebih cepat).
+
 ## Alur Generate (AI eksternal → form)
 
 1. Buka halaman **Generate**.
@@ -83,7 +91,9 @@ Prompt sumber: `prompts/system-prompt-analitik.txt` dan `prompts/prompt-analitik
 - `window.PlayerDashboard.applyFromAnalytics(json)` / `loadSample()` / `get()`
 - `window.ClubStore` — member/finance localStorage helpers + rumus remaining/status/dashboard
 - `window.Highlights.get()` / `addFromAnalitik(payload)` / `importPayload` / `generateMissingThumbs`
-- `window.Analitik.runFullAuto()` / `applyAll()`
+- `window.Analitik.runFullAuto()` / `applyAll()` / `loadVideoBlob()` / `applyVisionResult()`
+- `window.TFDEV.analitik` — hooks Drive→Gemini (`loadVideoBlob`, `applyVisionResult`, `parseAiJson`, …)
+- `window.TFDEV.drivePramu` / `window.TFDEV.driveGemini`
 
 
 ## Club MVP (Member + Finance)

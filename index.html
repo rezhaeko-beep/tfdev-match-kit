@@ -398,7 +398,7 @@ Scan sebelum terima bola</textarea></div>
               </div>
               <span class="pill">Google Drive</span>
             </div>
-            <p class="ux-hint an-drive-pramu-hint">Video besar (~1GB+). Pilih → meta terisi → unduh/buka Drive → pilih file lokal yang sama untuk Full auto Vision.</p>
+            <p class="ux-hint an-drive-pramu-hint">Video besar (~1GB+). <strong>Analisa total</strong> unduh via OAuth Drive lalu kirim video utuh ke Gemini Files (tanpa file picker). Atau <strong>Cepat</strong> = Drive + sample frame.</p>
             <div class="field">
               <label>Katalog Bali 7</label>
               <select id="anDrivePramuSelect" aria-label="Pilih video Drive Pramu">
@@ -417,6 +417,27 @@ Scan sebelum terima bola</textarea></div>
                 <input id="anDrivePramuPaste" type="text" placeholder="https://drive.google.com/file/d/…/view atau file id" autocomplete="off" />
                 <button class="btn btn-ghost btn-sm" type="button" id="anDrivePramuPasteBtn">Pakai</button>
               </div>
+            </div>
+
+            <div class="an-drive-gemini" id="anDriveGeminiBox">
+              <h4 class="an-drive-gemini-title">Analisa dari Drive · Gemini</h4>
+              <p class="ux-hint" style="margin:0 0 10px">Butuh: video terpilih + API key Gemini (panel Proses) + OAuth Client ID (sekali).</p>
+              <div class="field">
+                <label for="anGoogleOauthClientId">Google OAuth Client ID</label>
+                <input id="anGoogleOauthClientId" type="text" autocomplete="off" spellcheck="false" placeholder="….apps.googleusercontent.com" />
+              </div>
+              <p class="ux-hint an-oauth-help" id="anGoogleOauthHelp">
+                Buat OAuth Web client di Google Cloud (project sama dengan Gemini). Authorized JavaScript origins:
+                <code>https://rezhaeko-beep.github.io</code>,
+                <code>http://127.0.0.1:8766</code>,
+                <code>http://localhost:8766</code>.
+                <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener noreferrer">Buka Credentials</a>
+              </p>
+              <div class="btn-row an-drive-gemini-actions">
+                <button class="btn btn-cta" type="button" id="anDriveGeminiTotal" title="OAuth → unduh Drive → upload Gemini Files → generateContent video utuh">Analisa total · Gemini dari Drive</button>
+                <button class="btn btn-ghost" type="button" id="anDriveGeminiFast" title="OAuth → unduh Drive → sample frame Full auto">Cepat · Drive + sample frame</button>
+              </div>
+              <p class="an-drive-gemini-status" id="anDriveGeminiStatus" role="status" aria-live="polite"></p>
             </div>
           </div>
 
@@ -1283,6 +1304,7 @@ Scan sebelum terima bola</textarea></div>
   <script src="js/generate.js"></script>
   <script src="js/analitik.js"></script>
   <script src="js/drive-pramu.js"></script>
+  <script src="js/drive-gemini.js"></script>
   <script src="js/highlights.js"></script>
   <script src="js/coach-analytics.js"></script>
   <script src="js/coach-desk.js"></script>

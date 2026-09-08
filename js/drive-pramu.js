@@ -273,6 +273,50 @@
   }
 
   window.TFDEV = window.TFDEV || {};
+  function getSelectedId() {
+    if (selectedId) return selectedId;
+    const sel = $("anDrivePramuSelect");
+    if (sel && sel.value) return sel.value;
+    try {
+      const raw = localStorage.getItem(LS_SELECTED);
+      if (raw) {
+        const saved = JSON.parse(raw);
+        if (saved && saved.id) return saved.id;
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  function getSelectedMeta() {
+    const id = getSelectedId();
+    if (!id) return null;
+    const known = findVideo(id);
+    if (known) return known;
+    let saved = null;
+    try {
+      const raw = localStorage.getItem(LS_SELECTED);
+      if (raw) saved = JSON.parse(raw);
+    } catch (_) {}
+    if (saved && saved.id === id) {
+      return {
+        id: id,
+        title: saved.title || ("drive:" + id),
+        lawan: saved.lawan || "",
+        babak: saved.babak || "",
+        viewUrl: saved.viewUrl || viewUrlFor(id),
+        custom: !!saved.custom
+      };
+    }
+    return {
+      id: id,
+      title: "drive:" + id,
+      lawan: "",
+      babak: "",
+      viewUrl: viewUrlFor(id),
+      custom: true
+    };
+  }
+
   window.TFDEV.drivePramu = {
     init: init,
     loadCatalog: loadCatalog,
@@ -284,6 +328,8 @@
     getSelected: function () {
       return findVideo(selectedId);
     },
+    getSelectedId: getSelectedId,
+    getSelectedMeta: getSelectedMeta,
     openFolder: openFolder,
     openSelectedDrive: openSelectedDrive
   };
