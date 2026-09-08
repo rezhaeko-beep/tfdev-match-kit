@@ -11,12 +11,15 @@
   let frameSeq = 0;
 
   const SYSTEM_PROMPT_FALLBACK =
-    "Kamu analis youth football TFS/TFDEV. Tim kita jersey orange. " +
-    "PRIMARY EVIDENCE = VIDEO / frame gambar yang disertakan. Jangan mengarang gol/shot/kartu/skor. " +
-    "Angka yang tidak terbaca dari footage = null + reason (N/C). " +
-    "Possession & attacking sequences boleh estimasi (estimated:true). " +
-    "Output: ringkasan singkat + JSON Match Centre dan (jika diminta) Parent Session Report gaya TFDEV " +
-    "(overall score, 9 metrics, strengths, focus, 4 home drills, coach note). " +
+    "Kamu analis youth football TFS/TFDEV yang membaca perilaku manusia di lapangan (bukan hanya skor). " +
+    "Tim kita jersey orange. PRIMARY EVIDENCE = VIDEO / frame gambar yang disertakan. " +
+    "Jangan mengarang gol/shot/kartu/skor. Angka yang tidak terbaca = null + reason (N/C). " +
+    "Possession & attacking sequences boleh estimasi (estimated:true). No fake GPS. " +
+    "STAR LAYER = human behavior: decision under pressure, scanning, courage 1v1, reset setelah lose, " +
+    "help peers, body language, fair play, attention (bahasa lembut, age-appropriate). " +
+    "Output: ringkasan singkat + JSON { matchCentre, behaviorInsights, parentReports?, highlights? }. " +
+    "behaviorInsights: teamMood, keyBehaviors[{t,playerNo,tag,note,valence}], parentStory, coachCues. " +
+    "Petakan perilaku ke strengths/focus Parent Report & judul/note Highlights. " +
     "Bahasa Indonesia, konkret, cocok untuk coach & orang tua.";
 
   function $(id) {
@@ -354,9 +357,19 @@
       : "skip parent report";
 
     const packagePrompt = [
-      "=== TFDEV VIDEO-ANALITIK PROMPT ===",
+      "=== TFDEV VIDEO-ANALITIK · HUMAN BEHAVIOR VISION ===",
       "",
-      "PRIMARY EVIDENCE: video match / frame yang kamu lihat. JANGAN mengarang. N/C atau null + reason jika tidak terbaca dari footage.",
+      "PRIMARY EVIDENCE: video match / frame yang kamu lihat. JANGAN mengarang. N/C atau null + reason jika tidak terbaca. No fake GPS.",
+      "",
+      "STAR LAYER = perilaku manusia di lapangan (youth football):",
+      "- Decision under pressure (force pass vs patience)",
+      "- Body language / confidence / effort setelah lose ball",
+      "- Communication & scanning (head up, peer cues)",
+      "- Reaksi ke coach / teammates (encouragement, sulk, reset)",
+      "- 1v1 courage, recovery run honesty, pressing triggers",
+      "- Leadership / help peers / celebrate / fair play",
+      "- Attention / distraction (bahasa lembut, age-appropriate)",
+      "Hanya klaim yang didukung frames/video. Match Centre numbers tetap, tapi behaviorInsights adalah bintang untuk ortu & highlights.",
       "",
       sys,
       "",
@@ -373,13 +386,23 @@
       "INSTRUKSI UNTUK USER (sudah diikuti jika frame/video terlampir):",
       "1. Upload VIDEO penuh (atau frame JPEG di atas) ke ChatGPT / Claude / Grok vision.",
       "2. Paste seluruh prompt ini.",
-      "3. Minta output: ringkasan singkat (5–8 baris) lalu JSON valid { matchCentre, parentReports, highlights? }.",
+      "3. Minta output: ringkasan singkat (5–8 baris, utamakan perilaku) lalu JSON valid",
+      "   { matchCentre, behaviorInsights, parentReports?, highlights? }.",
       "4. Salin JSON kembali ke app TFDEV → Analitik AI → Paste JSON → Terapkan / Full auto.",
       "",
-      "Aturan: jangan invent gol/shot/kartu/skor; possession & attacking sequences boleh estimated:true; SoT dari wide cam sering null.",
+      "Aturan: jangan invent gol/shot/kartu/skor/perilaku; possession & attacking sequences boleh estimated:true; SoT dari wide cam sering null.",
       "",
-      "Opsional tapi preferred — sertakan juga array highlights (momen kunci dari footage):",
-      '"highlights": [{ "t": 40, "type": "CHANCE", "team": "TFS", "playerNo": "7", "title": "...", "note": "...", "rating": 4 }]',
+      "Wajib — behaviorInsights:",
+      '"behaviorInsights": {',
+      '  "teamMood": "…",',
+      '  "keyBehaviors": [{ "t": 90, "playerNo": "7", "tag": "SCANNING|COURAGE|RESET|PRESS|HELP|FOCUS|…", "note": "…", "valence": "positive|coach|caution" }],',
+      '  "parentStory": "2–3 kalimat human story untuk ortu",',
+      '  "coachCues": ["…"]',
+      "}",
+      "Petakan keyBehaviors positif → parentReports.strengths; valence coach/caution → focusAreas; parentStory → sessionSummary.",
+      "",
+      "Opsional preferred — highlights (judul/note bernuansa perilaku):",
+      '"highlights": [{ "t": 40, "type": "COACHING", "team": "TFS", "playerNo": "7", "title": "Scanning sebelum receive", "note": "…", "rating": 4 }]',
       "type ∈ GOL|CHANCE|SKILL|SAVE|COACHING|LAINNYA; t = detik dari awal clip/video.",
       ""
     ];
@@ -391,7 +414,7 @@
     }
 
     packagePrompt.push(
-      "Kembalikan ringkasan singkat lalu JSON sesuai schema Match Centre + Parent Reports TFDEV (+ highlights opsional)."
+      "Kembalikan ringkasan singkat (utamakan human behavior) lalu JSON sesuai schema Match Centre + behaviorInsights + Parent Reports TFDEV (+ highlights opsional)."
     );
     return packagePrompt.join("\n");
   }
@@ -482,8 +505,10 @@
             .map((f, i) => (i + 1) + ". t=" + fmtTime(f.t))
             .join("\n")
         : "(tidak ada frame — analisis terbatas)") +
-      "\n\nKembalikan ringkasan singkat lalu JSON { matchCentre, parentReports, highlights? }.\n" +
-      "Opsional preferred highlights: [{ t, type, team, playerNo, title, note, rating }] " +
+      "\n\nSTAR = human behavior (decision, scanning, courage, reset, help, body language, fair play). No fake GPS.\n" +
+      "Kembalikan ringkasan singkat (utamakan perilaku) lalu JSON { matchCentre, behaviorInsights, parentReports?, highlights? }.\n" +
+      "behaviorInsights wajib: { teamMood, keyBehaviors[{t,playerNo,tag,note,valence}], parentStory, coachCues }.\n" +
+      "Opsional preferred highlights (judul/note perilaku): [{ t, type, team, playerNo, title, note, rating }] " +
       "type∈GOL|CHANCE|SKILL|SAVE|COACHING|LAINNYA; t=detik.";
 
     parts.push({ type: "text", text: textBlock });
@@ -548,10 +573,12 @@
     lastResult = data;
     const pretty = {
       matchCentre: data.matchCentre,
+      behaviorInsights: data.behaviorInsights || undefined,
       parentReports: data.parentReports || [],
       highlights: data.highlights || data.keyMoments || undefined,
       playerDashboard: data.playerDashboard || undefined
     };
+    if (!pretty.behaviorInsights) delete pretty.behaviorInsights;
     if (!pretty.highlights) delete pretty.highlights;
     if (!pretty.playerDashboard) delete pretty.playerDashboard;
     if ($("anJsonOut")) $("anJsonOut").value = JSON.stringify(pretty, null, 2);
@@ -559,16 +586,23 @@
       (Array.isArray(data.highlights) && data.highlights.length) ||
       (Array.isArray(data.keyMoments) && data.keyMoments.length) ||
       0;
+    const behN =
+      (data.behaviorInsights &&
+        Array.isArray(data.behaviorInsights.keyBehaviors) &&
+        data.behaviorInsights.keyBehaviors.length) ||
+      0;
     const summary = [
-      "Mode: API Vision (" + model + ")",
+      "Mode: API Vision (" + model + ") · Human Behavior",
       "Frames dikirim: " + Math.min(frames.length, MAX_VISION_FRAMES),
       "Match: " + ((data.matchCentre && data.matchCentre.meta && data.matchCentre.meta.title) || meta.lawan),
+      "behaviorInsights: " + (data.behaviorInsights ? behN + " key behaviors" : "—"),
       "parentReports: " + ((data.parentReports && data.parentReports.length) || 0),
       "highlights: " + hlCount
     ];
     if ($("anSummaryList")) {
       $("anSummaryList").innerHTML = summary.map((s) => "<li>" + escapeHtml(s) + "</li>").join("");
     }
+    renderBehaviorPanel(data.behaviorInsights || null);
     setStatus("Vision API selesai · JSON siap diterapkan.", true);
     window.TFDEV.toast("Analitik Vision selesai");
     setWizardStep(3);
@@ -578,7 +612,7 @@
   /* ---------- Apply / copy JSON ---------- */
 
   function getCurrentJson() {
-    if (lastResult && (lastResult.matchCentre || lastResult.highlights || lastResult.parentReports)) {
+    if (lastResult && (lastResult.matchCentre || lastResult.highlights || lastResult.parentReports || lastResult.behaviorInsights)) {
       return lastResult;
     }
     const raw = ($("anJsonOut") && $("anJsonOut").value.trim()) || "";
@@ -607,6 +641,7 @@
         throw new Error("MatchCentre.applyJson belum siap");
       }
       window.MatchCentre.applyJson(mc);
+      renderBehaviorPanel(getBehaviorInsights(data));
       setWizardStep(3);
       showPostApply(true);
       window.TFDEV.toast("Diterapkan ke Match Centre");
@@ -621,17 +656,37 @@
   function applyPr() {
     try {
       const data = getCurrentJson();
-      const reports = data.parentReports || [];
+      const behavior = getBehaviorInsights(data);
+      renderBehaviorPanel(behavior);
+      let reports = data.parentReports || [];
+      if (!reports.length && behavior && (behavior.parentStory || (behavior.keyBehaviors && behavior.keyBehaviors.length))) {
+        reports = [
+          enrichParentReportWithBehavior(
+            {
+              player: {},
+              sessionSummary: "",
+              strengths: [],
+              focusAreas: [],
+              coach: { name: "Coach Pramu", note: "" }
+            },
+            behavior
+          )
+        ];
+      }
       if (!reports.length) {
         throw new Error("parentReports kosong — minta AI isi parent report (nama pemain di meta).");
       }
       if (!window.ParentReport || !window.ParentReport.applyJson) {
         throw new Error("ParentReport.applyJson belum siap");
       }
-      window.ParentReport.applyJson(reports[0], data.matchCentre || null);
+      const enriched = enrichParentReportWithBehavior(reports[0], behavior);
+      window.ParentReport.applyJson(enriched, data.matchCentre || null);
       window.TFDEV.showPage("report");
       window.TFDEV.toast("Diterapkan ke Parent Report");
-      setStatus("Parent Report diterapkan dari parentReports[0].", true);
+      setStatus(
+        "Parent Report diterapkan" + (behavior ? " (+ behaviorInsights)" : "") + " dari parentReports[0].",
+        true
+      );
     } catch (e) {
       setStatus("Gagal terapkan Parent Report: " + e.message, false);
       window.TFDEV.toast("Gagal terapkan");
@@ -653,6 +708,220 @@
       setStatus("Gagal terapkan Player Dashboard: " + e.message, false);
       window.TFDEV.toast("Gagal terapkan");
     }
+  }
+
+  function getBehaviorInsights(data) {
+    if (!data || typeof data !== "object") return null;
+    const b = data.behaviorInsights || data.behavior || null;
+    if (!b || typeof b !== "object") return null;
+    return b;
+  }
+
+  function behaviorTagToHighlightType(tag) {
+    const t = String(tag || "").toUpperCase();
+    if (/COURAGE|1V1|SKILL|DRIBBLE|CELEBRATE/.test(t)) return "SKILL";
+    if (/SAVE|GK/.test(t)) return "SAVE";
+    if (/GOL|GOAL/.test(t)) return "GOL";
+    if (/PRESS|RESET|SCAN|HELP|FOCUS|COMM|LEADER|FAIR|PATIENCE|EFFORT|DISTRACT|BODY|MOOD/.test(t)) {
+      return "COACHING";
+    }
+    return "COACHING";
+  }
+
+  function enrichParentReportWithBehavior(report, behavior) {
+    if (!report || typeof report !== "object") return report;
+    if (!behavior || typeof behavior !== "object") return report;
+    const r = Object.assign({}, report);
+    r.coach = Object.assign({}, report.coach || {});
+    const keys = Array.isArray(behavior.keyBehaviors) ? behavior.keyBehaviors : [];
+
+    if (!r.sessionSummary && behavior.parentStory) {
+      r.sessionSummary = behavior.parentStory;
+    } else if (
+      behavior.parentStory &&
+      r.sessionSummary &&
+      String(r.sessionSummary).length < 40
+    ) {
+      r.sessionSummary = behavior.parentStory;
+    }
+
+    if (!r.coach.note) {
+      if (Array.isArray(behavior.coachCues) && behavior.coachCues.length) {
+        r.coach.note = behavior.coachCues.filter(Boolean).join(" ");
+      } else if (behavior.parentStory) {
+        r.coach.note = behavior.parentStory;
+      } else if (behavior.teamMood) {
+        r.coach.note = "Suasana tim: " + behavior.teamMood;
+      }
+    }
+
+    const strengths = Array.isArray(r.strengths) ? r.strengths.slice() : [];
+    if (strengths.length < 3) {
+      keys
+        .filter((k) => k && (k.valence === "positive" || !k.valence) && k.note)
+        .forEach((k) => {
+          const line =
+            (k.tag ? String(k.tag).toUpperCase() + ": " : "") +
+            String(k.note) +
+            (k.playerNo ? " (#" + k.playerNo + ")" : "");
+          if (line && strengths.indexOf(line) < 0 && strengths.length < 5) strengths.push(line);
+        });
+      r.strengths = strengths;
+    }
+
+    let focus = Array.isArray(r.focusAreas) ? r.focusAreas.slice() : [];
+    if (focus.length < 2) {
+      keys
+        .filter((k) => k && (k.valence === "coach" || k.valence === "caution") && (k.note || k.tag))
+        .forEach((k) => {
+          const title = k.tag ? String(k.tag).toUpperCase() : "Fokus perilaku";
+          const desc = k.note || "";
+          const exists = focus.some(
+            (f) =>
+              (typeof f === "string" && f.indexOf(title) >= 0) ||
+              (f && f.title === title)
+          );
+          if (!exists && focus.length < 3) focus.push({ title: title, desc: desc });
+        });
+      r.focusAreas = focus;
+    }
+
+    return r;
+  }
+
+  function applyBehaviorsToHighlights(behavior, opts) {
+    opts = opts || {};
+    const keys = behavior && Array.isArray(behavior.keyBehaviors) ? behavior.keyBehaviors : [];
+    if (!keys.length) return { ok: false, skipped: true, reason: "keyBehaviors kosong", count: 0 };
+    if (!window.Highlights || typeof window.Highlights.addFromAnalitik !== "function") {
+      return { ok: false, skipped: true, reason: "Highlights belum siap", count: 0 };
+    }
+    const videoName =
+      ($("anVideoName") && $("anVideoName").textContent) ||
+      "";
+    let n = 0;
+    keys.forEach((b) => {
+      if (!b || b.t == null || b.t === "") return;
+      const tag = String(b.tag || "BEHAVIOR").toUpperCase();
+      const title =
+        tag +
+        (b.playerNo ? " #" + b.playerNo : "") +
+        (b.valence === "caution" ? " · fokus" : b.valence === "coach" ? " · cue" : "");
+      window.Highlights.addFromAnalitik({
+        t: Number(b.t) || 0,
+        type: behaviorTagToHighlightType(tag),
+        team: "TFS",
+        playerNo: b.playerNo != null ? String(b.playerNo) : "",
+        title: title,
+        note: b.note || behavior.parentStory || "",
+        rating: b.valence === "positive" ? 4 : b.valence === "caution" ? 3 : 3,
+        videoName: videoName && videoName !== "—" ? videoName : ""
+      });
+      n += 1;
+    });
+    return { ok: n > 0, count: n, via: "keyBehaviors→addFromAnalitik" };
+  }
+
+  function renderBehaviorPanel(behavior) {
+    const panel = $("anBehaviorPanel");
+    if (!panel) return;
+    if (!behavior || typeof behavior !== "object") {
+      panel.hidden = true;
+      panel.innerHTML = "";
+      return;
+    }
+    const keys = Array.isArray(behavior.keyBehaviors) ? behavior.keyBehaviors : [];
+    const cues = Array.isArray(behavior.coachCues) ? behavior.coachCues : [];
+    const chips = keys
+      .map((b, i) => {
+        if (!b) return "";
+        const tag = escapeHtml(String(b.tag || "BEHAVIOR").toUpperCase());
+        const valence = String(b.valence || "coach");
+        const note = escapeHtml(b.note || "");
+        const who = b.playerNo ? "#" + escapeHtml(String(b.playerNo)) + " · " : "";
+        const t = b.t != null && b.t !== "" ? Number(b.t) : null;
+        const timeLabel = t != null && isFinite(t) ? escapeHtml(fmtTime(t)) : "";
+        const jump =
+          t != null && isFinite(t)
+            ? '<button type="button" class="bhv-jump" data-bhv-t="' +
+              t +
+              '" title="Jump ke highlight / waktu">⏱ ' +
+              timeLabel +
+              "</button>"
+            : "";
+        return (
+          '<article class="bhv-card valence-' +
+          escapeHtml(valence) +
+          '" data-bhv-i="' +
+          i +
+          '">' +
+          '<div class="bhv-card-top">' +
+          '<span class="bhv-tag">' +
+          tag +
+          "</span>" +
+          (jump || "") +
+          "</div>" +
+          '<p class="bhv-note">' +
+          who +
+          note +
+          "</p>" +
+          "</article>"
+        );
+      })
+      .filter(Boolean)
+      .join("");
+
+    const story = behavior.parentStory
+      ? '<div class="bhv-story"><div class="bhv-story-label">Cerita untuk ortu</div><p>' +
+        escapeHtml(behavior.parentStory) +
+        "</p></div>"
+      : "";
+    const mood = behavior.teamMood
+      ? '<div class="bhv-mood">Suasana tim: <strong>' +
+        escapeHtml(behavior.teamMood) +
+        "</strong></div>"
+      : "";
+    const cueHtml = cues.length
+      ? '<ul class="bhv-cues">' +
+        cues.map((c) => "<li>" + escapeHtml(c) + "</li>").join("") +
+        "</ul>"
+      : "";
+
+    panel.hidden = false;
+    panel.innerHTML =
+      '<div class="bhv-head">' +
+      "<div>" +
+      "<strong>AI Vision · Human Behavior</strong>" +
+      "<span>Momen perilaku dari footage — bukan scoreboard kering</span>" +
+      "</div>" +
+      '<span class="bhv-count">' +
+      keys.length +
+      " perilaku</span>" +
+      "</div>" +
+      mood +
+      story +
+      (chips ? '<div class="bhv-strip">' + chips + "</div>" : '<p class="ux-hint">Belum ada keyBehaviors di JSON.</p>') +
+      (cueHtml
+        ? '<div class="bhv-cues-wrap"><div class="bhv-story-label">Coach cues</div>' + cueHtml + "</div>"
+        : "");
+  }
+
+  function jumpBehaviorTime(t) {
+    t = Number(t);
+    if (!isFinite(t)) return;
+    try {
+      if (window.Highlights && typeof window.Highlights.jumpTo === "function") {
+        window.Highlights.jumpTo(t);
+      }
+    } catch (_) {}
+    const v = $("anVideo");
+    if (v && v.src) {
+      try {
+        v.currentTime = Math.max(0, t);
+        v.play().catch(function () {});
+      } catch (_) {}
+    }
+    window.TFDEV.toast("Jump · " + fmtTime(t));
   }
 
   function collectHighlightItems(data) {
@@ -750,9 +1019,23 @@
       lines.push("✗ Match Centre: " + e.message);
     }
 
-    // Parent Report — skip gracefully if empty
+    const behavior = getBehaviorInsights(data);
+    renderBehaviorPanel(behavior);
+
+    // Parent Report — skip gracefully if empty; enrich from behaviorInsights
     try {
-      const reports = data.parentReports || [];
+      let reports = data.parentReports || [];
+      if (!reports.length && behavior && (behavior.parentStory || (behavior.keyBehaviors && behavior.keyBehaviors.length))) {
+        reports = [
+          {
+            player: {},
+            sessionSummary: "",
+            strengths: [],
+            focusAreas: [],
+            coach: { name: "Coach Pramu", note: "" }
+          }
+        ];
+      }
       if (!reports.length) {
         results.push({ module: "parentReport", ok: false, skipped: true, reason: "kosong" });
         lines.push("· Parent Report dilewati (parentReports kosong)");
@@ -760,9 +1043,12 @@
         results.push({ module: "parentReport", ok: false, reason: "API belum siap" });
         lines.push("· Parent Report dilewati (API belum siap)");
       } else {
-        window.ParentReport.applyJson(reports[0], data.matchCentre || null);
+        const enriched = enrichParentReportWithBehavior(reports[0], behavior);
+        window.ParentReport.applyJson(enriched, data.matchCentre || null);
         results.push({ module: "parentReport", ok: true });
-        lines.push("✓ Parent Report diterapkan (parentReports[0])");
+        lines.push(
+          "✓ Parent Report diterapkan" + (behavior ? " (+ behaviorInsights)" : "") + " (parentReports[0])"
+        );
       }
     } catch (e) {
       results.push({ module: "parentReport", ok: false, reason: e.message });
@@ -784,12 +1070,23 @@
       lines.push("· Player Dashboard dilewati: " + e.message);
     }
 
-    // Highlights
+    // Highlights (+ keyBehaviors → highlights jika array highlights kosong)
     try {
-      const hl = applyHighlightsFromData(data, { confirm: false });
+      let hl = applyHighlightsFromData(data, { confirm: false });
+      let behHl = { ok: false, count: 0 };
+      if ((!hl.ok || hl.skipped) && behavior) {
+        behHl = applyBehaviorsToHighlights(behavior, {});
+        if (behHl.ok) hl = behHl;
+      } else if (hl.ok && behavior) {
+        // merge behavior moments as extra coaching clips when possible
+        behHl = applyBehaviorsToHighlights(behavior, {});
+        if (behHl.ok) {
+          hl = { ok: true, count: (hl.count || 0) + (behHl.count || 0), via: "highlights+keyBehaviors" };
+        }
+      }
       if (hl.ok) {
         results.push({ module: "highlights", ok: true, count: hl.count });
-        lines.push("✓ Highlights: " + hl.count + " momen diimpor");
+        lines.push("✓ Highlights: " + hl.count + " momen diimpor" + (behHl.ok ? " (incl. behavior)" : ""));
       } else {
         results.push({ module: "highlights", ok: false, skipped: true, reason: hl.reason });
         lines.push("· Highlights dilewati (" + (hl.reason || "kosong") + ")");
@@ -875,7 +1172,7 @@
         data = parseAiJson(raw);
         lastResult = data;
         setStatus("Full auto: memakai JSON yang sudah di-paste.", true);
-      } else if (lastResult && (lastResult.matchCentre || lastResult.highlights)) {
+      } else if (lastResult && (lastResult.matchCentre || lastResult.highlights || lastResult.behaviorInsights)) {
         data = lastResult;
         setStatus("Full auto: memakai hasil JSON terakhir.", true);
       } else {
@@ -1062,6 +1359,7 @@
       return frames.slice();
     },
     buildPrompt: buildVideoAnalitikPrompt,
+    renderBehaviorPanel: renderBehaviorPanel,
     run: function () {
       if (getMode() === "api") return runApiVision();
       return copyPrompt();
@@ -1077,6 +1375,24 @@
   window.TFDEV.initAnalitik = function () {
     if (!$("page-analitik")) return;
     loadApiSettings();
+    if ($("anBehaviorPanel")) {
+      $("anBehaviorPanel").addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-bhv-t]");
+        if (!btn) return;
+        jumpBehaviorTime(btn.getAttribute("data-bhv-t"));
+      });
+    }
+    if ($("anJsonOut")) {
+      $("anJsonOut").addEventListener("blur", () => {
+        try {
+          const raw = $("anJsonOut").value.trim();
+          if (!raw) return;
+          const data = parseAiJson(raw);
+          lastResult = data;
+          renderBehaviorPanel(getBehaviorInsights(data));
+        } catch (_) {}
+      });
+    }
     syncModeUi();
     wireDropZone();
     renderFramesStrip();

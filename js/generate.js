@@ -1,43 +1,46 @@
 (function () {
   const SYSTEM_PROMPT_FALLBACK =
-    "Kamu analis youth football TFS/TFDEV. Tim kita jersey orange. PRIMARY EVIDENCE = VIDEO / frame gambar. Jangan mengarang gol/shot/kartu/skor. N/C jika unreadable dari footage. Angka yang tidak yakin dari wide cam = null + reason. Possession & attacking sequences boleh estimasi (estimated:true). Output: ringkasan singkat + JSON Match Centre dan (jika diminta) Parent Session Report gaya TFDEV (overall score, 9 metrics, strengths, focus, 4 home drills, coach note). Bahasa Indonesia, konkret, cocok untuk coach & orang tua.";
+    "Kamu analis youth football TFS/TFDEV yang membaca perilaku manusia di lapangan (bukan hanya skor). " +
+    "Tim kita jersey orange. PRIMARY EVIDENCE = VIDEO / frame gambar. Jangan mengarang gol/shot/kartu/skor. " +
+    "N/C jika unreadable dari footage. Angka yang tidak yakin dari wide cam = null + reason. " +
+    "Possession & attacking sequences boleh estimasi (estimated:true). No fake GPS. " +
+    "STAR LAYER = human behavior: decision under pressure, scanning, courage 1v1, reset setelah lose, " +
+    "help peers, body language, fair play, attention (bahasa lembut). " +
+    "Output: ringkasan singkat + JSON { matchCentre, behaviorInsights, parentReports?, highlights? }. " +
+    "behaviorInsights wajib: teamMood, keyBehaviors[{t,playerNo,tag,note,valence}], parentStory, coachCues. " +
+    "Petakan perilaku ke strengths/focus Parent Report & judul/note Highlights. " +
+    "Bahasa Indonesia, konkret, cocok untuk coach & orang tua.";
 
-  const FULL_PROMPT_EMBEDDED = `# Prompt Analitik — TFDEV Analitik
+  const FULL_PROMPT_EMBEDDED = `# Prompt Analitik — TFDEV Analitik · Human Behavior Vision
 
-Gunakan prompt ini saat AI / Tim Analis memproses video match atau sesi latihan academy (TFS / TFDEV) untuk mengisi **Match Centre** dan **Parent Session Report**.
+Gunakan prompt ini saat AI memproses video match academy (TFS / TFDEV) untuk **Match Centre**, **behaviorInsights** (bintang), **Parent Session Report**, dan **Highlights**.
 
 ## Peran
-Kamu adalah analis sepak bola youth academy untuk **Total Football School (TFS / TFDEV)**.
-Output harus akurat, jujur terhadap footage, bahasa Indonesia yang mudah dipahami coach & orang tua, dan siap di-inject ke app TFDEV Analitik (JSON di bawah).
+Analis youth academy TFS/TFDEV yang membaca **bagaimana pemain berperilaku sebagai manusia di lapangan** — bukan scoreboard kering saja. Bahasa Indonesia, jujur terhadap footage.
 
-## Konteks tetap
-- Tim kita: **TFS** — jersey **orange**
-- Lawan: sebutkan nama + warna jersey jika terbaca
-- Usia: youth / small-sided (sering 7v7–9v9, gawang portable)
-- Kamera tipikal: sideline elevated (ZV-E10), wide tactical; boleh ada Cam2 detail
-- Timestamp overlay di video sering format \`DD/MM/YYYY HH:MM:SS\`
-- Jangan mengarang gol, shot, kartu, atau skor yang tidak terlihat jelas
+## Konteks
+- Tim: **TFS** jersey **orange** · youth / small-sided · kamera wide sideline
+- Jangan mengarang gol/shot/kartu/skor · **no fake GPS** · N/C jika unreadable
 
-## Input yang kamu terima
-1. PRIMARY: Video match / babak (atau cuplikan) dan/atau frame JPEG
-2. (Opsional) metadata: nama lawan, babak, lokasi, tanggal, nama pemain fokus untuk parent report
-3. (Opsional, sekunder) event sheet — jangan dipakai untuk mengarang angka yang tidak terlihat di video
+## Tugas
+### A. Match Centre — angka tetap, bukan bintang
+Identitas, scoreline (confidence), possession estimated, attacking sequences, shots/SoT/corners/FK/cards (null+reason), timeline, players identified, internal notes.
 
-## Tugas analitik (urut)
-### A. Match Centre (tim vs tim)
-Dari VIDEO / frames (bukti utama), hasilkan:
-1. Identitas match, scoreline (confidence), possession (estimated), attacking sequences, shots/SoT/corners/FK/cards (null + reason jika tidak yakin), timeline events, players identified, coach notes internal.
+### B. Human Behavior Insights — STAR (wajib)
+Observasi dari frames: decision under pressure, body language/effort setelah lose, scanning & communication, reaksi coach/teman, 1v1 courage, recovery honesty, pressing triggers, leadership/help/celebrate/fair play, attention (bahasa lembut).
+Hanya klaim yang didukung footage.
+\`behaviorInsights\`: teamMood; keyBehaviors[{t, playerNo, tag∈SCANNING|COURAGE|RESET|PRESS|HELP|FOCUS|COMM|LEADER|FAIRPLAY|CELEBRATE|PATIENCE|EFFORT|DISTRACT, note, valence∈positive|coach|caution}]; parentStory (2–3 kalimat ortu); coachCues[].
 
-### B. Parent Session Report (per pemain — jika diminta)
-Overall score 0–100 + label, session summary, 9 metrics (proxy observasi OK), strengths, focus areas, 4 home drills, coach note.
+### C. Parent Report (jika diminta)
+Overall score + label; sessionSummary **bernuansa perilaku**; metrics proxy video_observation; strengths dari keyBehaviors positif; focus dari coach/caution; 4 home drills; coach note hangat.
 
-## Aturan kualitas
-- Honesty first / video-first: bukti utama VIDEO/frames; lebih baik null / N/C daripada angka palsu
-- Jangan invent event yang tidak terbaca dari footage
-- Bedakan confirmed vs estimated
-- Output JSON valid sesuai schema Match Centre + parentReports
+### D. Highlights (preferred)
+Judul/note bernuansa perilaku; type∈GOL|CHANCE|SKILL|SAVE|COACHING|LAINNYA; t=detik.
 
-## Schema output JSON (ringkas)
+## Aturan
+Honesty / video-first; confirmed vs estimated; JSON valid { matchCentre, behaviorInsights, parentReports?, highlights? }.
+
+## Schema ringkas
 \`\`\`json
 {
   "matchCentre": {
@@ -52,6 +55,12 @@ Overall score 0–100 + label, session summary, 9 metrics (proxy observasi OK), 
     },
     "internalNotes": [""]
   },
+  "behaviorInsights": {
+    "teamMood": "",
+    "keyBehaviors": [{ "t": 90, "playerNo": "7", "tag": "SCANNING", "note": "", "valence": "positive" }],
+    "parentStory": "",
+    "coachCues": [""]
+  },
   "parentReports": [
     {
       "player": { "name": "", "position": "", "sessionDate": "" },
@@ -63,21 +72,17 @@ Overall score 0–100 + label, session summary, 9 metrics (proxy observasi OK), 
       "focusAreas": [{ "title": "", "desc": "" }],
       "coach": { "name": "Coach Pramu", "note": "" }
     }
-  ]
+  ],
+  "highlights": [{ "t": 90, "type": "COACHING", "team": "TFS", "playerNo": "7", "title": "", "note": "", "rating": 4 }]
 }
 \`\`\`
 
-## Prompt satu-blok (copy-paste)
-Analisis VIDEO match youth academy berikut untuk TFDEV Analitik.
-PRIMARY EVIDENCE = video / frame yang dilampirkan. Jangan mengarang. N/C jika unreadable dari footage.
-
-Tim kita: TFS (jersey orange). Lawan: [ISI]. Babak/clip: [ISI].
-Frame timestamps (jika ada): [ISI]
-Pemain untuk Parent Report (opsional): [NAMA / NOMOR / ATAU "skip parent report"]
-
-Ikuti aturan: jangan mengarang event; angka yang tidak terbaca dari wide cam = null + alasan; possession & attacking sequences boleh estimasi dengan flag estimated=true.
-
-Kembalikan ringkasan singkat (5–8 baris) lalu JSON sesuai schema Match Centre + Parent Reports TFDEV.`;
+## Prompt satu-blok
+Analisis VIDEO match youth academy untuk TFDEV · Human Behavior Vision.
+PRIMARY EVIDENCE = video/frame. Jangan mengarang. N/C jika unreadable. No fake GPS.
+STAR = perilaku manusia (decision, scanning, courage, reset, help, body language, fair play).
+Tim: TFS (orange). Lawan: [ISI]. Babak: [ISI]. Frames: [ISI]. Parent: [NAMA/NO atau skip].
+Kembalikan ringkasan singkat (utamakan perilaku) lalu JSON schema di atas.`;
 
   const SAMPLE_JSON = {
     matchCentre: {
@@ -115,6 +120,39 @@ Kembalikan ringkasan singkat (5–8 baris) lalu JSON sesuai schema Match Centre 
       playersIdentified: { TFS: [{ no: "7", note: "Aktif di build-up" }] },
       internalNotes: ["Pressing midfield agresif babak 1", "Finishing masih kurang tajam"]
     },
+    behaviorInsights: {
+      teamMood: "Kompak, tetap mencoba setelah chance terbuang",
+      keyBehaviors: [
+        {
+          t: 90,
+          playerNo: "7",
+          tag: "SCANNING",
+          note: "Head up sebelum receive di half-space; peer cue ke #8",
+          valence: "positive"
+        },
+        {
+          t: 210,
+          playerNo: "7",
+          tag: "RESET",
+          note: "Setelah lose ball, recovery run jujur tanpa sulk",
+          valence: "positive"
+        },
+        {
+          t: 300,
+          playerNo: "7",
+          tag: "PATIENCE",
+          note: "Sempat force pass di tekanan — cue: napas & scan dulu",
+          valence: "coach"
+        }
+      ],
+      parentStory:
+        "Athalla terlihat semakin berani mengangkat kepala sebelum menerima bola, dan tetap berusaha pulih setelah kehilangan bola. Ada momen di mana ia terburu-buru mengoper di bawah tekanan — itu titik coaching yang sehat untuk usia ini, bukan kekurangan karakter.",
+      coachCues: [
+        "Rayakan scanning & recovery honesty di clip",
+        "Drill: receive under press → 2 opsi (patience vs pass)",
+        "Bahasa lembut saat bahas force-pass moment"
+      ]
+    },
     parentReports: [
       {
         player: {
@@ -127,7 +165,7 @@ Kembalikan ringkasan singkat (5–8 baris) lalu JSON sesuai schema Match Centre 
         overallScore: 82,
         scoreLabel: "GOOD",
         sessionSummary:
-          "Athalla aktif di fase build-up dan pressing. Keputusan passing membaik di sepertiga akhir. Fokus minggu depan: finishing setelah receive di half-space.",
+          "Athalla aktif di build-up dengan scanning yang lebih sering, dan recovery run setelah lose ball terasa jujur. Di sepertiga akhir masih ada momen force-pass — fokus minggu depan: patience + finishing setelah receive di half-space.",
         metrics: [
           { key: "workRate", label: "Work rate", value: "8.5", tag: "tinggi", source: "video_observation" },
           { key: "passes", label: "Passing", value: "7.5", tag: "stabil", source: "video_observation" },

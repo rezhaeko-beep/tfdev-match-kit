@@ -71,8 +71,30 @@
 
     const player = report.player || {};
     const metrics = Array.isArray(report.metrics) ? report.metrics : [];
-    const strengths = Array.isArray(report.strengths) ? report.strengths : [];
-    const focusAreas = Array.isArray(report.focusAreas) ? report.focusAreas : [];
+    let strengths = Array.isArray(report.strengths) ? report.strengths.slice() : [];
+    let focusAreas = Array.isArray(report.focusAreas) ? report.focusAreas.slice() : [];
+    const bi = report.behaviorInsights || null;
+    if (bi && typeof bi === "object") {
+      if ((!report.sessionSummary || !String(report.sessionSummary).trim()) && bi.parentStory) {
+        report = Object.assign({}, report, { sessionSummary: bi.parentStory });
+      }
+      if ((!report.coach || !report.coach.note) && Array.isArray(bi.coachCues) && bi.coachCues.length) {
+        report = Object.assign({}, report, {
+          coach: Object.assign({}, report.coach || {}, { note: bi.coachCues.filter(Boolean).join(" ") })
+        });
+      }
+      if (strengths.length < 2 && Array.isArray(bi.keyBehaviors)) {
+        bi.keyBehaviors.filter((k) => k && k.valence === "positive" && k.note).forEach((k) => {
+          const line = (k.tag ? String(k.tag).toUpperCase() + ": " : "") + k.note;
+          if (line && strengths.indexOf(line) < 0) strengths.push(line);
+        });
+      }
+      if (focusAreas.length < 1 && Array.isArray(bi.keyBehaviors)) {
+        bi.keyBehaviors.filter((k) => k && (k.valence === "coach" || k.valence === "caution")).forEach((k) => {
+          focusAreas.push({ title: String(k.tag || "Fokus").toUpperCase(), desc: k.note || "" });
+        });
+      }
+    }
 
     const metaBits = [];
     if (player.number || player.no) metaBits.push("#" + (player.number || player.no));
