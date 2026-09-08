@@ -34,6 +34,7 @@
   if (window.TFDEV.initReport) window.TFDEV.initReport();
   if (window.TFDEV.initGenerate) window.TFDEV.initGenerate();
   if (window.TFDEV.initAnalitik) window.TFDEV.initAnalitik();
+  if (window.TFDEV.initDrivePramu) window.TFDEV.initDrivePramu();
   if (window.TFDEV.initHighlights) window.TFDEV.initHighlights();
   if (window.TFDEV.initCoachDesk) window.TFDEV.initCoachDesk();
   if (window.TFDEV.initPlayer) window.TFDEV.initPlayer();
