@@ -16,6 +16,14 @@ Dark UI TFDEV (hitam + `#FF6B1A`), Bahasa Indonesia, mobile-friendly. **Tidak pe
 8. **Club · Member & Finance** — dashboard finance, member CRUD, paket & harga, tagihan, pembayaran (offline `localStorage`)
 9. **Highlights** — tandai momen kunci dari video match (GOL/CHANCE/SKILL/SAVE/COACHING/LAINNYA), thumbnail, export JSON / daftar teks CapCut; `localStorage` `tfdev-highlights-v1` per nama file
 
+## Hosting permanen (Pramu)
+
+- **Live:** https://rezhaeko-beep.github.io/tfdev-match-kit/
+- Highlights: https://rezhaeko-beep.github.io/tfdev-match-kit/#highlights
+- Analitik AI: https://rezhaeko-beep.github.io/tfdev-match-kit/#analitik
+- Repo: https://github.com/rezhaeko-beep/tfdev-match-kit
+
+
 ## Cara buka
 
 Dari folder ini:
