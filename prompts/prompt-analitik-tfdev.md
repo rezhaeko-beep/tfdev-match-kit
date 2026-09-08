@@ -35,7 +35,18 @@ Dari **VIDEO / frames** (bukti utama), hasilkan:
 8. **Coach notes (internal):** 2–4 bullet pola main (bukan untuk orang tua)
 
 ### B. Human Behavior Insights — **STAR LAYER** (wajib)
-Dari gerakan tubuh, kepala, interaksi, dan keputusan yang **terlihat** di frames/video, hasilkan `behaviorInsights`:
+Dari gerakan tubuh, kepala, interaksi, dan keputusan yang **terlihat** di frames/video, hasilkan `behaviorInsights`.
+
+**Cara mengamati SETIAP frame (sangat detail):**
+1. Baca nomor punggung jika terbaca; catat orientasi tubuh & arah hadap
+2. Scanning: shoulder check / head up sebelum receive atau decide
+3. First touch: arah, berat, siap aksi berikutnya?
+4. Spacing: jarak ke teman/lawan; courage 1v1 vs mundur
+5. Reset setelah lose ball: jujur recovery atau berhenti?
+6. Help peers / komunikasi / gestur
+7. Keterlibatan GK (organisasi, sweep, komunikasi) jika terlihat
+8. Momen coaching-relevant (keputusan bagus/buruk yang bisa dilatih)
+9. Per **key moment**: tebak `t` dari urutan frame, siapa/apa/mengapa, `valence`
 
 Fokus observasi (youth football, bahasa hangat & jujur):
 - **Decision under pressure** — force pass vs patience; risk vs safe
@@ -44,15 +55,18 @@ Fokus observasi (youth football, bahasa hangat & jujur):
 - **Reaction to coach / teammates** — encouragement, sulk, reset cepat
 - **1v1 courage**, recovery run honesty, pressing triggers
 - **Leadership / help peers / celebrate / fair play**
-- **Attention span / distraction** — hanya jika jelas; pakai bahasa lembut & age-appropriate (jangan menghakimi anak)
+- **First touch & body orientation** ke aksi berikutnya
+- **GK involvement** jika terlihat di frame
+- **Attention span / distraction** — hanya jika jelas; bahasa lembut & age-appropriate (jangan menghakimi anak)
 
 Aturan behavior:
 - Hanya klaim yang didukung footage; jika tidak jelas → jangan isi / tulis N/C di note
-- `keyBehaviors[].tag` ∈ `SCANNING|COURAGE|RESET|PRESS|HELP|FOCUS|COMM|LEADER|FAIRPLAY|CELEBRATE|PATIENCE|EFFORT|DISTRACT` (boleh tag lain singkat UPPER)
+- `keyBehaviors`: **min 5–8** bila bukti ada; tag ∈ `SCANNING|COURAGE|RESET|PRESS|HELP|FOCUS|COMM|LEADER|FAIRPLAY|CELEBRATE|PATIENCE|EFFORT|DISTRACT|FIRSTTOUCH|GK` (boleh tag lain singkat UPPER)
 - `valence`: `positive` (rayakan), `coach` (titik coaching netral), `caution` (fokus lembut)
-- `parentStory`: 2–3 kalimat human story untuk ortu (bukan daftar statistik)
-- `coachCues`: 2–5 bullet actionable untuk coach
+- `parentStory`: **paragraf hangat berbahasa Indonesia** untuk ortu — spesifik dari frame (bukan generik / template)
+- `coachCues`: 2–5 bullet **drill actionable berbahasa Indonesia** (bisa langsung dipakai di latihan)
 - `teamMood`: satu frasa suasana tim di footage
+- **Lebih baik detail lambat daripada jawaban generik. Klaim hanya dari frame.**
 
 ### C. Parent Session Report (per pemain — jika diminta)
 Untuk tiap pemain fokus (atau yang paling terbaca), hasilkan gaya TFDEV:
@@ -82,12 +96,14 @@ Array momen kunci; **judul & note harus bernuansa perilaku** jika momen itu tent
 
 ## Aturan kualitas
 - **Honesty first / video-first:** bukti utama adalah VIDEO/frames; lebih baik `null` / N/C daripada angka atau perilaku palsu
+- Match Centre stats **hanya jika bukti di frames**; else N/C + reason — **never invent GPS**
 - Jangan invent event yang tidak terbaca dari footage
 - Bedakan `confirmed` vs `estimated`
 - Jika hanya Babak 1 / clip pendek: sebutkan di summary bahwa data = footage tersedia, bukan full match resmi
 - Jangan sebut tool/AI; tulis seolah laporan analis academy
 - Output **JSON valid** saja di blok akhir (boleh ada ringkasan teks singkat sebelum JSON)
 - Bahasa Indonesia; nada coach academy yang peduli (bukan scouting keras)
+- **Lebih baik detail lambat daripada jawaban generik. Klaim hanya dari frame.**
 
 ## Schema output JSON
 ```json
@@ -135,8 +151,8 @@ Array momen kunci; **judul & note harus bernuansa perilaku** jika momen itu tent
         "valence": "positive|coach|caution"
       }
     ],
-    "parentStory": "2–3 kalimat human story untuk ortu",
-    "coachCues": ["…"]
+    "parentStory": "paragraf hangat Indonesia untuk ortu — spesifik dari frame",
+    "coachCues": ["drill actionable berbahasa Indonesia"]
   },
   "parentReports": [
     {
@@ -172,8 +188,11 @@ Array momen kunci; **judul & note harus bernuansa perilaku** jika momen itu tent
 ```
 Analisis VIDEO match youth academy berikut untuk TFDEV Analitik · Human Behavior Vision.
 PRIMARY EVIDENCE = video / frame yang dilampirkan. Jangan mengarang. N/C jika unreadable dari footage. No fake GPS.
+Lebih baik detail lambat daripada jawaban generik. Klaim hanya dari frame.
 
-STAR LAYER = perilaku manusia di lapangan (decision under pressure, scanning, courage 1v1, reset setelah lose, help peers, body language, fair play). Match Centre numbers tetap, tapi behaviorInsights + parentStory adalah bintang untuk ortu.
+Amati SETIAP frame: nomor pemain, orientasi tubuh, scanning/shoulder check, first touch, spacing, courage 1v1, reset setelah lose, help peers, GK, momen coaching. Per key moment: timestamp dari urutan frame, siapa/apa/mengapa, valence.
+
+STAR LAYER = perilaku manusia. Match Centre numbers hanya jika bukti; behaviorInsights wajib kaya: teamMood, keyBehaviors min 5–8 bila bukti, parentStory (paragraf hangat Indonesia spesifik), coachCues (drill actionable Indonesia).
 
 Tim kita: TFS (jersey orange). Lawan: [ISI]. Babak/clip: [ISI].
 Frame timestamps (jika ada): [ISI]
@@ -181,5 +200,5 @@ Pemain untuk Parent Report (opsional): [NAMA / NOMOR / ATAU "skip parent report"
 
 Ikuti aturan: jangan mengarang event/perilaku; angka yang tidak terbaca dari wide cam = null + alasan; possession & attacking sequences boleh estimasi dengan flag estimated=true.
 
-Kembalikan ringkasan singkat (5–8 baris, utamakan perilaku) lalu JSON sesuai schema Match Centre + behaviorInsights + Parent Reports TFDEV (+ highlights opsional bernuansa perilaku).
+Kembalikan ringkasan singkat (utamakan perilaku detail) lalu JSON sesuai schema Match Centre + behaviorInsights + Parent Reports TFDEV (+ highlights opsional bernuansa perilaku).
 ```

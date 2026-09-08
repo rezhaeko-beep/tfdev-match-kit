@@ -2,8 +2,8 @@
   const API_KEY_LS = "tfdev-analitik-api-key";
   const API_BASE_LS = "tfdev-analitik-api-base";
   const API_MODEL_LS = "tfdev-analitik-api-model";
-  const MAX_VISION_FRAMES = 6;
-  const MAX_VISION_FRAMES_FULL_AUTO = 4;
+  const MAX_VISION_FRAMES = 8;
+  const MAX_VISION_FRAMES_FULL_AUTO = 8;
   const JPEG_QUALITY = 0.68;
   const CAPTURE_MAX_WIDTH = 960;
   const GEMINI_MODEL_FALLBACKS = [
@@ -18,14 +18,22 @@
   let frameSeq = 0;
 
   const SYSTEM_PROMPT_FALLBACK =
-    "Kamu analis youth football TFS/TFDEV yang membaca perilaku manusia di lapangan (bukan hanya skor). " +
+    "Kamu analis youth football TFS/TFDEV yang ahli membaca perilaku manusia di lapangan (bukan hanya skor). " +
     "Tim kita jersey orange. PRIMARY EVIDENCE = VIDEO / frame gambar yang disertakan. " +
     "Jangan mengarang gol/shot/kartu/skor. Angka yang tidak terbaca = null + reason (N/C). " +
     "Possession & attacking sequences boleh estimasi (estimated:true). No fake GPS. " +
+    "OBSERVASI FRAME SANGAT DETAIL: amati SETIAP frame — nomor punggung jika terbaca, orientasi tubuh, " +
+    "scanning (shoulder check / head up), first touch, spacing, courage 1v1, reset setelah lose ball, " +
+    "help peers, keterlibatan GK, momen coaching-relevant. Per momen kunci: timestamp dari urutan frame, " +
+    "siapa/apa/mengapa, valence (positive|coach|caution). " +
     "STAR LAYER = human behavior: decision under pressure, scanning, courage 1v1, reset setelah lose, " +
-    "help peers, body language, fair play, attention (bahasa lembut, age-appropriate). " +
+    "help peers, body language, fair play, first touch, GK, attention (bahasa lembut, age-appropriate). " +
+    "behaviorInsights kaya: teamMood; keyBehaviors min 5–8 bila bukti [{t,playerNo,tag,note,valence}]; " +
+    "parentStory = paragraf hangat Indonesia untuk ortu (spesifik dari frame); " +
+    "coachCues = drill actionable berbahasa Indonesia. " +
+    "Match Centre stats hanya jika bukti di frames; else N/C + reason — never invent GPS. " +
+    "Lebih baik detail lambat daripada jawaban generik. Klaim hanya dari frame. " +
     "Output: ringkasan singkat + JSON { matchCentre, behaviorInsights, parentReports?, highlights? }. " +
-    "behaviorInsights: teamMood, keyBehaviors[{t,playerNo,tag,note,valence}], parentStory, coachCues. " +
     "Petakan perilaku ke strengths/focus Parent Report & judul/note Highlights. " +
     "Bahasa Indonesia, konkret, cocok untuk coach & orang tua.";
 
@@ -367,6 +375,11 @@
       "",
       "PRIMARY EVIDENCE: video match / frame yang kamu lihat. JANGAN mengarang. N/C atau null + reason jika tidak terbaca. No fake GPS.",
       "",
+      "OBSERVASI FRAME SANGAT DETAIL — amati SETIAP frame:",
+      "- Nomor punggung jika terbaca, orientasi tubuh, scanning (shoulder check), first touch, spacing",
+      "- Courage 1v1, reset setelah lose ball, help peers, keterlibatan GK, momen coaching-relevant",
+      "- Per key moment: timestamp dari urutan frame, siapa/apa/mengapa, valence (positive|coach|caution)",
+      "",
       "STAR LAYER = perilaku manusia di lapangan (youth football):",
       "- Decision under pressure (force pass vs patience)",
       "- Body language / confidence / effort setelah lose ball",
@@ -374,8 +387,11 @@
       "- Reaksi ke coach / teammates (encouragement, sulk, reset)",
       "- 1v1 courage, recovery run honesty, pressing triggers",
       "- Leadership / help peers / celebrate / fair play",
+      "- First touch & body orientation; GK involvement jika terlihat",
       "- Attention / distraction (bahasa lembut, age-appropriate)",
-      "Hanya klaim yang didukung frames/video. Match Centre numbers tetap, tapi behaviorInsights adalah bintang untuk ortu & highlights.",
+      "Hanya klaim dari frames/video. Match Centre hanya jika bukti (else N/C + reason). No fake GPS.",
+      "Lebih baik detail lambat daripada jawaban generik. Klaim hanya dari frame.",
+      "behaviorInsights = bintang: keyBehaviors min 5–8 bila bukti; parentStory paragraf hangat Indonesia; coachCues drill actionable.",
       "",
       sys,
       "",
@@ -390,7 +406,7 @@
       frameLines,
       "",
       "INSTRUKSI UNTUK USER (sudah diikuti jika frame/video terlampir):",
-      "1. Upload VIDEO penuh (atau frame JPEG di atas) ke ChatGPT / Claude / Grok vision.",
+      "1. Upload VIDEO penuh (atau frame JPEG di atas) ke Gemini (AI Studio / Chat) vision — jalur utama TFDEV.",
       "2. Paste seluruh prompt ini.",
       "3. Minta output: ringkasan singkat (5–8 baris, utamakan perilaku) lalu JSON valid",
       "   { matchCentre, behaviorInsights, parentReports?, highlights? }.",
@@ -398,13 +414,14 @@
       "",
       "Aturan: jangan invent gol/shot/kartu/skor/perilaku; possession & attacking sequences boleh estimated:true; SoT dari wide cam sering null.",
       "",
-      "Wajib — behaviorInsights:",
+      "Wajib — behaviorInsights (kaya, spesifik dari frame):",
       '"behaviorInsights": {',
       '  "teamMood": "…",',
       '  "keyBehaviors": [{ "t": 90, "playerNo": "7", "tag": "SCANNING|COURAGE|RESET|PRESS|HELP|FOCUS|…", "note": "…", "valence": "positive|coach|caution" }],',
-      '  "parentStory": "2–3 kalimat human story untuk ortu",',
-      '  "coachCues": ["…"]',
+      '  "parentStory": "paragraf hangat berbahasa Indonesia untuk ortu — spesifik dari frame, bukan generik",',
+      '  "coachCues": ["drill actionable berbahasa Indonesia"]',
       "}",
+      "keyBehaviors: min 5–8 bila bukti ada. Lebih baik detail lambat daripada jawaban generik.",
       "Petakan keyBehaviors positif → parentReports.strengths; valence coach/caution → focusAreas; parentStory → sessionSummary.",
       "",
       "Opsional preferred — highlights (judul/note bernuansa perilaku):",
@@ -453,7 +470,7 @@
       window.TFDEV.toast("Prompt disalin");
       $("anSummaryList").innerHTML = [
         "Prompt disalin (" + text.length + " karakter).",
-        "Upload video atau " + frames.length + " frame ke ChatGPT / Claude / Grok vision.",
+        "Upload video atau " + frames.length + " frame ke Gemini vision (jalur utama) / cadangan chat vision.",
         "Paste prompt → salin JSON jawaban → tempel di langkah 5 → Terapkan."
       ]
         .map((s) => "<li>" + escapeHtml(s) + "</li>")
@@ -486,8 +503,9 @@
     const limit = Math.max(1, Number(maxFrames) || MAX_VISION_FRAMES);
     const parts = [];
     const textBlock =
-      "Analisis VIDEO/frames youth academy berikut untuk TFDEV Analitik.\n" +
-      "PRIMARY EVIDENCE = gambar frame di bawah (dan video jika model mendukung). Jangan mengarang. N/C jika unreadable.\n\n" +
+      "Analisis VIDEO/frames youth academy berikut untuk TFDEV Analitik · observasi perilaku sangat detail.\n" +
+      "PRIMARY EVIDENCE = gambar frame di bawah (dan video jika model mendukung). Jangan mengarang. N/C jika unreadable.\n" +
+      "Lebih baik detail lambat daripada jawaban generik. Klaim hanya dari frame.\n\n" +
       "Tim kita: TFS (jersey orange).\n" +
       "Lawan: " +
       meta.lawan +
@@ -505,16 +523,20 @@
         ? meta.player.name + (meta.player.no ? " #" + meta.player.no : "")
         : "skip parent report") +
       ".\n\n" +
-      "Frame timestamps:\n" +
+      "Frame timestamps (urut — pakai untuk tebak t key moment):\n" +
       (frames.length
         ? frames
             .slice(0, limit)
-            .map((f, i) => (i + 1) + ". t=" + fmtTime(f.t))
+            .map((f, i) => (i + 1) + ". t=" + fmtTime(f.t) + " (" + f.t.toFixed(1) + "s)")
             .join("\n")
         : "(tidak ada frame — analisis terbatas)") +
-      "\n\nSTAR = human behavior (decision, scanning, courage, reset, help, body language, fair play). No fake GPS.\n" +
-      "Kembalikan ringkasan singkat (utamakan perilaku) lalu JSON { matchCentre, behaviorInsights, parentReports?, highlights? }.\n" +
-      "behaviorInsights wajib: { teamMood, keyBehaviors[{t,playerNo,tag,note,valence}], parentStory, coachCues }.\n" +
+      "\n\nAMATI SETIAP FRAME: nomor punggung, orientasi tubuh, scanning/shoulder check, first touch, spacing, " +
+      "courage 1v1, reset setelah lose, help peers, GK involvement, momen coaching-relevant.\n" +
+      "Per key moment: timestamp dari urutan frame, siapa/apa/mengapa, valence.\n" +
+      "STAR = human behavior. Match Centre stats hanya jika bukti di frames; else N/C + reason. No fake GPS.\n" +
+      "Kembalikan ringkasan singkat (utamakan perilaku detail) lalu JSON { matchCentre, behaviorInsights, parentReports?, highlights? }.\n" +
+      "behaviorInsights wajib kaya: { teamMood, keyBehaviors[{t,playerNo,tag,note,valence}] min 5–8 bila bukti, " +
+      "parentStory (paragraf hangat Indonesia spesifik untuk ortu), coachCues (drill actionable Indonesia) }.\n" +
       "Opsional preferred highlights (judul/note perilaku): [{ t, type, team, playerNo, title, note, rating }] " +
       "type∈GOL|CHANCE|SKILL|SAVE|COACHING|LAINNYA; t=detik.";
 
@@ -577,11 +599,11 @@
       const model = models[i];
       usedModel = model;
       setStatus(
-        "Mencoba model " +
+        "Gemini observasi detail · " +
           model +
           "… (" +
           Math.min(frames.length, frameLimit) +
-          " frame)" +
+          " frame human-behavior)" +
           (i ? " · fallback " + (i + 1) + "/" + models.length : ""),
         true
       );
@@ -690,7 +712,7 @@
         data.behaviorInsights.keyBehaviors.length) ||
       0;
     const summary = [
-      "Mode: API Vision (" + usedModel + ") · Human Behavior",
+      "Mode: API Vision (" + usedModel + ") · Human Behavior detail",
       "Frames dikirim: " + Math.min(frames.length, frameLimit),
       "Match: " + ((data.matchCentre && data.matchCentre.meta && data.matchCentre.meta.title) || meta.lawan),
       "behaviorInsights: " + (data.behaviorInsights ? behN + " key behaviors" : "—"),
@@ -1240,7 +1262,7 @@
     setStatus("Full auto: memeriksa frame…", true);
 
     if (!frames.length) {
-      setStatus("Full auto: mengambil sample frame otomatis…", true);
+      setStatus("Full auto: sample frame untuk observasi perilaku detail…", true);
       const maxEl = $("anSampleMax");
       const prevMax = maxEl ? maxEl.value : null;
       if (maxEl) {
@@ -1275,7 +1297,7 @@
           syncModeUi();
         }
       }
-      setStatus("Full auto: menjalankan Gemini Vision…", true);
+      setStatus("Full auto: Gemini Vision · observasi perilaku manusia detail…", true);
       data = await runApiVision({ fullAuto: true });
     } else {
       const raw = ($("anJsonOut") && $("anJsonOut").value.trim()) || "";
@@ -1401,13 +1423,13 @@
     const hint = $("anFullAutoHint");
     if (title) {
       title.textContent = ready
-        ? "Siap Full auto · Gemini"
-        : "Full auto · Gemini Vision";
+        ? "Siap Full auto · Gemini · observasi detail"
+        : "Full auto · Gemini Vision · observasi detail";
     }
     if (hint) {
       hint.textContent = ready
-        ? "Siap Full auto · Gemini — tekan tombol: sample frame → Vision → modul."
-        : "Paste key Gemini di atas, lalu Full auto";
+        ? "Siap Full auto · Gemini — sample hingga 8 frame → observasi perilaku manusia detail → modul."
+        : "Paste key Gemini di atas, lalu Full auto (observasi perilaku detail)";
     }
   }
 
