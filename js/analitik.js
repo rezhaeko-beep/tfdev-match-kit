@@ -524,6 +524,9 @@
   /* ---------- API Vision ---------- */
 
   function parseAiJson(raw) {
+    if (window.TFDEV && window.TFDEV.JsonRepair && typeof window.TFDEV.JsonRepair.parseAndRepair === "function") {
+      return window.TFDEV.JsonRepair.parseAndRepair(raw);
+    }
     let text = String(raw || "").trim();
     if (!text) throw new Error("Respons AI kosong");
     const fence = text.match(/```(?:json)?\s*([\s\S]*?)```/i);
@@ -1087,6 +1090,9 @@
 
   function collectHighlightItems(data) {
     if (!data || typeof data !== "object") return [];
+    if (window.TFDEV && window.TFDEV.JsonRepair && typeof window.TFDEV.JsonRepair.ensureHighlights === "function") {
+      window.TFDEV.JsonRepair.ensureHighlights(data);
+    }
     if (Array.isArray(data.highlights) && data.highlights.length) return data.highlights;
     if (Array.isArray(data.keyMoments) && data.keyMoments.length) return data.keyMoments;
     // frames-as-moments: [{t|timeSec|second, type?, ...}]
