@@ -531,7 +531,7 @@
       /\/$/,
       ""
     );
-    const model = ($("anApiModel") && $("anApiModel").value.trim()) || "gemini-2.0-flash";
+    const model = ($("anApiModel") && $("anApiModel").value.trim()) || "gemini-3.6-flash";
     const key = ($("anApiKey") && $("anApiKey").value.trim()) || localStorage.getItem(API_KEY_LS) || "";
     if (!key) throw new Error("API key kosong — isi dulu (disimpan di localStorage).");
 
@@ -1200,7 +1200,7 @@
   function loadApiSettings() {
     const key = localStorage.getItem(API_KEY_LS) || "";
     const base = localStorage.getItem(API_BASE_LS) || "https://generativelanguage.googleapis.com/v1beta/openai";
-    const model = localStorage.getItem(API_MODEL_LS) || "gemini-2.0-flash";
+    const model = localStorage.getItem(API_MODEL_LS) || "gemini-3.6-flash";
     if ($("anApiKey")) $("anApiKey").value = key;
     if ($("anApiBase")) $("anApiBase").value = base;
     if ($("anApiModel")) $("anApiModel").value = model;

@@ -66,7 +66,7 @@
     var key = "";
     try { key = localStorage.getItem(API_KEY_LS) || ""; } catch (e) { key = ""; }
     var base = "https://generativelanguage.googleapis.com/v1beta/openai";
-    var model = "gemini-2.0-flash";
+    var model = "gemini-3.6-flash";
     try {
       base = localStorage.getItem(API_BASE_LS) || base;
       model = localStorage.getItem(API_MODEL_LS) || model;
