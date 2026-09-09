@@ -508,30 +508,45 @@
         encodeURIComponent(model) +
         ":generateContent?key=" +
         encodeURIComponent(apiKey);
+      function buildBody(includeFps) {
+        const videoPart = { fileData: { mimeType: mimeType, fileUri: fileUri } };
+        if (includeFps) videoPart.videoMetadata = { fps: fps };
+        return JSON.stringify({
+          systemInstruction: { parts: [{ text: system }] },
+          contents: [
+            {
+              role: "user",
+              // 1 video per request · video dulu, teks belakangan
+              parts: [videoPart, { text: userText }]
+            }
+          ],
+          generationConfig: { temperature: 0.2, topP: 0.9 }
+        });
+      }
       let res;
       try {
         res = await fetch(url, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            systemInstruction: { parts: [{ text: system }] },
-            contents: [
-              {
-                role: "user",
-                parts: [
-                  // 1 video per request · video dulu, teks belakangan
-                  {
-                    fileData: { mimeType: mimeType, fileUri: fileUri },
-                    videoMetadata: { fps: fps }
-                  },
-                  { text: userText }
-                ]
-              }
-            ],
-            generationConfig: { temperature: 0.2, topP: 0.9 }
-          })
+          body: buildBody(true)
         });
+        // Some models reject videoMetadata → retry once without fps
+        if (!res.ok && res.status === 400) {
+          const t0 = await res.text().catch(function () { return ""; });
+          if (/videoMetadata|Unknown name|Invalid JSON|fps/i.test(t0)) {
+            res = await fetch(url, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: buildBody(false)
+            });
+          } else {
+            lastErr = new Error("generateContent 400 (" + model + "): " + (t0.slice(0, 180) || res.statusText));
+            if (i < models.length - 1) continue;
+            throw lastErr;
+          }
+        }
       } catch (netErr) {
+        if (netErr && netErr.message && /^generateContent/.test(netErr.message)) throw netErr;
         lastErr = new Error(
           "Jaringan ke Gemini gagal: " + ((netErr && netErr.message) || "Failed to fetch")
         );

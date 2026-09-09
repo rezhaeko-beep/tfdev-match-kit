@@ -1609,13 +1609,23 @@
       src.indexOf("coach") >= 0 || src.indexOf("event") >= 0 || src.indexOf("sheet") >= 0;
 
     if (coach) {
-      // Always prefer Event Sheet scoreline for this fixture
-      if (!fromCoach || (h === 0 && a === 0) || h == null || a == null) {
+      // Only fill gaps — jangan timpa hasil AI full-video yang sudah punya skor/stats
+      const weakScore =
+        h == null ||
+        a == null ||
+        (h === 0 && a === 0 && !fromCoach);
+      if (weakScore) {
         mc.score = Object.assign({}, coach.score);
       }
       if (!mc.stats) mc.stats = {};
-      if (coach.corners) mc.stats.corners = coach.corners;
-      if (coach.saves) mc.stats.saves = coach.saves;
+      const st = mc.stats;
+      if (coach.corners && (st.corners == null || (st.corners.home == null && st.corners.away == null))) {
+        st.corners = coach.corners;
+      }
+      if (coach.saves && (st.saves == null || (st.saves.home == null && st.saves.away == null))) {
+        st.saves = coach.saves;
+      }
+      // Pad GOL timeline hanya jika AI belum menemukan gol cukup
       ensureCoachGoalTimeline(mc);
       return mc;
     }
