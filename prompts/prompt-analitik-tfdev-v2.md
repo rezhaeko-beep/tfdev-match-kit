@@ -19,7 +19,12 @@ Analis youth academy **Total Football School (TFS / TFDEV)**. Baca perilaku manu
 3. Event sheet coach = sekunder saja
 
 ## Sampling yang kamu asumsikan dari app
-Full-auto mengirim ~8 frame dengan **bias sepertiga akhir + transisi**. Jika frame didominasi midfield kosong, turunkan confidence & naikkan N/C — jangan mengarang peluang.
+Ada **dua mode** input dari Match Kit:
+
+1. **Full video (utama)** — Gemini Files menonton video utuh. Match stats (skor, gol+detik bila terlihat, corner, save, timeline) boleh diisi lebih lengkap **hanya jika bukti ada di footage**. Tetap N/C jika tidak jelas; **jangan default 0-0**.
+2. **Sample frame (cadangan cepat)** — ~8 frame dengan **bias sepertiga akhir + transisi**. Jika frame didominasi midfield kosong, turunkan confidence & naikkan N/C — jangan mengarang peluang atau skor.
+
+Event Sheet coach / overlay terbaca tetap menang untuk skor fixture yang sudah diverifikasi.
 
 ## Tugas (urut)
 ### A. Match Centre

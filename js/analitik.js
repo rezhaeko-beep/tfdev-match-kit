@@ -1172,6 +1172,8 @@
     if (!data || typeof data !== "object") {
       throw new Error("Hasil Vision kosong / bukan objek");
     }
+    // Full-video (Gemini Files) and frame paths share this entry — soften before JSON/UI.
+    if (data.matchCentre) softenUnverifiedZeroZero(data.matchCentre);
     lastResult = data;
     const pretty = {
       matchCentre: data.matchCentre,
