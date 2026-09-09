@@ -8,3 +8,5 @@
 Wire: Super Grok hooks kecil di `analitik.js` / `generate.js` — prefer load v2; fallback ke file tanpa `-v2` jika perlu.
 
 Compatible with apply-all: `matchCentre`, optional `behaviorInsights`, `parentReports`, `playerDashboard`, `highlights`.
+
+Score honesty: never default `0-0`; prefer coach Event Sheet / readable overlay; unclear → null + `scoreConfidence: low` (N/C).

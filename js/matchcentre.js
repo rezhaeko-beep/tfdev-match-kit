@@ -1,14 +1,14 @@
 (function () {
   const SAMPLE = {
-    home: "TFS", away: "G8", scoreH: 0, scoreA: 0,
+    home: "TFS", away: "G8", scoreH: 0, scoreA: 3,
     comp: "TFS VIDEO ANALYSIS · BABAK 1",
-    source: "(T8) TFS VS G8 Babak 1",
+    source: "(T8) TFS VS G8 Babak 1 · coach_event_sheet",
     date: "01/02/2024",
     possH: 54, possA: 46,
     attH: "~4", attA: "~3",
     shotH: "N/C", shotA: "N/C",
     cardH: "0", cardA: "0",
-    note: "Estimasi dari footage wide sideline. Shot/corner N/C jika tidak terkonfirmasi."
+    note: "Coach Event Sheet: skor 0–3 · corner 0–1 · saves 3–0. Shot N/C dari wide cam."
   };
 
   function val(id) { return document.getElementById(id).value; }

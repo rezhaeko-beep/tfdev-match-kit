@@ -107,20 +107,22 @@ Kembalikan ringkasan singkat (utamakan perilaku detail) lalu JSON schema di atas
       },
       score: {
         home: 0,
-        away: 0,
+        away: 3,
         confidence: "high",
-        note: "Estimasi dari footage wide sideline. Shot/corner N/C jika tidak terkonfirmasi."
+        note: "Coach Event Sheet Babak 1 (bukan tebakan 0-0). Corner 0–1 · saves 3–0.",
+        source: "coach_event_sheet"
       },
       possession: { homePct: 54, awayPct: 46, estimated: true },
       stats: {
         attackingSequences: { home: 4, away: 3, estimated: true },
         shots: { home: null, away: null },
         shotsOnTarget: { home: null, away: null },
-        corners: { home: null, away: null },
+        corners: { home: 0, away: 1 },
+        saves: { home: 3, away: 0 },
         freeKicks: { home: null, away: null },
         cards: { home: 0, away: 0 }
       },
-      uncountable: ["shotsOnTarget", "corners"],
+      uncountable: ["shotsOnTarget"],
       timeline: [
         { minute: "12", type: "CHANCE", team: "TFS", playerNo: "7", text: "Cutback half-space", confidence: "medium" }
       ],

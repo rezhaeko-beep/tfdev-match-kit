@@ -734,6 +734,7 @@
     }
 
     const data = parseAiJson(content);
+    if (data.matchCentre) softenUnverifiedZeroZero(data.matchCentre);
     lastResult = data;
     const pretty = {
       matchCentre: data.matchCentre,
@@ -800,7 +801,7 @@
   function applyMc() {
     try {
       const data = getCurrentJson();
-      const mc = data.matchCentre || data;
+      const mc = softenUnverifiedZeroZero(data.matchCentre || data);
       if (!window.MatchCentre || !window.MatchCentre.applyJson) {
         throw new Error("MatchCentre.applyJson belum siap");
       }
@@ -1210,7 +1211,9 @@
 
     // Match Centre
     try {
-      const mc = data.matchCentre || (data.teams || data.score || data.meta ? data : null);
+      const mc = softenUnverifiedZeroZero(
+        data.matchCentre || (data.teams || data.score || data.meta ? data : null)
+      );
       if (mc && window.MatchCentre && window.MatchCentre.applyJson) {
         window.MatchCentre.applyJson(mc);
         results.push({ module: "matchCentre", ok: true });
@@ -1518,6 +1521,41 @@
     }
   }
 
+  /** Known coach Event Sheet for seeded demos — never invent 0-0 for these titles. */
+  function coachSheetForTitle(title) {
+    const t = String(title || "").toLowerCase();
+    if (t.indexOf("tfs") >= 0 && t.indexOf("g8") >= 0) {
+      return {
+        score: {
+          home: 0,
+          away: 3,
+          confidence: "high",
+          note: "Coach Event Sheet · Babak 1 (bukan tebakan 0-0).",
+          source: "coach_event_sheet"
+        },
+        corners: { home: 0, away: 1 },
+        saves: { home: 3, away: 0 }
+      };
+    }
+    return null;
+  }
+
+  /** If AI/demo returns 0-0 with high/missing confidence and no sheet source, demote — do not rewrite numbers. */
+  function softenUnverifiedZeroZero(mc) {
+    if (!mc || !mc.score) return mc;
+    const s = mc.score;
+    const h = s.home;
+    const a = s.away;
+    const src = String(s.source || "").toLowerCase();
+    if (src.indexOf("coach") >= 0 || src.indexOf("event") >= 0 || src.indexOf("sheet") >= 0) return mc;
+    if (h === 0 && a === 0 && s.confidence !== "low") {
+      s.confidence = "low";
+      const tip = "Skor 0-0 belum terverifikasi Event Sheet/overlay — prefer N/C + scoreConfidence low.";
+      s.note = s.note ? String(s.note) + " · " + tip : tip;
+    }
+    return mc;
+  }
+
   /** Built-in demo so Pramu can see end-to-end without an API key (beats rival offline demo). */
   function getDemoAnalitikPayload() {
     return {
@@ -1528,15 +1566,18 @@
           dateStamp: "01/02/2024"
         },
         teams: { home: { name: "TFS" }, away: { name: "G8" } },
-        score: {
-          home: 0,
-          away: 0,
-          note: "Demo offline · skor dari clip seed (bukan GPS)."
+        score: (coachSheetForTitle("TFS VS G8 Babak 1") || {}).score || {
+          home: null,
+          away: null,
+          confidence: "low",
+          note: "N/C — tidak ada Event Sheet/overlay."
         },
         possession: { homePct: 54, awayPct: 46 },
         stats: {
           attackingSequences: { home: 4, away: 3, estimated: true },
           shotsOnTarget: { home: "N/C", away: "N/C" },
+          corners: { home: 0, away: 1 },
+          saves: { home: 3, away: 0 },
           cards: { home: 0, away: 0 }
         },
         internalNotes: [
@@ -1570,7 +1611,7 @@
           }
         ],
         parentStory:
-          "Di Babak 1 vs G8, anak terlihat terlibat di transisi dan duel tengah. Belum ada gol, tapi keputusan di bawah tekanan dan keberanian 1v1 sudah muncul di clip. Cocok dibahas bareng ortu tanpa menunggu Vision API.",
+          "Di Babak 1 vs G8 (skor coach 0–3), anak terlihat terlibat di transisi dan duel tengah. Keputusan di bawah tekanan dan keberanian 1v1 sudah muncul di clip — cerita ortu fokus perilaku, skor dari Event Sheet. Cocok tanpa menunggu Vision API.",
         coachCues: [
           "Jaga jarak antar lini di build-up awal.",
           "Counter-press 3 detik pertama setelah lose ball.",
