@@ -25,6 +25,9 @@ Full-auto mengirim ~8 frame dengan **bias sepertiga akhir + transisi**. Jika fra
 ### A. Match Centre
 1. Identitas: lawan, babak, durasi, format jika jelas
 2. Scoreline + `scoreConfidence: low|medium|high`
+   - **JANGAN hardcode / default `0-0`.** Prefer skor dari Event Sheet coach / overlay skor yang terbaca di footage.
+   - Jika skor tidak jelas di frame → `score.home`/`score.away` = `null` (atau omit) + `scoreConfidence: "low"` + note N/C reason — **jangan nebak 0-0**.
+   - Corner / saves / shots: sama — hanya angka yang terlihat atau dari sheet terverifikasi; else N/C.
 3. Possession % + `estimated: true` jika bukan tracking
 4. Attacking sequences / final-third entries (estimasi OK)
 5. Shots / SoT / corners / FK / cards — angka hanya jika yakin; else `null` + `reason`

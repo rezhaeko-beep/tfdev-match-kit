@@ -10,8 +10,11 @@
     "home": "TFS",
     "away": "G8",
     "half": "Babak 1",
-    "score": "0-0",
-    "durationSec": 621
+    "score": "0-3",
+    "durationSec": 621,
+    "corners": "0-1",
+    "saves": "3-0",
+    "source": "coach_event_sheet"
   },
   "exportedAt": "2026-09-08T15:18:55Z",
   "highlights": [
@@ -94,7 +97,7 @@
       "team": "TFS",
       "playerNo": "1",
       "title": "Situasi di depan gawang TFS",
-      "note": "Aksi dekat gawang (0-0 dipertahankan). Clip untuk sesi GK / block.",
+      "note": "Aksi dekat gawang (tekanan ke gawang TFS). Clip untuk sesi GK / block.",
       "rating": 4,
       "thumb": null,
       "time": "5:35"
@@ -142,7 +145,7 @@
       "team": "Lawan",
       "playerNo": "",
       "title": "Counter / peluang G8 akhir babak",
-      "note": "Kelola game state 0-0 menjelang akhir Babak 1.",
+      "note": "Kelola game state (TFS trailing; truth 0-3) menjelang akhir Babak 1.",
       "rating": 3,
       "thumb": null,
       "time": "9:30"
@@ -153,8 +156,8 @@
       "type": "LAINNYA",
       "team": "TFS",
       "playerNo": "",
-      "title": "Tutup Babak 1 (0-0)",
-      "note": "Skor babak 1: 0-0. Siap highlight reel CapCut dari timestamp di atas.",
+      "title": "Tutup Babak 1 (0–3)",
+      "note": "Skor babak 1 (coach): TFS 0–3 G8. Siap highlight reel CapCut dari timestamp di atas.",
       "rating": 3,
       "thumb": null,
       "time": "10:10"

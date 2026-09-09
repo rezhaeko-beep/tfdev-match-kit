@@ -1545,7 +1545,7 @@
         ]
       },
       behaviorInsights: {
-        teamMood: "Kompak, sabar di build-up; game state 0-0 dijaga sampai akhir babak.",
+        teamMood: "Kompak di build-up; jujur pada skor — jangan asumsikan 0-0 jika Event Sheet beda.",
         keyBehaviors: [
           {
             t: 90,
@@ -1587,7 +1587,7 @@
             sessionDate: "01/02/2024"
           },
           sessionSummary:
-            "Sesi solid: terlibat di peluang & skill, menjaga game state 0-0. Cerita fokus ke perilaku, bukan hanya skor.",
+            "Sesi solid: terlibat di peluang & skill. Cerita fokus ke perilaku; skor mengikuti Event Sheet/overlay, bukan tebakan 0-0.",
           strengths: ["Pressing support", "Change of pace 1v1"],
           focusAreas: [
             { title: "Finishing", desc: "Keputusan akhir di sepertiga akhir" },

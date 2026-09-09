@@ -26,7 +26,7 @@ Output harus akurat, jujur terhadap footage, bahasa Indonesia yang mudah dipaham
 ### A. Match Centre (tim vs tim) — angka tetap penting, bukan bintang
 Dari **VIDEO / frames** (bukti utama), hasilkan:
 1. **Identitas match:** kompetisi/friendly, tanggal, babak, durasi clip, format (7v7 dll jika jelas)
-2. **Scoreline:** skor terbaik yang didukung footage; jika tidak ada gol/selebrasi jelas → `0-0` + flag `scoreConfidence: low|medium|high`
+2. **Scoreline:** skor dari footage/Event Sheet/overlay; **jangan default `0-0`**. Tidak jelas → null + `scoreConfidence: low` + N/C reason (bukan nebak 0-0)
 3. **Possession (estimasi):** % TFS vs lawan dari territory/ball location; wajib `estimated: true` jika bukan tracking GPS
 4. **Attacking sequences:** jumlah fase masuk final third per tim (estimasi OK, tandai)
 5. **Shots / SoT / corners / FK / cards:** isi angka hanya jika yakin; jika kamera wide tidak memungkinkan → `null` + `reason: "not_countable_from_wide_cam"`
