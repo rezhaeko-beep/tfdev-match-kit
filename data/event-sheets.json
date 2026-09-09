@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "note": "Coach Event Sheet terverifikasi. Prioritas tertinggi untuk Goals / Corners / Saves pada fixture kunci.",
+  "sheets": [
+    {
+      "id": "tfs-vs-g8-babak-1",
+      "matchKeys": ["tfs", "g8"],
+      "half": 1,
+      "title": "TFS VS G8 Babak 1",
+      "teams": { "home": "TFS", "away": "G8" },
+      "score": { "home": 0, "away": 3 },
+      "corners": { "home": 0, "away": 1 },
+      "saves": { "home": 3, "away": 0 },
+      "shotsOnTarget": { "home": null, "away": null, "reason": "wide_cam_N/C" },
+      "attackingSequences": { "home": null, "away": null, "estimated": true },
+      "cards": { "home": 0, "away": 0 },
+      "possession": null,
+      "source": "coach_event_sheet",
+      "note": "Coach Event Sheet Babak 1: skor 0–3 · corner 0–1 · saves 3–0. Shot N/C wide-cam."
+    }
+  ]
+}

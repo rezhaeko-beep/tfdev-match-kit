@@ -1596,47 +1596,30 @@
     return mc;
   }
 
-  /** Align score + goals with coach sheet; demote fake 0-0 when unknown fixture. */
+  /** Align score + goals via Match stats formula (js/match-stats.js). */
   function softenUnverifiedZeroZero(mc) {
-    if (!mc || !mc.score) return mc;
+    if (!mc) return mc;
+    try {
+      if (window.TFDEV && window.TFDEV.MatchStats && typeof window.TFDEV.MatchStats.resolve === "function") {
+        return window.TFDEV.MatchStats.resolve(mc);
+      }
+    } catch (_) {}
+    // Fallback if match-stats.js not loaded
+    if (!mc.score) return mc;
     const s = mc.score;
     const h = s.home;
     const a = s.away;
-    const src = String(s.source || "").toLowerCase();
-    const title = matchTitleFromMc(mc);
-    const coach = coachSheetForTitle(title);
-    const fromCoach =
-      src.indexOf("coach") >= 0 || src.indexOf("event") >= 0 || src.indexOf("sheet") >= 0;
-
-    if (coach) {
-      // Only fill gaps — jangan timpa hasil AI full-video yang sudah punya skor/stats
-      const weakScore =
-        h == null ||
-        a == null ||
-        (h === 0 && a === 0 && !fromCoach);
-      if (weakScore) {
-        mc.score = Object.assign({}, coach.score);
-      }
+    const coach = coachSheetForTitle(matchTitleFromMc(mc));
+    if (coach && (h == null || a == null || (h === 0 && a === 0))) {
+      mc.score = Object.assign({}, coach.score);
       if (!mc.stats) mc.stats = {};
-      const st = mc.stats;
-      if (coach.corners && (st.corners == null || (st.corners.home == null && st.corners.away == null))) {
-        st.corners = coach.corners;
-      }
-      if (coach.saves && (st.saves == null || (st.saves.home == null && st.saves.away == null))) {
-        st.saves = coach.saves;
-      }
-      // Pad GOL timeline hanya jika AI belum menemukan gol cukup
+      if (coach.corners) mc.stats.corners = coach.corners;
+      if (coach.saves) mc.stats.saves = coach.saves;
       ensureCoachGoalTimeline(mc);
-      return mc;
-    }
-
-    if (h === 0 && a === 0 && s.confidence !== "low") {
-      s.confidence = "low";
-      const tip = "Skor 0-0 belum terverifikasi Event Sheet/overlay — prefer N/C + scoreConfidence low.";
-      s.note = s.note ? String(s.note) + " · " + tip : tip;
     }
     return mc;
   }
+
 
   /** Built-in demo so Pramu can see end-to-end without an API key (beats rival offline demo). */
   function getDemoAnalitikPayload() {

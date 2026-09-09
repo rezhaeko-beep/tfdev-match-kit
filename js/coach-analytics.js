@@ -456,6 +456,11 @@
     if (!window.MatchCentre || typeof window.MatchCentre.applyJson !== "function") {
       throw new Error("MatchCentre.applyJson belum siap");
     }
+    try {
+      if (window.TFDEV && window.TFDEV.MatchStats && summary.matchCentre) {
+        summary.matchCentre = window.TFDEV.MatchStats.resolve(summary.matchCentre);
+      }
+    } catch (_) {}
     window.MatchCentre.applyJson(summary.matchCentre);
 
     // Keep Analitik JSON area in sync so Vision/clip paths share one sink

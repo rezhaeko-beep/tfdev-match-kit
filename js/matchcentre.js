@@ -235,6 +235,12 @@
       return;
     }
 
+    // Apply Match stats formula (Event Sheet > overlay > AI > clips > N/C)
+    try {
+      if (window.TFDEV && window.TFDEV.MatchStats && typeof window.TFDEV.MatchStats.resolve === "function") {
+        data = window.TFDEV.MatchStats.resolve(data);
+      }
+    } catch (_) {}
     const meta = data.meta || {};
     const teams = data.teams || {};
     const home = teams.home || {};
