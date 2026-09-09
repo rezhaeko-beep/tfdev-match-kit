@@ -375,36 +375,56 @@
 
   function buildFullVideoUserPrompt(meta) {
     meta = meta || {};
-    return (
-      "Analisis VIDEO UTUH youth academy berikut untuk TFDEV Analitik · observasi perilaku sangat detail.\n" +
-      "PRIMARY EVIDENCE = seluruh video yang dilampirkan (file_data). Jangan mengarang. N/C jika unreadable.\n" +
-      "Lebih baik detail lambat daripada jawaban generik. Klaim hanya dari video.\n\n" +
-      "Tim kita: TFS (jersey orange).\n" +
-      "Lawan: " +
+    const babak = String(meta.babak || "Babak 1");
+    const isFullMatch =
+      /penuh|full|utuh|1\s*\+\s*2|babak\s*1.*babak\s*2|both|laporan utuh/i.test(babak) ||
+      meta.reportMode === "fullMatch";
+    const header =
+      "PRIMARY EVIDENCE = seluruh video (file_data). Klaim hanya dari video. N/C jika unreadable. No fake GPS. Jangan default skor 0-0.\n" +
+      "Tim kita: TFS (jersey orange). Lawan: " +
       (meta.lawan || "Lawan") +
       (meta.kitLawan ? " (kit " + meta.kitLawan + ")" : "") +
-      ".\n" +
-      "Babak/clip: " +
-      (meta.babak || "Babak 1") +
-      (meta.durasi ? " · durasi ~" + meta.durasi + "s" : "") +
-      ".\n" +
-      "Source: " +
-      (meta.sourceFile || "(Google Drive)") +
-      ".\n" +
-      "Pemain Parent Report: " +
+      ".\nBabak/mode: " +
+      babak +
+      (meta.durasi ? " · ~" + meta.durasi + "s" : "") +
+      ".\nSource: " +
+      (meta.sourceFile || "(video)") +
+      ".\nPemain Parent Report: " +
       (meta.player && meta.player.name
         ? meta.player.name + (meta.player.no ? " #" + meta.player.no : "")
         : "skip parent report") +
-      ".\n\n" +
-      "AMATI SELURUH VIDEO: nomor punggung jika terbaca, orientasi tubuh, scanning/shoulder check, first touch, spacing, " +
-      "courage 1v1, reset setelah lose, help peers, GK involvement, momen coaching-relevant.\n" +
-      "Per key moment: timestamp detik dari video, siapa/apa/mengapa, valence (positive|coach|caution).\n" +
-      "STAR = human behavior. Match Centre stats hanya jika bukti di video; else N/C + reason. No fake GPS.\n" +
-      "Kembalikan ringkasan singkat (utamakan perilaku detail) lalu JSON { matchCentre, behaviorInsights, parentReports?, highlights? }.\n" +
-      "behaviorInsights wajib kaya: { teamMood, keyBehaviors[{t,playerNo,tag,note,valence}] min 5–8 bila bukti, " +
-      "parentStory (paragraf hangat Indonesia spesifik untuk ortu), coachCues (drill actionable Indonesia) }.\n" +
-      "Opsional preferred highlights (judul/note perilaku): [{ t, type, team, playerNo, title, note, rating }] " +
-      "type∈GOL|CHANCE|SKILL|SAVE|COACHING|LAINNYA; t=detik."
+      ".\n\n";
+
+    if (isFullMatch) {
+      return (
+        header +
+        "MODE: LAPORAN UTUH · Gabungkan Babak 1 + Babak 2.\n" +
+        "Wajib: (1) perubahan taktik antarbabak, (2) dampak pergantian pemain, (3) penilaian manajer.\n" +
+        "JANGAN mengulang timeline mentah; sitir timestamp penting saja (gol, big chance, momen taktikal, sub kunci).\n" +
+        "Output: narasi berstruktur ID + JSON { matchCentre, behaviorInsights, parentReports?, highlights?, fullMatchReport? }.\n" +
+        "fullMatchReport: { tacticalChange, substitutionImpact[{t,playerIn,playerOut,impact}], " +
+        "managerAssessment:{positives[],negatives[],grade,note}, keyTimestamps[{t,why}], whoControlled, finalBullets[8] }.\n" +
+        "behaviorInsights: teamMood, keyBehaviors[], parentStory ID, coachCues[]. highlights type∈GOL|CHANCE|SKILL|SAVE|COACHING|LAINNYA."
+      );
+    }
+
+    return (
+      header +
+      "MODE: DEEP-WATCH SATU BABAK · Ini adalah " +
+      babak +
+      ". Tonton seluruh cuplikan.\n" +
+      "Tugas wajib:\n" +
+      "1) Timeline event lengkap + timestamp detik.\n" +
+      "2) Bentuk kedua tim (BK–MID–FW) di menit 5, 20, 40+ (atau ekuivalen babak 2).\n" +
+      "3) 3 pola berulang tiap tim (konkret, seperti invert FB ke half-space).\n" +
+      "4) Semua big chance.\n" +
+      "5) Perubahan setelah gol / kartu / pergantian.\n" +
+      "6) Ringkasan 8 bullet: siapa mengendalikan babak & mengapa.\n" +
+      "Jangan ringkas berlebihan — lengkap dan terikat timestamp.\n" +
+      "Output: narasi detail ID + JSON { matchCentre, behaviorInsights, parentReports?, highlights?, deepWatch? }.\n" +
+      "deepWatch: { half, timeline[{t,type,team,playerNo,desc}], shapes[{minute,home,away}], " +
+      "patterns:{home[3],away[3]}, bigChances[{t,team,desc}], afterEvents[{t,trigger,change}], controlSummary[8] }.\n" +
+      "matchCentre.timeline type∈GOL|SHOT|SAVE|CORNER|FK|KARTU|CHANCE|NOTE|SUB. Gol terlihat wajib entry GOL + t."
     );
   }
 
