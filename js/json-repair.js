@@ -109,6 +109,15 @@
   }
 
   function softNormalizeRoot(data) {
+    if (data && data.kidsCard && typeof data.kidsCard === "object") {
+      var kc = data.kidsCard;
+      if (!Array.isArray(kc.kamus)) kc.kamus = [];
+      if (!Array.isArray(kc.momen)) kc.momen = [];
+      if (!Array.isArray(kc.pemain)) kc.pemain = [];
+      if (!Array.isArray(kc.pelajaran)) kc.pelajaran = [];
+      if (!Array.isArray(kc.klip_wajib)) kc.klip_wajib = [];
+      if (!kc.keyakinan) kc.keyakinan = "Sedang";
+    }
     if (!data || typeof data !== "object") return data;
     // wrap legacy shapes
     if (!data.matchCentre && (data.teams || data.score || data.meta || data.stats)) {

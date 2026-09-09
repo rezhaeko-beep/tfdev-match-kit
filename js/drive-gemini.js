@@ -418,9 +418,13 @@
         "7) PELUANG GOL: Emas/Bagus/Sayang sekali (tanpa xG)\n" +
         "8) PESAN PELATIH: 5 pelajaran taktik; latihan 10 menit; 3 cuplikan tonton ulang (rentang ts)\n" +
         "9) YANG BELUM BISA PASTI (jarak lari, sentuhan resmi, dll)\n" +
-        "Output: narasi 1–9 + JSON { matchCentre, behaviorInsights, parentReports?, highlights?, kidsProReport? }.\n" +
-        "kidsProReport: { kabarLapangan, kamusMini[], ceritaBab[], petaTaktik, momenWowOops[], pahlawan[], peluangGol[], pesanPelatih, belumPasti[] }.\n" +
-        "behaviorInsights.teamMood + parentStory hangat ID. highlights type∈GOL|CHANCE|SKILL|SAVE|COACHING|LAINNYA."
+        "Setelah narasi 1–9, keluarkan JSON valid TANPA markdown fence.\n" +
+        "Root: { matchCentre, behaviorInsights, parentReports?, highlights?, kidsProReport?, kidsCard }.\n" +
+        "kidsCard WAJIB skema: { judul, skor, ringkasan_anak, kamus[{istilah,arti,timestamp}], " +
+        "momen[{timestamp,tipe,penjelasan_anak,pelajaran}], pemain[{label,bintang,alasan}], " +
+        "pelajaran[3], klip_wajib[{mulai:MM:SS,selesai:MM:SS,alasan}], keyakinan: Tinggi|Sedang|Rendah }.\n" +
+        "kidsProReport opsional (detail 9 bagian). behaviorInsights.teamMood + parentStory ID. " +
+        "highlights type∈GOL|CHANCE|SKILL|SAVE|COACHING|LAINNYA."
       );
     }
 

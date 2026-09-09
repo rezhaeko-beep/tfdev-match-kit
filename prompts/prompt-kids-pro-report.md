@@ -62,9 +62,21 @@ Batasannya: statistik jarak lari, sentuhan resmi, dsb. tidak ada di video.
 Jangan panjang bertele-tele. Padat, urut, selalu terikat gambar/video.
 Jangan default skor 0-0. N/C jika tidak terbaca. No fake GPS.
 
-## Output
-Narasi berstruktur (urut 1–9) + JSON:
-`{ matchCentre, behaviorInsights, parentReports?, highlights?, kidsProReport? }`
+## BLOK JSON WAJIB (setelah narasi)
+Keluarkan **satu objek JSON valid saja** (tanpa fence markdown ```) dengan skema tepat:
 
-`kidsProReport` (opsional tapi dianjurkan): ringkas field untuk UI —
-`{ kabarLapangan, kamusMini[], ceritaBab[], petaTaktik, momenWowOops[], pahlawan[], peluangGol[], pesanPelatih, belumPasti[] }`
+{
+  "judul": "",
+  "skor": "",
+  "ringkasan_anak": "",
+  "kamus": [{"istilah": "", "arti": "", "timestamp": ""}],
+  "momen": [{"timestamp": "", "tipe": "", "penjelasan_anak": "", "pelajaran": ""}],
+  "pemain": [{"label": "", "bintang": 0, "alasan": ""}],
+  "pelajaran": ["", "", ""],
+  "klip_wajib": [{"mulai": "MM:SS", "selesai": "MM:SS", "alasan": ""}],
+  "keyakinan": "Tinggi|Sedang|Rendah"
+}
+
+Boleh sekaligus membungkus di root TFDEV:
+`{ "matchCentre": {...}, "behaviorInsights": {...}, "kidsCard": { ...skema di atas... }, "kidsProReport": {...} }`
+Field `kidsCard` = skema JSON di atas (wajib untuk mode bahasa anak).
