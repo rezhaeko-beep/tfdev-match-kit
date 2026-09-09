@@ -376,9 +376,14 @@
   function buildFullVideoUserPrompt(meta) {
     meta = meta || {};
     const babak = String(meta.babak || "Babak 1");
+    const reportMode = String(meta.reportMode || "");
+    const isKidsPro =
+      reportMode === "kidsPro" ||
+      /anak|kids|pro.?anak|bahasa anak/i.test(babak + " " + reportMode);
     const isFullMatch =
-      /penuh|full|utuh|1\s*\+\s*2|babak\s*1.*babak\s*2|both|laporan utuh/i.test(babak) ||
-      meta.reportMode === "fullMatch";
+      !isKidsPro &&
+      (/penuh|full|utuh|1\s*\+\s*2|babak\s*1.*babak\s*2|both|laporan utuh/i.test(babak) ||
+        reportMode === "fullMatch");
     const header =
       "PRIMARY EVIDENCE = seluruh video (file_data). Klaim hanya dari video. N/C jika unreadable. No fake GPS. Jangan default skor 0-0.\n" +
       "Tim kita: TFS (jersey orange). Lawan: " +
@@ -393,7 +398,31 @@
       (meta.player && meta.player.name
         ? meta.player.name + (meta.player.no ? " #" + meta.player.no : "")
         : "skip parent report") +
+      (meta.readerAge ? ".\nUsia pembaca: " + meta.readerAge : "") +
+      (meta.focus ? ".\nFokus: " + meta.focus : "") +
+      (meta.scoreHint ? ".\nSkor (jika tahu): " + meta.scoreHint : "") +
       ".\n\n";
+
+    if (isKidsPro) {
+      return (
+        header +
+        "MODE: LAPORAN PRO · BAHASA ANAK. Tonton sampai selesai. Padat, urut, terikat timestamp.\n" +
+        "DATA (deteksi dari video jika kosong): kompetisi; Tim A vs Tim B; dewasa/anak; usia pembaca; skor; fokus.\n" +
+        "URUTAN WAJIB:\n" +
+        "1) KABAR LAPANGAN (maks 8 kalimat, bahasa anak)\n" +
+        "2) KAMUS MINI (maks 6 istilah: arti anak + contoh video + timestamp)\n" +
+        "3) JALAN CERITA LAGA (4–6 babak cerita: judul seru, skor saat itu, 3 bullet, 1 timestamp kunci)\n" +
+        "4) PETA TAKTIK Tim A & B: bentuk (jelaskan angka formasi), bangun serangan, merebut, counter, 1 trik+ts, 1 lubang+ts\n" +
+        "5) MOMEN WOW & OOPS min 8: ts | kejadian | pintar/kurang | pelajaran anak\n" +
+        "6) PAHLAWAN 5 pemain: peran, aksi hebat+ts, 1 yang dilatih, bintang 1–5 + alasan (pemain anak: nomor, jangan kritik pedas)\n" +
+        "7) PELUANG GOL: Emas/Bagus/Sayang sekali (tanpa xG)\n" +
+        "8) PESAN PELATIH: 5 pelajaran taktik; latihan 10 menit; 3 cuplikan tonton ulang (rentang ts)\n" +
+        "9) YANG BELUM BISA PASTI (jarak lari, sentuhan resmi, dll)\n" +
+        "Output: narasi 1–9 + JSON { matchCentre, behaviorInsights, parentReports?, highlights?, kidsProReport? }.\n" +
+        "kidsProReport: { kabarLapangan, kamusMini[], ceritaBab[], petaTaktik, momenWowOops[], pahlawan[], peluangGol[], pesanPelatih, belumPasti[] }.\n" +
+        "behaviorInsights.teamMood + parentStory hangat ID. highlights type∈GOL|CHANCE|SKILL|SAVE|COACHING|LAINNYA."
+      );
+    }
 
     if (isFullMatch) {
       return (

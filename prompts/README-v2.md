@@ -16,3 +16,4 @@ Modes: **full video** (Gemini Files, primary) vs **~8 frame sample** (fast fallb
 
 | `prompt-deep-watch-half.md` | Deep-watch satu babak (timeline, shape, pola, big chance) |
 | `prompt-full-match-report.md` | Gabung Babak 1+2: taktik antarbabak, sub, penilaian manajer |
+| `prompt-kids-pro-report.md` | Laporan pro bahasa anak (9 bagian + kidsProReport JSON) |

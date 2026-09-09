@@ -98,6 +98,7 @@
       lawan: ($("anLawan") && $("anLawan").value.trim()) || "Lawan",
       kitLawan: ($("anKitLawan") && $("anKitLawan").value.trim()) || "",
       babak: ($("anBabak") && $("anBabak").value.trim()) || "Babak 1",
+      reportMode: ($("anReportMode") && $("anReportMode").value.trim()) || "auto",
       durasi: Number(($("anDurasi") && $("anDurasi").value) || 0) || durFromVideo,
       sourceFile: ($("anSource") && $("anSource").value.trim()) || "",
       player: {
