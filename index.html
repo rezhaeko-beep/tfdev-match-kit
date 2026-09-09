@@ -422,7 +422,13 @@ Scan sebelum terima bola</textarea></div>
               <p class="ux-hint">Isi lawan, kit &amp; babak supaya analisa akurat.</p>
               <div class="field-row">
                 <div class="field"><label>Lawan</label><input id="anLawan" value="G8" placeholder="nama lawan" /></div>
-                <div class="field"><label>Babak</label><input id="anBabak" value="Babak 1" /></div>
+                <div class="field"><label>Babak</label>
+                  <select id="anBabak" aria-label="Pilih babak atau laporan utuh">
+                    <option value="Babak 1" selected>Babak 1 · deep-watch</option>
+                    <option value="Babak 2">Babak 2 · deep-watch</option>
+                    <option value="Babak 1 + Babak 2 · Laporan utuh">Babak 1 + Babak 2 · Laporan utuh</option>
+                  </select>
+                </div>
               </div>
               <div class="field-row">
                 <div class="field"><label>Kit lawan</label><input id="anKitLawan" value="blue" placeholder="mis. blue / white" /></div>
