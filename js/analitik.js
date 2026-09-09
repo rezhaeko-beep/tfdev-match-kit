@@ -1548,6 +1548,20 @@
     const a = s.away;
     const src = String(s.source || "").toLowerCase();
     if (src.indexOf("coach") >= 0 || src.indexOf("event") >= 0 || src.indexOf("sheet") >= 0) return mc;
+    const title =
+      (mc.meta && mc.meta.title) ||
+      ((mc.teams && mc.teams.home && mc.teams.home.name) || "") +
+        " VS " +
+        ((mc.teams && mc.teams.away && mc.teams.away.name) || "");
+    const coach = coachSheetForTitle(title);
+    // Known fixture: overwrite fake/default 0-0 with coach Event Sheet
+    if (coach && h === 0 && a === 0) {
+      mc.score = Object.assign({}, coach.score);
+      if (!mc.stats) mc.stats = {};
+      if (coach.corners) mc.stats.corners = coach.corners;
+      if (coach.saves) mc.stats.saves = coach.saves;
+      return mc;
+    }
     if (h === 0 && a === 0 && s.confidence !== "low") {
       s.confidence = "low";
       const tip = "Skor 0-0 belum terverifikasi Event Sheet/overlay — prefer N/C + scoreConfidence low.";
