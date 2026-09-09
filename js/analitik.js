@@ -1534,34 +1534,82 @@
           source: "coach_event_sheet"
         },
         corners: { home: 0, away: 1 },
-        saves: { home: 3, away: 0 }
+        saves: { home: 3, away: 0 },
+        // Goal events from sheet scoreline — timestamps N/C until tagged in Highlights/video
+        goals: [
+          { team: "G8", desc: "Gol 1 G8 (Event Sheet) — detik N/C sampai ditandai di Highlights" },
+          { team: "G8", desc: "Gol 2 G8 (Event Sheet) — detik N/C sampai ditandai di Highlights" },
+          { team: "G8", desc: "Gol 3 G8 (Event Sheet) — detik N/C sampai ditandai di Highlights" }
+        ]
       };
     }
     return null;
   }
 
-  /** If AI/demo returns 0-0 with high/missing confidence and no sheet source, demote — do not rewrite numbers. */
+  function matchTitleFromMc(mc) {
+    if (!mc) return "";
+    return (
+      (mc.meta && mc.meta.title) ||
+      ((mc.teams && mc.teams.home && mc.teams.home.name) || "") +
+        " VS " +
+        ((mc.teams && mc.teams.away && mc.teams.away.name) || "")
+    );
+  }
+
+  /** Ensure GOL timeline entries match coach sheet score when frames miss celebrations. */
+  function ensureCoachGoalTimeline(mc) {
+    if (!mc) return mc;
+    const coach = coachSheetForTitle(matchTitleFromMc(mc));
+    if (!coach || !coach.goals || !coach.goals.length) return mc;
+    if (!Array.isArray(mc.timeline)) mc.timeline = [];
+    const golCount = mc.timeline.filter(function (ev) {
+      const ty = String((ev && ev.type) || "").toUpperCase();
+      return ty === "GOL" || ty === "GOAL";
+    }).length;
+    const need = coach.goals.length;
+    if (golCount >= need) return mc;
+    for (let i = golCount; i < need; i++) {
+      const g = coach.goals[i];
+      mc.timeline.push({
+        type: "GOL",
+        team: g.team,
+        playerNo: "",
+        t: null,
+        minute: null,
+        desc: g.desc,
+        source: "coach_event_sheet"
+      });
+    }
+    if (!mc.stats) mc.stats = {};
+    if (coach.corners) mc.stats.corners = coach.corners;
+    if (coach.saves) mc.stats.saves = coach.saves;
+    return mc;
+  }
+
+  /** Align score + goals with coach sheet; demote fake 0-0 when unknown fixture. */
   function softenUnverifiedZeroZero(mc) {
     if (!mc || !mc.score) return mc;
     const s = mc.score;
     const h = s.home;
     const a = s.away;
     const src = String(s.source || "").toLowerCase();
-    if (src.indexOf("coach") >= 0 || src.indexOf("event") >= 0 || src.indexOf("sheet") >= 0) return mc;
-    const title =
-      (mc.meta && mc.meta.title) ||
-      ((mc.teams && mc.teams.home && mc.teams.home.name) || "") +
-        " VS " +
-        ((mc.teams && mc.teams.away && mc.teams.away.name) || "");
+    const title = matchTitleFromMc(mc);
     const coach = coachSheetForTitle(title);
-    // Known fixture: overwrite fake/default 0-0 with coach Event Sheet
-    if (coach && h === 0 && a === 0) {
-      mc.score = Object.assign({}, coach.score);
+    const fromCoach =
+      src.indexOf("coach") >= 0 || src.indexOf("event") >= 0 || src.indexOf("sheet") >= 0;
+
+    if (coach) {
+      // Always prefer Event Sheet scoreline for this fixture
+      if (!fromCoach || (h === 0 && a === 0) || h == null || a == null) {
+        mc.score = Object.assign({}, coach.score);
+      }
       if (!mc.stats) mc.stats = {};
       if (coach.corners) mc.stats.corners = coach.corners;
       if (coach.saves) mc.stats.saves = coach.saves;
+      ensureCoachGoalTimeline(mc);
       return mc;
     }
+
     if (h === 0 && a === 0 && s.confidence !== "low") {
       s.confidence = "low";
       const tip = "Skor 0-0 belum terverifikasi Event Sheet/overlay — prefer N/C + scoreConfidence low.";

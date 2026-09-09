@@ -22,7 +22,7 @@ behaviorInsights (kaya, opsional tapi sangat dianjurkan):
 - coachCues: 2–5 drill/aksi actionable Bahasa Indonesia
 - teamShape / pressingTriggers / decisionMoments (opsional)
 
-matchCentre: score (+ scoreConfidence; jangan 0-0 tebakan), possession, shots/onTarget/corners/saves jika countable else N/C, timeline[{t|minute,type,team,playerNo,desc}], notes. type timeline: GOL|SHOT|SAVE|CORNER|FK|KARTU|CHANCE|NOTE.
+matchCentre: score (+ scoreConfidence; jangan 0-0 tebakan), possession, shots/onTarget/corners/saves jika countable else N/C, timeline[{t|minute,type,team,playerNo,desc}], notes. type timeline: GOL|SHOT|SAVE|CORNER|FK|KARTU|CHANCE|NOTE. Jika Event Sheet/overlay skor >0, WAJIB isi entry timeline type GOL sebanyak gol (t boleh null + note N/C timestamp bila selebrasi tidak di frame).
 
 highlights[]: {t,type,team,playerNo,title,note,rating} type ∈ GOL|CHANCE|SKILL|SAVE|COACHING|LAINNYA. rating 1–5.
 
