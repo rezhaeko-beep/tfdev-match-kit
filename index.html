@@ -82,7 +82,7 @@
         <div class="card coach-desk-gemini">
           <div class="coach-desk-gemini-copy">
             <strong>Analisa video match</strong>
-            <span>Upload video → tempel kunci → Full auto. Hasil masuk Match Centre &amp; laporan.</span>
+            <span>Upload/Drive → AI nonton full video → Match Centre (skor, gol, stats).</span>
             <small class="coach-desk-gemini-hint">Teknis: Gemini · model <code>gemini-3.6-flash</code> (fallback otomatis) · key dari AI Studio</small>
           </div>
           <div class="btn-row" style="margin:0">
@@ -380,7 +380,7 @@ Scan sebelum terima bola</textarea></div>
         </button>
         <button type="button" class="an-wizard-step" data-an-step="2" id="anWizardStep2">
           <span class="an-wizard-n">2</span>
-          <span class="an-wizard-label"><strong>Analisa</strong><small>Full auto</small></span>
+          <span class="an-wizard-label"><strong>Analisa</strong><small>Full video</small></span>
         </button>
         <button type="button" class="an-wizard-step" data-an-step="3" id="anWizardStep3">
           <span class="an-wizard-n">3</span>
@@ -471,8 +471,8 @@ Scan sebelum terima bola</textarea></div>
               </div>
             </div>
 
-            <details class="an-drive-advanced" id="anDriveAdvanced">
-              <summary>Lanjutan · OAuth &amp; Analisa total Gemini</summary>
+            <details class="an-drive-advanced" id="anDriveAdvanced" open>
+              <summary>Drive · Analisa total Gemini (full video dari Pramu)</summary>
               <p class="ux-hint an-drive-pramu-hint">Video besar (~1GB+). <strong>Analisa total</strong> unduh via OAuth Drive lalu kirim video utuh ke Gemini Files. Atau <strong>Cepat</strong> = Drive + sample frame.</p>
               <div class="an-drive-gemini" id="anDriveGeminiBox">
                 <h4 class="an-drive-gemini-title">Analisa dari Drive · Gemini</h4>
@@ -489,7 +489,7 @@ Scan sebelum terima bola</textarea></div>
                   <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener noreferrer">Buka Credentials</a>
                 </p>
                 <div class="btn-row an-drive-gemini-actions">
-                  <button class="btn btn-cta" type="button" id="anDriveGeminiTotal" title="OAuth → unduh Drive → upload Gemini Files → generateContent video utuh">Analisa total · Gemini dari Drive</button>
+                  <button class="btn btn-cta" type="button" id="anDriveGeminiTotal" title="OAuth → unduh Drive → Gemini Files nonton utuh → Match Centre">AI nonton full video · dari Drive</button>
                   <button class="btn btn-ghost" type="button" id="anDriveGeminiFast" title="OAuth → unduh Drive → sample frame Full auto">Cepat · Drive + sample frame</button>
                 </div>
                 <p class="an-drive-gemini-status" id="anDriveGeminiStatus" role="status" aria-live="polite"></p>
@@ -509,9 +509,9 @@ Scan sebelum terima bola</textarea></div>
         <!-- STEP 2 · Analisa -->
         <div class="an-wizard-panel" id="anPanel2" data-an-panel="2" hidden>
           <div class="card">
-            <h3>Analisa · Full auto</h3>
+            <h3>Analisa · Match stats dari full video</h3>
             <p class="ux-hint" id="anFullAutoLead">
-              Tempel kunci API → tekan <strong style="color:#fff">Full auto</strong>. AI membaca video, lalu mengisi Match Centre &amp; perilaku.
+              Tempel kunci Gemini → tekan <strong style="color:#fff">AI nonton full video</strong>. Gemini Files menonton video utuh lalu mengisi Match Centre (skor, gol+detik, corner, save). Sample frame = cadangan cepat.
             </p>
             <!-- keep mode radios for JS; default API Vision -->
             <div class="chip-row gen-mode-row" style="margin-bottom:12px" hidden>
@@ -528,11 +528,12 @@ Scan sebelum terima bola</textarea></div>
 
             <div class="an-fullauto-banner" id="anFullAutoBanner">
               <div>
-                <strong id="anFullAutoTitle">Full auto</strong>
-                <span id="anFullAutoHint">Pastikan video sudah di-upload di langkah Upload, lalu tekan Full auto.</span>
+                <strong id="anFullAutoTitle">AI nonton full video</strong>
+                <span id="anFullAutoHint">Upload/Drive di langkah 1 → key Gemini → tombol ini. Untuk Match Centre stats akurat (gol terdeteksi).</span>
               </div>
-              <div class="btn-row" style="margin:0;flex-shrink:0">
-                <button class="btn btn-cta btn-lg" type="button" id="anFullAutoPrimary" title="Sample frame → Gemini Vision → semua modul">Full auto</button>
+              <div class="btn-row" style="margin:0;flex-shrink:0;flex-wrap:wrap;gap:8px">
+                <button class="btn btn-cta btn-lg" type="button" id="anFullVideoPrimary" title="Upload video ke Gemini Files → nonton utuh → Match Centre">AI nonton full video</button>
+                <button class="btn btn-ghost" type="button" id="anFullAutoPrimary" title="Cepat: sample ~8 frame saja">Cepat · sample frame</button>
               </div>
             </div>
 

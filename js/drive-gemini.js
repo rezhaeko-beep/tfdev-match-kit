@@ -422,8 +422,9 @@
   async function generateFromFile(fileUri, mimeType, apiKey, preferredModel) {
     const a = analitik();
     const system =
-      (a && typeof a.getSystemPrompt === "function" && a.getSystemPrompt()) ||
-      "Kamu analis youth football TFS/TFDEV. Output JSON { matchCentre, behaviorInsights, parentReports?, highlights? }. Bahasa Indonesia.";
+      ((a && typeof a.getSystemPrompt === "function" && a.getSystemPrompt()) ||
+        "Kamu analis youth football TFS/TFDEV. Output JSON { matchCentre, behaviorInsights, parentReports?, highlights? }. Bahasa Indonesia.") +
+      "\n\nFULL VIDEO MATCH STATS: kamu MENONTON video utuh. Wajib isi matchCentre.score, timeline GOL dengan t(detik) akurat bila selebrasi/gol terlihat, corners, saves, shots bila countable. Jangan default 0-0. Prefer Event Sheet/overlay jika terbaca. Gol yang terlihat di video HARUS masuk timeline type GOL.";
     const meta = (a && typeof a.readMeta === "function" && a.readMeta()) || {};
     const userText = buildFullVideoUserPrompt(meta);
     let models = MODEL_FALLBACKS.slice();
@@ -685,6 +686,75 @@
     }
   }
 
+  async function runLocalFullVideo() {
+    if (busy) {
+      toast("Analisa masih berjalan…");
+      return;
+    }
+    const a = analitik();
+    const apiKey = getGeminiApiKey();
+    if (!apiKey) {
+      throw new Error("API key Gemini kosong — paste di panel Analisa.");
+    }
+    let file = a && typeof a.getVideoFile === "function" ? a.getVideoFile() : null;
+    if (!file) {
+      // Fallback: try Drive path
+      const video = getSelectedDriveVideo();
+      if (video && video.id) {
+        return runAnalyze({ fast: false });
+      }
+      throw new Error("Belum ada video. Upload di langkah 1 atau pilih Drive Pramu.");
+    }
+    const size = file.size || 0;
+    if (size > 1.8 * 1024 * 1024 * 1024) {
+      throw new Error(
+        "Video terlalu besar untuk upload browser (~" +
+          formatBytes(size) +
+          "). Pakai proxy lebih kecil atau Analisa total dari Drive."
+      );
+    }
+    busy = true;
+    const btn = $("anFullVideoPrimary");
+    const btnFrame = $("anFullAutoPrimary");
+    if (btn) btn.disabled = true;
+    if (btnFrame) btnFrame.disabled = true;
+    try {
+      const filename = file.name || "match-video.mp4";
+      const mime = guessMime(filename, "", file.type || "");
+      setDriveStatus("Upload Gemini 0% · full video · " + formatBytes(size), true);
+      const uploaded = await resumableUploadGemini(file, filename, mime, apiKey, function (p, sent, total) {
+        setDriveStatus(
+          "Upload Gemini " + pct(p) + "% · full video · " + formatBytes(sent) + " / " + formatBytes(total),
+          true
+        );
+      });
+      setDriveStatus("Processing video · menunggu ACTIVE…", true);
+      const active = await pollFileActive(uploaded.name, apiKey, function (state, n) {
+        setDriveStatus("Processing video · " + (state || "…") + " (" + n + ")", true);
+      });
+      const preferred =
+        (a.getPreferredModel && a.getPreferredModel()) ||
+        (($("anApiModel") && $("anApiModel").value.trim()) || "gemini-3.6-flash");
+      const gen = await generateFromFile(active.uri, active.mimeType || mime, apiKey, preferred);
+      setDriveStatus("Applying · Match Centre dari full video · " + gen.model + "…", true);
+      const data = parseAiJsonLocal(gen.content);
+      if (typeof a.applyVisionResult !== "function") throw new Error("applyVisionResult belum siap");
+      a.applyVisionResult(data, { navigate: true });
+      setDriveStatus("Selesai · AI nonton full video → Match Centre diterapkan.", true);
+      toast("Full video · Match stats siap");
+    } catch (e) {
+      const msg = (e && e.message) || String(e);
+      setDriveStatus(msg, false);
+      toast("Full video gagal");
+      console.error("[full-video]", e);
+      throw e;
+    } finally {
+      busy = false;
+      if (btn) btn.disabled = false;
+      if (btnFrame) btnFrame.disabled = false;
+    }
+  }
+
   function wireUi() {
     if ($("anDriveGeminiTotal")) {
       $("anDriveGeminiTotal").addEventListener("click", function () {
@@ -717,6 +787,7 @@
   window.TFDEV.driveGemini = {
     init: init,
     runAnalyze: runAnalyze,
+    runLocalFullVideo: runLocalFullVideo,
     getClientId: getClientId,
     oauthSetupHelp: oauthSetupHelp
   };

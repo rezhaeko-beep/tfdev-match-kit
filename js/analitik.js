@@ -14,6 +14,7 @@
 
   let videoObjectUrl = null;
   let frames = []; // { id, t, dataUrl, w, h }
+  let lastVideoFile = null; // File/Blob for full-video Gemini upload
   let lastResult = null;
   let frameSeq = 0;
 
@@ -166,6 +167,7 @@
     if ($("anSource") && !$("anSource").value.trim()) {
       $("anSource").value = file.name.replace(/\.[^.]+$/, "");
     }
+    lastVideoFile = file;
     setStatus("Video dimuat: " + file.name, true);
     window.TFDEV.toast("Video siap");
   }
@@ -1860,6 +1862,7 @@
       return copyPrompt();
     },
     runFullAuto: runFullAuto,
+    getVideoFile: function () { return lastVideoFile; },
     applyAll: applyAll,
     applyVisionResult: applyVisionResult,
     loadVideoFile: loadVideoFile,
