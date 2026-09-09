@@ -99,6 +99,9 @@
       kitLawan: ($("anKitLawan") && $("anKitLawan").value.trim()) || "",
       babak: ($("anBabak") && $("anBabak").value.trim()) || "Babak 1",
       reportMode: ($("anReportMode") && $("anReportMode").value.trim()) || "auto",
+      readerAge: ($("anReaderAge") && $("anReaderAge").value.trim()) || "",
+      focus: ($("anFocus") && $("anFocus").value.trim()) || "",
+      scoreHint: ($("anScoreHint") && $("anScoreHint").value.trim()) || "",
       durasi: Number(($("anDurasi") && $("anDurasi").value) || 0) || durFromVideo,
       sourceFile: ($("anSource") && $("anSource").value.trim()) || "",
       player: {
@@ -2055,7 +2058,7 @@
     }
 
     // rebuild prompt when meta fields change
-    ["anLawan", "anKitLawan", "anBabak", "anDurasi", "anSource", "anPlayerName", "anPlayerNo", "anPlayerAge", "anPlayerPos"].forEach(
+    ["anLawan", "anKitLawan", "anBabak", "anReportMode", "anReaderAge", "anFocus", "anScoreHint", "anVideoFps", "anDurasi", "anSource", "anPlayerName", "anPlayerNo", "anPlayerAge", "anPlayerPos"].forEach(
       (id) => {
         const el = $(id);
         if (el) el.addEventListener("change", rebuildPromptPreview);
