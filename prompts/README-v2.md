@@ -12,3 +12,7 @@ Compatible with apply-all: `matchCentre`, optional `behaviorInsights`, `parentRe
 Score honesty: never default `0-0`; prefer coach Event Sheet / readable overlay; unclear → null + `scoreConfidence: low` (N/C).
 
 Modes: **full video** (Gemini Files, primary) vs **~8 frame sample** (fast fallback). Same apply path; score honesty rules identical.
+
+
+| `prompt-deep-watch-half.md` | Deep-watch satu babak (timeline, shape, pola, big chance) |
+| `prompt-full-match-report.md` | Gabung Babak 1+2: taktik antarbabak, sub, penilaian manajer |
