@@ -109,6 +109,32 @@
   }
 
   function softNormalizeRoot(data) {
+    // Bare kidsCard root (judul/ringkasan_anak without wrapper) → wrap
+    if (
+      data &&
+      !data.kidsCard &&
+      (data.ringkasan_anak || (data.judul && data.skor && (data.kamus || data.momen)))
+    ) {
+      data = {
+        kidsCard: {
+          judul: data.judul || "",
+          skor: data.skor || "",
+          ringkasan_anak: data.ringkasan_anak || "",
+          kamus: data.kamus || [],
+          momen: data.momen || [],
+          pemain: data.pemain || [],
+          pelajaran: data.pelajaran || [],
+          klip_wajib: data.klip_wajib || [],
+          keyakinan: data.keyakinan || "Sedang"
+        },
+        matchCentre: data.matchCentre,
+        behaviorInsights: data.behaviorInsights,
+        parentReports: data.parentReports,
+        highlights: data.highlights,
+        kidsProReport: data.kidsProReport,
+        playerDashboard: data.playerDashboard
+      };
+    }
     if (data && data.kidsCard && typeof data.kidsCard === "object") {
       var kc = data.kidsCard;
       if (!Array.isArray(kc.kamus)) kc.kamus = [];
