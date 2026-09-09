@@ -12,19 +12,18 @@
         home: "TFS",
         away: "G8",
         scoreH: 0,
-        scoreA: 0,
+        scoreA: 3,
         half: "Babak 1",
         stats: [
-          { label: "Clip", value: "12" },
-          { label: "Chance", value: "5" },
-          { label: "Skill", value: "2" },
-          { label: "Save", value: "1" },
-          { label: "Coach", value: "3" }
+          { label: "Goals", value: "0–3" },
+          { label: "Corner", value: "0–1" },
+          { label: "Saves", value: "3–0" },
+          { label: "SoT", value: "N/C" }
         ]
       },
       briefing: [
-        "Demo seed TFS vs G8 Babak 1 · skor 0–0 dari clip tags.",
-        "Peluang (CHANCE): TFS 3 · Lawan 2.",
+        "Demo seed TFS vs G8 Babak 1 · Event Sheet skor 0–3 · corner 0–1 · saves 3–0.",
+        "Match Centre pakai Goals / Corners / Saves — bukan tebakan 0–0.",
         "Clip SKILL & COACHING siap untuk ortu / CapCut."
       ],
       parentStory:
