@@ -855,10 +855,13 @@
   }
 
   async function init() {
-    if (!$("anDrivePramuCard") && !$("anDriveGeminiTotal")) return;
+    // Drive Pramu UI may be removed; still wire local full-video CTA
+    if (!$("anFullVideoPrimary") && !$("anDriveGeminiTotal") && !$("anDrivePramuCard")) return;
     wireUi();
-    await loadOauthConfig();
-    syncOauthFieldHelp();
+    try {
+      await loadOauthConfig();
+      syncOauthFieldHelp();
+    } catch (_) {}
   }
 
   window.TFDEV = window.TFDEV || {};

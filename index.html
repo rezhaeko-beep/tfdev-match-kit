@@ -82,7 +82,7 @@
         <div class="card coach-desk-gemini">
           <div class="coach-desk-gemini-copy">
             <strong>Analisa video match</strong>
-            <span>Upload/Drive → AI nonton full video → Match Centre (skor, gol, stats).</span>
+            <span>Upload video → AI nonton full video → Match Centre (skor, gol, stats).</span>
             <small class="coach-desk-gemini-hint">Teknis: Gemini · <code>gemini-2.5-pro</code> / <code>2.5-flash</code> · temp 0.2 · topP 0.9 · 1 video/request · key AI Studio</small>
           </div>
           <div class="btn-row" style="margin:0">
@@ -391,7 +391,7 @@ Scan sebelum terima bola</textarea></div>
       <div class="an-wizard-panels">
         <!-- STEP 1 · Upload -->
         <div class="an-wizard-panel is-active" id="anPanel1" data-an-panel="1">
-          <p class="an-step-lead">Pilih sumber video: <strong>upload file</strong> atau <strong>pilih dari Drive</strong>.</p>
+          <p class="an-step-lead">Upload file video match (lokal). Nanti bisa pakai Drive lagi.</p>
 
           <div class="grid grid-2">
             <div class="card">
@@ -468,60 +468,6 @@ Scan sebelum terima bola</textarea></div>
             </div>
           </div>
 
-          <div class="card an-drive-pramu" id="anDrivePramuCard">
-            <div class="an-drive-pramu-head">
-              <div>
-                <h3>Atau pilih video Drive</h3>
-                <p class="ux-hint" style="margin:4px 0 0">Katalog Bali 7 · <span id="anDrivePramuOwner">pramu.pr@totalfootballschool.com</span></p>
-              </div>
-              <span class="pill">Google Drive</span>
-            </div>
-            <div class="field">
-              <label>Video Bali 7</label>
-              <select id="anDrivePramuSelect" aria-label="Pilih video Drive Pramu">
-                <option value="">— Pilih video Bali 7 —</option>
-              </select>
-            </div>
-            <p class="an-drive-pramu-selected" id="anDrivePramuSelected">Belum ada video dipilih.</p>
-            <div class="btn-row" style="margin-top:10px">
-              <button class="btn btn-cta btn-sm" type="button" id="anDrivePramuUse" title="Isi meta lawan/babak/source dari katalog">Pakai video ini</button>
-              <button class="btn btn-ghost btn-sm" type="button" id="anDrivePramuOpen" title="Buka file di Google Drive">Buka di Drive</button>
-              <button class="btn btn-ghost btn-sm" type="button" id="anDrivePramuFolder" title="Buka folder Bali 7">Buka folder Bali 7</button>
-            </div>
-            <div class="field" style="margin-top:12px">
-              <label>Atau paste link / id Drive</label>
-              <div class="an-drive-pramu-paste">
-                <input id="anDrivePramuPaste" type="text" placeholder="https://drive.google.com/file/d/…/view atau file id" autocomplete="off" />
-                <button class="btn btn-ghost btn-sm" type="button" id="anDrivePramuPasteBtn">Pakai</button>
-              </div>
-            </div>
-
-            <details class="an-drive-advanced" id="anDriveAdvanced" open>
-              <summary>Drive · Analisa total Gemini (full video dari Pramu)</summary>
-              <p class="ux-hint an-drive-pramu-hint">Video besar (~1GB+). <strong>Analisa total</strong> unduh via OAuth Drive lalu kirim video utuh ke Gemini Files. Atau <strong>Cepat</strong> = Drive + sample frame.</p>
-              <div class="an-drive-gemini" id="anDriveGeminiBox">
-                <h4 class="an-drive-gemini-title">Analisa dari Drive · Gemini</h4>
-                <p class="ux-hint" style="margin:0 0 10px">Butuh: video terpilih + API key (langkah Analisa) + OAuth Client ID (sekali).</p>
-                <div class="field">
-                  <label for="anGoogleOauthClientId">Google OAuth Client ID</label>
-                  <input id="anGoogleOauthClientId" type="text" autocomplete="off" spellcheck="false" placeholder="….apps.googleusercontent.com" />
-                </div>
-                <p class="ux-hint an-oauth-help" id="anGoogleOauthHelp">
-                  Buat OAuth Web client di Google Cloud (project sama dengan Gemini). Authorized JavaScript origins:
-                  <code>https://rezhaeko-beep.github.io</code>,
-                  <code>http://127.0.0.1:8766</code>,
-                  <code>http://localhost:8766</code>.
-                  <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener noreferrer">Buka Credentials</a>
-                </p>
-                <div class="btn-row an-drive-gemini-actions">
-                  <button class="btn btn-cta" type="button" id="anDriveGeminiTotal" title="OAuth → unduh Drive → Gemini Files nonton utuh → Match Centre">AI nonton full video · dari Drive</button>
-                  <button class="btn btn-ghost" type="button" id="anDriveGeminiFast" title="OAuth → unduh Drive → sample frame Full auto">Cepat · Drive + sample frame</button>
-                </div>
-                <p class="an-drive-gemini-status" id="anDriveGeminiStatus" role="status" aria-live="polite"></p>
-              </div>
-            </details>
-          </div>
-
           <div class="an-wizard-nav">
             <span class="an-wizard-hint">Setelah video siap, lanjut ke Analisa.</span>
             <div class="btn-row">
@@ -554,7 +500,7 @@ Scan sebelum terima bola</textarea></div>
             <div class="an-fullauto-banner" id="anFullAutoBanner">
               <div>
                 <strong id="anFullAutoTitle">AI nonton full video</strong>
-                <span id="anFullAutoHint">Upload/Drive → key → AI nonton full video. Disarankan: 2.5-pro, temp 0.2, topP 0.9, 1 video/request, potong per babak. FPS 1 babak; 3–5 clip gol.</span>
+                <span id="anFullAutoHint">Upload video → key Gemini → AI nonton full video. Disarankan: 2.5-pro, temp 0.2, topP 0.9, 1 video/request, potong per babak. FPS 1 babak; 3–5 clip gol.</span>
               </div>
               <div class="btn-row" style="margin:0;flex-shrink:0;flex-wrap:wrap;gap:8px">
                 <button class="btn btn-cta btn-lg" type="button" id="anFullVideoPrimary" title="Upload video ke Gemini Files → nonton utuh → Match Centre">AI nonton full video</button>
@@ -1332,7 +1278,6 @@ Scan sebelum terima bola</textarea></div>
   <script src="js/metric-glossary.js"></script>
   <script src="js/json-repair.js"></script>
   <script src="js/analitik.js"></script>
-  <script src="js/drive-pramu.js"></script>
   <script src="js/drive-gemini.js"></script>
   <script src="js/highlights.js"></script>
   <script src="js/coach-analytics.js"></script>
