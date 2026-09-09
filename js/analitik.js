@@ -7,6 +7,8 @@
   const JPEG_QUALITY = 0.68;
   const CAPTURE_MAX_WIDTH = 960;
   const GEMINI_MODEL_FALLBACKS = [
+    "gemini-2.5-pro",
+    "gemini-2.5-flash",
     "gemini-3.6-flash",
     "gemini-3.5-flash",
     "gemini-flash-latest"
@@ -625,7 +627,7 @@
       /\/$/,
       ""
     );
-    const preferred = ($("anApiModel") && $("anApiModel").value.trim()) || "gemini-3.6-flash";
+    const preferred = ($("anApiModel") && $("anApiModel").value.trim()) || "gemini-2.5-pro";
     const key = ($("anApiKey") && $("anApiKey").value.trim()) || localStorage.getItem(API_KEY_LS) || "";
     if (!key) throw new Error("API key kosong — paste key Gemini di atas (disimpan di localStorage).");
 
@@ -1425,7 +1427,7 @@
   function loadApiSettings() {
     const key = localStorage.getItem(API_KEY_LS) || "";
     let base = localStorage.getItem(API_BASE_LS) || "https://generativelanguage.googleapis.com/v1beta/openai";
-    let model = localStorage.getItem(API_MODEL_LS) || "gemini-3.6-flash";
+    let model = localStorage.getItem(API_MODEL_LS) || "gemini-2.5-pro";
     // Migrate stale OpenAI / retired Gemini defaults so Full auto does not 404.
     const staleBase =
       !base ||
@@ -1442,7 +1444,7 @@
       localStorage.setItem(API_BASE_LS, base);
     }
     if (staleModel) {
-      model = "gemini-3.6-flash";
+      model = "gemini-2.5-pro";
       localStorage.setItem(API_MODEL_LS, model);
     }
     if ($("anApiKey")) $("anApiKey").value = key;
@@ -1899,7 +1901,7 @@
       return (($("anApiKey") && $("anApiKey").value.trim()) || localStorage.getItem(API_KEY_LS) || "");
     },
     getPreferredModel: function () {
-      return (($("anApiModel") && $("anApiModel").value.trim()) || localStorage.getItem(API_MODEL_LS) || "gemini-3.6-flash");
+      return (($("anApiModel") && $("anApiModel").value.trim()) || localStorage.getItem(API_MODEL_LS) || "gemini-2.5-pro");
     },
     buildModelFallbackChain: buildModelFallbackChain,
     getLast: function () {

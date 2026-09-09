@@ -9,7 +9,7 @@
   const GSI_SRC = "https://accounts.google.com/gsi/client";
   const GEMINI_UPLOAD = "https://generativelanguage.googleapis.com/upload/v1beta/files";
   const GEMINI_API = "https://generativelanguage.googleapis.com/v1beta";
-  const MODEL_FALLBACKS = ["gemini-3.6-flash", "gemini-3.5-flash", "gemini-flash-latest"];
+  const MODEL_FALLBACKS = ["gemini-2.5-pro", "gemini-2.5-flash", "gemini-3.6-flash", "gemini-flash-latest"];
   const UPLOAD_CHUNK = 8 * 1024 * 1024; // 8 MiB
 
   let oauthCfg = null;
@@ -441,6 +441,12 @@
 
   async function generateFromFile(fileUri, mimeType, apiKey, preferredModel) {
     const a = analitik();
+    const metaEarly = (a && typeof a.readMeta === "function" && a.readMeta()) || {};
+    // Long half / full match: fps 1. Goal/highlight clips: 3–5 (meta.fps or babak hint).
+    let fps = 1;
+    const fpsOpt = Number(metaEarly.fps || ($("anVideoFps") && $("anVideoFps").value));
+    if (fpsOpt === 3 || fpsOpt === 5 || fpsOpt === 1) fps = fpsOpt;
+    else if (/gol|highlight|clip|cepat/i.test(String(metaEarly.babak || ""))) fps = 3;
     const system =
       ((a && typeof a.getSystemPrompt === "function" && a.getSystemPrompt()) ||
         "Kamu analis youth football TFS/TFDEV. Output JSON { matchCentre, behaviorInsights, parentReports?, highlights? }. Bahasa Indonesia.") +
@@ -480,12 +486,16 @@
               {
                 role: "user",
                 parts: [
-                  { fileData: { mimeType: mimeType, fileUri: fileUri } },
+                  // 1 video per request · video dulu, teks belakangan
+                  {
+                    fileData: { mimeType: mimeType, fileUri: fileUri },
+                    videoMetadata: { fps: fps }
+                  },
                   { text: userText }
                 ]
               }
             ],
-            generationConfig: { temperature: 0.2 }
+            generationConfig: { temperature: 0.2, topP: 0.9 }
           })
         });
       } catch (netErr) {
@@ -667,7 +677,7 @@
 
       const preferred =
         (a.getPreferredModel && a.getPreferredModel()) ||
-        (($("anApiModel") && $("anApiModel").value.trim()) || "gemini-3.6-flash");
+        (($("anApiModel") && $("anApiModel").value.trim()) || "gemini-2.5-pro");
       const gen = await generateFromFile(active.uri, active.mimeType || mime, apiKey, preferred);
       setDriveStatus("Applying · parse JSON · " + gen.model + "…", true);
       const data = parseAiJsonLocal(gen.content);
@@ -754,7 +764,7 @@
       });
       const preferred =
         (a.getPreferredModel && a.getPreferredModel()) ||
-        (($("anApiModel") && $("anApiModel").value.trim()) || "gemini-3.6-flash");
+        (($("anApiModel") && $("anApiModel").value.trim()) || "gemini-2.5-pro");
       const gen = await generateFromFile(active.uri, active.mimeType || mime, apiKey, preferred);
       setDriveStatus("Applying · Match Centre dari full video · " + gen.model + "…", true);
       const data = parseAiJsonLocal(gen.content);
