@@ -1886,6 +1886,7 @@
     applyVisionResult: applyVisionResult,
     parseAiJson: parseAiJson,
     runFullAuto: runFullAuto,
+    getVideoFile: function () { return lastVideoFile; },
     applyAll: applyAll,
     getSystemPrompt: getSystemPrompt,
     readMeta: readMeta,
