@@ -31,12 +31,16 @@
   }
 
   function setDriveStatus(msg, ok) {
-    const el = $("anDriveGeminiStatus");
-    if (el) {
+    const els = [$("anDriveGeminiStatus"), $("anFullVideoStatus")].filter(Boolean);
+    els.forEach(function (el) {
       el.textContent = msg || "";
       el.className =
-        "an-drive-gemini-status" + (msg ? (ok === false ? " err" : ok ? " ok" : "") : "");
-    }
+        (el.id === "anFullVideoStatus" ? "gen-status" : "an-drive-gemini-status") +
+        (msg ? (ok === false ? " err" : ok ? " ok" : "") : "");
+      if (el.id === "anFullVideoStatus") {
+        el.hidden = !msg;
+      }
+    });
     const a = analitik();
     if (a && typeof a.setStatus === "function" && msg) {
       a.setStatus(msg, ok !== false);
@@ -772,7 +776,10 @@
     const a = analitik();
     const apiKey = getGeminiApiKey();
     if (!apiKey) {
-      throw new Error("API key Gemini kosong — paste di panel Analisa.");
+      const msg = "API key Gemini kosong — paste di panel Analisa.";
+      setDriveStatus(msg, false);
+      toast("Full video gagal");
+      throw new Error(msg);
     }
     let file = a && typeof a.getVideoFile === "function" ? a.getVideoFile() : null;
     if (!file) {
@@ -781,15 +788,20 @@
       if (video && video.id) {
         return runAnalyze({ fast: false });
       }
-      throw new Error("Belum ada video. Upload di langkah 1 atau pilih Drive Pramu.");
+      const msg = "Belum ada video. Upload di langkah 1 dulu.";
+      setDriveStatus(msg, false);
+      toast("Full video gagal");
+      throw new Error(msg);
     }
     const size = file.size || 0;
     if (size > 1.8 * 1024 * 1024 * 1024) {
-      throw new Error(
+      const msg =
         "Video terlalu besar untuk upload browser (~" +
-          formatBytes(size) +
-          "). Pakai proxy lebih kecil atau Analisa total dari Drive."
-      );
+        formatBytes(size) +
+        "). Potong per babak atau pakai file lebih kecil.";
+      setDriveStatus(msg, false);
+      toast("Full video gagal");
+      throw new Error(msg);
     }
     busy = true;
     const btn = $("anFullVideoPrimary");
@@ -834,6 +846,14 @@
   }
 
   function wireUi() {
+    if ($("anFullVideoPrimary") && !$("anFullVideoPrimary").__fvBound) {
+      $("anFullVideoPrimary").__fvBound = true;
+      $("anFullVideoPrimary").addEventListener("click", function () {
+        runLocalFullVideo().catch(function () {
+          /* status + toast already set in runLocalFullVideo */
+        });
+      });
+    }
     if ($("anDriveGeminiTotal")) {
       $("anDriveGeminiTotal").addEventListener("click", function () {
         runAnalyze({ fast: false });
@@ -873,4 +893,11 @@
     oauthSetupHelp: oauthSetupHelp
   };
   window.TFDEV.initDriveGemini = init;
+
+  // Eager wire: CTA must work even if initDriveGemini is skipped or delayed.
+  if (document.getElementById("anFullVideoPrimary")) {
+    try {
+      wireUi();
+    } catch (_) {}
+  }
 })();
