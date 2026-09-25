@@ -44,4 +44,9 @@
   const hash = (location.hash || "#home").replace("#", "");
   if (document.getElementById("page-" + hash)) showPage(hash);
   else showPage("home");
+
+  window.addEventListener("hashchange", () => {
+    const id = (location.hash || "#home").replace("#", "");
+    if (document.getElementById("page-" + id)) showPage(id);
+  });
 })();
