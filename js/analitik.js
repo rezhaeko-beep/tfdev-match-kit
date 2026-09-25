@@ -1521,13 +1521,13 @@
     const hint = $("anFullAutoHint");
     if (title) {
       title.textContent = ready
-        ? "Siap Full auto · Gemini · observasi detail"
-        : "Full auto · Gemini Vision · observasi detail";
+        ? "Siap · AI nonton full video"
+        : "AI nonton full video";
     }
     if (hint) {
       hint.textContent = ready
-        ? "Siap Full auto · Gemini — sample hingga 8 frame → observasi perilaku manusia detail → modul."
-        : "Paste key Gemini di atas, lalu Full auto (observasi perilaku detail)";
+        ? "Key siap — tekan AI nonton full video (Gemini Files). Cadangan: Cepat · sample frame."
+        : "Paste key Gemini di atas, upload video di langkah 1, lalu tekan AI nonton full video.";
     }
   }
 
