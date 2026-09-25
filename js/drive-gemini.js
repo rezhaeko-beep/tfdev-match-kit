@@ -85,7 +85,7 @@
     return (
       "OAuth Client ID belum diisi. Buat OAuth 2.0 Client ID (tipe Web application) di Google Cloud " +
       "(project yang sama dengan Gemini API), lalu isi Authorized JavaScript origins:\n" +
-      "• https://rezhaeko-beep.github.io\n" +
+      "• https://tfdevpro.github.io\n" +
       "• http://127.0.0.1:8766\n" +
       "• http://localhost:8766\n" +
       "Paste Client ID ke field «Google OAuth Client ID» (disimpan di browser). " +
