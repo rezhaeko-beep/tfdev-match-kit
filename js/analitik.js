@@ -1813,6 +1813,22 @@
       });
     };
     if ($("anFullAutoPrimary")) $("anFullAutoPrimary").addEventListener("click", runFull);
+
+    // Safety net: primary full-video CTA must always be wired (also wired in drive-gemini).
+    const fvBtn = $("anFullVideoPrimary");
+    if (fvBtn && !fvBtn.__fvBound) {
+      fvBtn.__fvBound = true;
+      fvBtn.addEventListener("click", () => {
+        const dg = window.TFDEV && window.TFDEV.driveGemini;
+        if (dg && typeof dg.runLocalFullVideo === "function") {
+          dg.runLocalFullVideo().catch(() => {});
+          return;
+        }
+        setStatus("Full video belum siap — refresh halaman.", false);
+        window.TFDEV.toast("Full video gagal");
+      });
+    }
+
     if ($("anLoadDemoJson")) {
       $("anLoadDemoJson").addEventListener("click", () => {
         try {

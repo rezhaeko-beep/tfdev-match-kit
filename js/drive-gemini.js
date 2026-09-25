@@ -893,4 +893,11 @@
     oauthSetupHelp: oauthSetupHelp
   };
   window.TFDEV.initDriveGemini = init;
+
+  // Eager wire: CTA must work even if initDriveGemini is skipped or delayed.
+  if (document.getElementById("anFullVideoPrimary")) {
+    try {
+      wireUi();
+    } catch (_) {}
+  }
 })();
