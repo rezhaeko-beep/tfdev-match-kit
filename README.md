@@ -18,10 +18,10 @@ Dark UI TFDEV (hitam + `#FF6B1A`), Bahasa Indonesia, mobile-friendly. **Tidak pe
 
 ## Hosting permanen (Pramu)
 
-- **Live:** https://rezhaeko-beep.github.io/tfdev-match-kit/
-- Highlights: https://rezhaeko-beep.github.io/tfdev-match-kit/#highlights
-- Analitik AI: https://rezhaeko-beep.github.io/tfdev-match-kit/#analitik
-- Repo: https://github.com/rezhaeko-beep/tfdev-match-kit
+- **Live:** https://tfdevpro.github.io/tfdev-match-kit/
+- Highlights: https://tfdevpro.github.io/tfdev-match-kit/#highlights
+- Analitik AI: https://tfdevpro.github.io/tfdev-match-kit/#analitik
+- Repo: https://github.com/tfdevpro/tfdev-match-kit
 
 
 ## Cara buka
@@ -67,7 +67,7 @@ Aturan prompt: primary evidence = VIDEO/frames; jangan mengarang; N/C / `null` +
 
 1. Di langkah **Upload**, pilih video katalog **Drive Pramu · Bali 7** (atau paste Drive id).
 2. Paste **API key Gemini** di panel Proses (localStorage).
-3. Isi **Google OAuth Client ID** (Web client, origins: `https://rezhaeko-beep.github.io`, `http://127.0.0.1:8766`, `http://localhost:8766`) — disimpan di `localStorage` `tfdev-google-oauth-client-id`. Config kosong di `data/google-oauth.json` (jangan commit secret).
+3. Isi **Google OAuth Client ID** (Web client, origins: `https://tfdevpro.github.io`, `http://127.0.0.1:8766`, `http://localhost:8766`) — disimpan di `localStorage` `tfdev-google-oauth-client-id`. Config kosong di `data/google-oauth.json` (jangan commit secret).
 4. **Analisa total · Gemini dari Drive** — GIS OAuth `drive.readonly` → unduh file → resumable upload Gemini Files → `generateContent` video utuh → apply Match Centre / parent / highlights.
 5. Atau **Cepat · Drive + sample frame** — unduh lalu `runFullAuto` (sample frame, lebih cepat).
 

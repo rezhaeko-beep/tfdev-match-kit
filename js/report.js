@@ -11,7 +11,7 @@
     return v(id).split(/\n+/).map((x) => x.trim()).filter(Boolean);
   }
 
-  const PAGES_URL = "https://rezhaeko-beep.github.io/tfdev-match-kit/";
+  const PAGES_URL = "https://tfdevpro.github.io/tfdev-match-kit/";
 
   function render() {
     const strengths = lines("prStrengths").map((t) => `<li>${esc(t)}</li>`).join("") || "<li>—</li>";
